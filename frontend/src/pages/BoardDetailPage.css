@@ -1,0 +1,64 @@
+.detail-container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  color: white;
+}
+
+.meta {
+  color: gray;
+  margin-bottom: 10px;
+}
+
+.content {
+  margin: 20px 0;
+  line-height: 1.5;
+}
+
+.post-actions button {
+  margin-right: 10px;
+  background-color: #00AEEF;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.comment-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  background: #2a2a2a;
+  color: white;
+  border: none;
+}
+
+.comment-form button {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #00AEEF;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.comment-item {
+  background-color: #1e1e1e;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+.comment-meta {
+  font-size: 0.9rem;
+  color: gray;
+}
+
+.comment-actions button {
+  margin-right: 5px;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+}
