@@ -24,7 +24,7 @@ function BoardWritePage() {
     try {
       const token = localStorage.getItem('accessToken');
       const res = await axios.post(
-        '/api/boards/',
+        '/board/posts/',
         { title, content, category },
         {
           headers: {
@@ -32,10 +32,21 @@ function BoardWritePage() {
           },
         }
       );
+
+      // 선택: 작성 후 입력 초기화
+      setTitle('');
+      setContent('');
+      setCategory('자유');
+
+      // 작성 완료 후 이동
       navigate('/community');
     } catch (err) {
-      setError('게시글 작성 중 오류가 발생했습니다.');
-      console.error(err);
+      console.error('게시글 작성 실패:', err);
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else {
+        setError('게시글 작성 중 오류가 발생했습니다.');
+      }
     }
   };
 
