@@ -1,4 +1,4 @@
-/* 🎬 전체 페이지 레이아웃 */
+/* 🎬 영화 상세 페이지 전체 레이아웃 */
 .movie-detail-container {
   padding: 20px;
   background-color: #141414;
@@ -6,38 +6,15 @@
   min-height: 100vh;
 }
 
-/* 🎥 영화 정보 섹션 래퍼 */
-.movie-info-wrapper {
-  margin-bottom: 3rem;
-}
-
-/* 🖼 영화 정보 콘텐츠 */
-.movie-info {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.movie-info h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: white;
-}
-
-.movie-info img {
-  max-width: 280px;
+.movie-detail-container img {
+  max-width: 100%;
   border-radius: 10px;
-  margin: 1rem auto;
-  display: block;
+  margin-bottom: 15px;
 }
 
-.movie-info p {
-  font-size: 1.1rem;
-  color: #d1d1d1;
-}
-
+/* 📺 OTT 로고 표시 */
 .ott-logos {
   display: flex;
-  justify-content: center;
   gap: 10px;
   margin: 10px 0;
 }
@@ -47,11 +24,7 @@
   height: auto;
 }
 
-/* 📝 리뷰 작성 섹션 */
-.review-write-wrapper {
-  margin-bottom: 3rem;
-}
-
+/* 📝 리뷰 작성 폼 */
 .review-form {
   display: flex;
   flex-direction: column;
@@ -92,25 +65,23 @@
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.3s ease;
 }
 
 .review-form button:disabled {
   background-color: gray;
 }
 
-/* 🧾 리뷰 목록 공통 */
+/* 🧾 리뷰 목록 */
 .reviews {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
 .review-card {
-  background-color: #1e1e1e;
+  background-color: #222;
   padding: 15px;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   color: white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .review-card button {
@@ -203,15 +174,4 @@
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
-}
-
-/* ⏳ 로딩 화면 */
-.loading-container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #141414;
-  flex-direction: column;
-  color: white;
 }

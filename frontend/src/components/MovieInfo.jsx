@@ -5,7 +5,7 @@ import React from 'react';
  * @param {Object} props - 영화 객체
  */
 const MovieInfo = ({ movie }) => {
-  if (!movie) return null; // 영화 정보가 없을 경우 렌더링 생략
+  if (!movie) return null; // movie가 없는 경우 아무것도 렌더링하지 않음
 
   return (
     <section className="movie-info">
@@ -19,7 +19,7 @@ const MovieInfo = ({ movie }) => {
 
       <p className="movie-description">{movie.description}</p>
 
-      {movie.ott_list && movie.ott_list.length > 0 && (
+      {movie.ott_list?.length > 0 && (
         <div className="ott-logos">
           {movie.ott_list.map((ott) => (
             <img
