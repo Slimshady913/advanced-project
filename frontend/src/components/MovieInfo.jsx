@@ -5,23 +5,33 @@ import React from 'react';
  * @param {Object} props - 영화 객체
  */
 const MovieInfo = ({ movie }) => {
-  return (
-    <div className="movie-info">
-      <h1>{movie.title}</h1>
-      <img src={movie.thumbnail_url} alt={movie.title} />
-      <p>{movie.description}</p>
+  if (!movie) return null; // 영화 정보가 없을 경우 렌더링 생략
 
-      <div className="ott-logos">
-        {movie.ott_list?.map(ott => (
-          <img
-            key={ott.id}
-            src={ott.logo_url}
-            alt={ott.name}
-            className="ott-logo"
-          />
-        ))}
-      </div>
-    </div>
+  return (
+    <section className="movie-info">
+      <h1 className="movie-title">{movie.title}</h1>
+
+      <img
+        src={movie.thumbnail_url}
+        alt={`${movie.title} 포스터`}
+        className="movie-thumbnail"
+      />
+
+      <p className="movie-description">{movie.description}</p>
+
+      {movie.ott_list && movie.ott_list.length > 0 && (
+        <div className="ott-logos">
+          {movie.ott_list.map((ott) => (
+            <img
+              key={ott.id}
+              src={ott.logo_url}
+              alt={ott.name}
+              className="ott-logo"
+            />
+          ))}
+        </div>
+      )}
+    </section>
   );
 };
 

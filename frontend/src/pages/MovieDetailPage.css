@@ -1,4 +1,4 @@
-/* 🎬 영화 상세 페이지 전체 레이아웃 */
+/* 🎬 전체 페이지 레이아웃 */
 .movie-detail-container {
   padding: 20px;
   background-color: #141414;
@@ -6,7 +6,12 @@
   min-height: 100vh;
 }
 
-/* 🖼 영화 정보 섹션 */
+/* 🎥 영화 정보 섹션 래퍼 */
+.movie-info-wrapper {
+  margin-bottom: 3rem;
+}
+
+/* 🖼 영화 정보 콘텐츠 */
 .movie-info {
   text-align: center;
   margin-bottom: 2rem;
@@ -27,7 +32,7 @@
 
 .movie-info p {
   font-size: 1.1rem;
-  color: #ccc;
+  color: #d1d1d1;
 }
 
 .ott-logos {
@@ -42,7 +47,11 @@
   height: auto;
 }
 
-/* 📝 리뷰 작성 폼 */
+/* 📝 리뷰 작성 섹션 */
+.review-write-wrapper {
+  margin-bottom: 3rem;
+}
+
 .review-form {
   display: flex;
   flex-direction: column;
