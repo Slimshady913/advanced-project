@@ -10,7 +10,10 @@ import SubscribePage from './pages/SubscribePage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import { ClipLoader } from 'react-spinners';
 import axios from './api/axios';
-
+import BoardListPage from './pages/BoardListPage.jsx';
+import BoardWritePage from './pages/BoardWritePage.jsx';
+import BoardDetailPage from './pages/BoardDetailPage.jsx';
+import BoardEditPage from './pages/BoardEditPage.jsx';
 /**
  * App: 루트 컴포넌트
  * - 로그인 상태 체크 및 헤더 렌더링
@@ -113,6 +116,25 @@ function App() {
             element={
               <PrivateRoute isLoggedIn={isLoggedIn}>
                 <ProfilePage setGlobalUsername={setUsername} />
+              </PrivateRoute>
+            }
+          />
+          {/* 🗣️ 커뮤니티 게시판 */}
+          <Route path="/community" element={<BoardListPage />} />
+          <Route
+            path="/community/write"
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <BoardWritePage />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/community/:id" element={<BoardDetailPage />} />
+          <Route
+            path="/community/edit/:id"
+            element={
+              <PrivateRoute isLoggedIn={isLoggedIn}>
+                <BoardEditPage />
               </PrivateRoute>
             }
           />
