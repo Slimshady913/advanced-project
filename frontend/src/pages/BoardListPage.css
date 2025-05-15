@@ -1,0 +1,59 @@
+.board-container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  color: #fff;
+}
+
+.board-title {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.category-tabs button {
+  padding: 8px 16px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.category-tabs button.active {
+  background-color: #00AEEF;
+  font-weight: bold;
+}
+
+.write-button {
+  background-color: #00AEEF;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.post-card {
+  background-color: #1f1f1f;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.post-card:hover {
+  background-color: #2a2a2a;
+}
