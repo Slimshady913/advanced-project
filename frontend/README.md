@@ -83,6 +83,43 @@
   - 추천순 정렬 시 상위 3개 댓글 우선 표시
 - 스타일 유지보수: `MovieDetailPage.css`에 별도 스타일 정리
 
+### ✅ 커뮤니티 기능 (Board)
+
+#### 📄 BoardListPage.jsx
+- 게시글 목록 조회: `/board/posts/` API 연동
+- 카테고리 탭 구현: 자유, 국내/해외 드라마/영화, 인기 게시판
+- `category` 쿼리 파라미터로 필터링 처리
+- 게시글 카드 클릭 시 상세 페이지(`/community/:id`)로 이동
+- 로그인 사용자만 '글쓰기' 버튼 표시
+- 스타일 유지보수: `BoardListPage.css`에 정리 (Netflix 스타일 + 밝은 배경 구조 반영)
+
+#### 📝 BoardWritePage.jsx
+- 게시글 작성 폼 구현: 제목, 내용, 카테고리 입력
+- 게시글 작성 요청: `POST /board/posts/`
+- 작성 완료 시 게시판 목록(`/community`)으로 리디렉션
+- 로그인 사용자 전용 경로 (`/community/write`)
+- 드롭다운으로 카테고리 선택 가능
+
+#### 📑 BoardDetailPage.jsx
+- 게시글 상세 조회: `GET /board/posts/:id/`
+- 제목, 내용, 작성자, 작성일 출력
+- 로그인한 작성자일 경우 ‘수정’/‘삭제’ 버튼 표시
+- 댓글 목록 조회: `GET /board/posts/:id/comments/`
+  - 추천수 상위 3개 + 작성순 댓글 정렬 혼합 구조
+- 댓글 작성, 삭제, 추천(좋아요) 기능 구현
+  - 작성: `POST /board/posts/:id/comments/`
+  - 삭제: `DELETE /board/comments/:id/`
+  - 추천: `POST /board/comments/:id/like/`
+- 스타일: muko.kr 스타일 참고
+  - 밝은 회색 배경(`#f9f9f9`), 어두운 텍스트(`#333`), 흰색 카드, 하늘색 버튼 유지
+
+#### ✏️ BoardEditPage.jsx
+- 기존 게시글 정보 불러오기: `GET /board/posts/:id/`
+- 제목, 내용, 카테고리 수정 가능
+- 수정 요청: `PUT /board/posts/:id/`
+- 수정 완료 시 상세 페이지로 리디렉션
+- 기존 값 자동 세팅, 카테고리 드롭다운 유지
+
 ---
 
 ## 💡 기술 스택
