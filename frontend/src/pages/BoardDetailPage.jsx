@@ -21,7 +21,7 @@ function BoardDetailPage() {
 
   const fetchPost = async () => {
     try {
-      const res = await axios.get(`/api/boards/${id}/`);
+      const res = await axios.get(`/board/posts/${id}/`);
       setPost(res.data);
     } catch (err) {
       console.error('게시글 조회 실패', err);
@@ -30,7 +30,7 @@ function BoardDetailPage() {
 
   const fetchComments = async () => {
     try {
-      const res = await axios.get(`/api/boards/${id}/comments/`);
+      const res = await axios.get(`/board/posts/${id}/comments/`);
       setComments(res.data);
     } catch (err) {
       console.error('댓글 목록 불러오기 실패', err);
@@ -46,7 +46,7 @@ function BoardDetailPage() {
 
     try {
       await axios.post(
-        `/api/boards/${id}/comments/`,
+        `/board/posts/${id}/comments/`,
         { content: newComment },
         {
           headers: {
@@ -63,7 +63,7 @@ function BoardDetailPage() {
 
   const handleCommentDelete = async (commentId) => {
     try {
-      await axios.delete(`/api/comments/${commentId}/`, {
+      await axios.delete(`/board/comments/${commentId}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -77,7 +77,7 @@ function BoardDetailPage() {
   const handleCommentLike = async (commentId, isLike) => {
     try {
       await axios.post(
-        `/api/comments/${commentId}/like/`,
+        `/board/comments/${commentId}/like/`,
         { is_like: isLike },
         {
           headers: {
@@ -94,7 +94,7 @@ function BoardDetailPage() {
   const handlePostDelete = async () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`/api/boards/${id}/`, {
+        await axios.delete(`/board/posts/${id}/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
