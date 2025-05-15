@@ -17,7 +17,7 @@ function Header({ isLoggedIn, username, onLogout }) {
         <Link to="/" className="logo">MovieRC</Link>
         <nav className="nav-links">
           <Link to="/">영화</Link>
-          <Link to="/board">게시판</Link>
+          <Link to="/community">게시판</Link>
         </nav>
       </div>
 
