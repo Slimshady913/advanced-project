@@ -19,6 +19,9 @@ function BoardDetailPage() {
     fetchComments();
   }, [id]);
 
+  console.log('post:', post);
+  console.log('comments:', comments);
+
   const fetchPost = async () => {
     try {
       const res = await axios.get(`/board/posts/${id}/`);
@@ -111,10 +114,10 @@ function BoardDetailPage() {
       {post && (
         <>
           <h2>{post.title}</h2>
-          <p className="meta">작성자: {post.user.username} | {post.created_at.slice(0, 10)}</p>
+          <p className="meta">작성자: {post.user} | {post.created_at.slice(0, 10)}</p>
           <p className="content">{post.content}</p>
 
-          {username === post.user.username && (
+          {username === post.user && (
             <div className="post-actions">
               <button onClick={() => navigate(`/community/edit/${post.id}`)}>수정</button>
               <button onClick={handlePostDelete}>삭제</button>
@@ -135,11 +138,11 @@ function BoardDetailPage() {
           <div className="comment-list">
             {comments.map((comment) => (
               <div key={comment.id} className="comment-item">
-                <p>{comment.user.username}: {comment.content}</p>
+                <p>{comment.user}: {comment.content}</p>
                 <p className="comment-meta">{comment.created_at.slice(0, 10)}</p>
                 <div className="comment-actions">
-                  <button onClick={() => handleCommentLike(comment.id, true)}>👍 {comment.like_count}</button>
-                  {comment.user.username === username && (
+                  <button onClick={() => handleCommentLike(comment.id, true)}>👍 {comment.like_count ?? 0}</button>
+                  {comment.user === username && (
                     <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
                   )}
                 </div>
