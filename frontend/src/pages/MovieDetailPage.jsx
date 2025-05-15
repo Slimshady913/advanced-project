@@ -154,74 +154,82 @@ const MovieDetailPage = () => {
 
   return (
     <div className="movie-detail-container">
-      {/* 🎬 영화 상세 정보 */}
-      <MovieInfo movie={movie} />
+      {/* 🎬 영화 정보 - 반드시 최상단에 배치 */}
+      <section className="movie-info-wrapper">
+        <MovieInfo movie={movie} />
+      </section>
 
-      {/* 📝 리뷰 작성 폼 */}
-      <h2>📝 리뷰 작성</h2>
-      <ReviewForm
-        reviewData={newReview}
-        onChange={setNewReview}
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
-      />
+      {/* 📝 리뷰 작성 */}
+      <section className="review-write-wrapper">
+        <h2>📝 리뷰 작성</h2>
+        <ReviewForm
+          reviewData={newReview}
+          onChange={setNewReview}
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+        />
+      </section>
 
-      {/* 🎖️ 추천 Top 3 */}
-      <h2>🎖️ Top 3 리뷰</h2>
-      <div className="reviews">
-        {top3Reviews.length === 0 ? (
-          <p>아직 추천된 리뷰가 없습니다.</p>
-        ) : (
-          top3Reviews.map((review) => (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              isTop={true}
-              isEditing={editReviewId === review.id}
-              editReviewData={editReviewData}
-              onEditChange={setEditReviewData}
-              onEditSubmit={handleEditSubmit}
-              onCancelEdit={cancelEditing}
-              onEditStart={startEditing}
-              onDelete={handleDelete}
-              onLike={handleLike}
-              token={token}
-              commentState={newComment}
-              onCommentChange={handleCommentChange}
-              onCommentSubmit={handleCommentSubmit}
-              onCommentDelete={handleCommentDelete}
-            />
-          ))
-        )}
-      </div>
+      {/* 🎖️ Top 3 리뷰 */}
+      <section>
+        <h2>🎖️ Top 3 리뷰</h2>
+        <div className="reviews">
+          {top3Reviews.length === 0 ? (
+            <p>아직 추천된 리뷰가 없습니다.</p>
+          ) : (
+            top3Reviews.map((review) => (
+              <ReviewCard
+                key={review.id}
+                review={review}
+                isTop={true}
+                isEditing={editReviewId === review.id}
+                editReviewData={editReviewData}
+                onEditChange={setEditReviewData}
+                onEditSubmit={handleEditSubmit}
+                onCancelEdit={cancelEditing}
+                onEditStart={startEditing}
+                onDelete={handleDelete}
+                onLike={handleLike}
+                token={token}
+                commentState={newComment}
+                onCommentChange={handleCommentChange}
+                onCommentSubmit={handleCommentSubmit}
+                onCommentDelete={handleCommentDelete}
+              />
+            ))
+          )}
+        </div>
+      </section>
 
-      {/* 📝 나머지 리뷰 */}
-      <h2>📝 다른 리뷰</h2>
-      <div className="reviews">
-        {otherReviews.length === 0 ? (
-          <p>다른 리뷰가 없습니다.</p>
-        ) : (
-          otherReviews.map((review) => (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              isEditing={editReviewId === review.id}
-              editReviewData={editReviewData}
-              onEditChange={setEditReviewData}
-              onEditSubmit={handleEditSubmit}
-              onCancelEdit={cancelEditing}
-              onEditStart={startEditing}
-              onDelete={handleDelete}
-              onLike={handleLike}
-              token={token}
-              commentState={newComment}
-              onCommentChange={handleCommentChange}
-              onCommentSubmit={handleCommentSubmit}
-              onCommentDelete={handleCommentDelete}
-            />
-          ))
-        )}
-      </div>
+      {/* 📋 다른 리뷰 */}
+      <section>
+        <h2>📝 다른 리뷰</h2>
+        <div className="reviews">
+          {otherReviews.length === 0 ? (
+            <p>다른 리뷰가 없습니다.</p>
+          ) : (
+            otherReviews.map((review) => (
+              <ReviewCard
+                key={review.id}
+                review={review}
+                isEditing={editReviewId === review.id}
+                editReviewData={editReviewData}
+                onEditChange={setEditReviewData}
+                onEditSubmit={handleEditSubmit}
+                onCancelEdit={cancelEditing}
+                onEditStart={startEditing}
+                onDelete={handleDelete}
+                onLike={handleLike}
+                token={token}
+                commentState={newComment}
+                onCommentChange={handleCommentChange}
+                onCommentSubmit={handleCommentSubmit}
+                onCommentDelete={handleCommentDelete}
+              />
+            ))
+          )}
+        </div>
+      </section>
     </div>
   );
 };
