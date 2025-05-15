@@ -1,0 +1,35 @@
+.write-container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  color: white;
+}
+
+.write-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.write-form input,
+.write-form textarea,
+.write-form select {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #2a2a2a;
+  color: white;
+}
+
+.write-form button {
+  padding: 12px;
+  background-color: #00AEEF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.error-message {
+  color: #ff4d4f;
+}
