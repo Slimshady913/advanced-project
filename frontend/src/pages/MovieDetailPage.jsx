@@ -154,8 +154,10 @@ const MovieDetailPage = () => {
 
   return (
     <div className="movie-detail-container">
+      {/* 🎬 영화 상세 정보 */}
       <MovieInfo movie={movie} />
 
+      {/* 📝 리뷰 작성 폼 */}
       <h2>📝 리뷰 작성</h2>
       <ReviewForm
         reviewData={newReview}
@@ -164,6 +166,7 @@ const MovieDetailPage = () => {
         isSubmitting={isSubmitting}
       />
 
+      {/* 🎖️ 추천 Top 3 */}
       <h2>🎖️ Top 3 리뷰</h2>
       <div className="reviews">
         {top3Reviews.length === 0 ? (
@@ -192,6 +195,7 @@ const MovieDetailPage = () => {
         )}
       </div>
 
+      {/* 📝 나머지 리뷰 */}
       <h2>📝 다른 리뷰</h2>
       <div className="reviews">
         {otherReviews.length === 0 ? (
