@@ -6,10 +6,16 @@
   min-height: 100vh;
 }
 
-/* 🖼 영화 정보 */
+/* 🖼 영화 정보 섹션 */
 .movie-info {
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.movie-info h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: white;
 }
 
 .movie-info img {
@@ -19,7 +25,11 @@
   display: block;
 }
 
-/* 📺 OTT 로고 표시 */
+.movie-info p {
+  font-size: 1.1rem;
+  color: #ccc;
+}
+
 .ott-logos {
   display: flex;
   justify-content: center;
@@ -80,7 +90,7 @@
   background-color: gray;
 }
 
-/* 🧾 리뷰 목록 */
+/* 🧾 리뷰 목록 공통 */
 .reviews {
   margin-top: 30px;
 }
@@ -184,4 +194,15 @@
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* ⏳ 로딩 화면 */
+.loading-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #141414;
+  flex-direction: column;
+  color: white;
 }
