@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import './BoardWritePage.css'; // 작성 페이지 스타일 재사용
+import './BoardWritePage.css';
 
 const categories = ['자유', '국내 드라마', '해외 드라마', '국내 영화', '해외 영화'];
 
@@ -19,11 +19,12 @@ function BoardEditPage() {
 
   const fetchPost = async () => {
     try {
-      const res = await axios.get(`/api/boards/${id}/`);
+      const res = await axios.get(`/board/posts/${id}/`);
       const post = res.data;
       setTitle(post.title);
       setContent(post.content);
-      setCategory(post.category);
+      // category: 문자열 또는 { name: '...' } 형태 둘 다 대응
+      setCategory(post.category.name || post.category);
     } catch (err) {
       console.error('게시글 불러오기 실패', err);
     }
@@ -41,7 +42,7 @@ function BoardEditPage() {
     try {
       const token = localStorage.getItem('accessToken');
       await axios.put(
-        `/api/boards/${id}/`,
+        `/board/posts/${id}/`,
         { title, content, category },
         {
           headers: {
