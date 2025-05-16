@@ -41,6 +41,9 @@ const MoviesPage = ({ isLoggedIn }) => {
     axios.get(url)
       .then(res => {
         setMovies(res.data);
+        res.data.forEach(m => {
+          console.log(m.title, m.ott_services);
+        });
         setError('');
       })
       .catch(err => {

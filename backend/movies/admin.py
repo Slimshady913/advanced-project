@@ -8,6 +8,8 @@ class MovieAdmin(admin.ModelAdmin):
     list_filter = ('release_date',)
     ordering = ('-average_rating_cache',)
 
+    filter_horizontal = ('ott_services',)  # ★ 여기 추가! ★
+
     def display_average_rating(self, obj):
         return round(obj.calculate_average_rating(), 1)
 
