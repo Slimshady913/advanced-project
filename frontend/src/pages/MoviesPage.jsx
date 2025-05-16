@@ -59,20 +59,21 @@ const MoviesPage = ({ isLoggedIn }) => {
           type="text"
           placeholder="영화 제목 검색"
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') setSearch(searchInput);
-          }}
+          onChange={e => setSearchInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && setSearch(searchInput)}
         />
-        <button onClick={() => setSearch(searchInput)} className="search-button">
+        <button
+          onClick={() => setSearch(searchInput)}
+          className="search-button"
+        >
           검색
         </button>
 
         {/* 🎛️ OTT 드롭다운 - 구독 필터 포함 */}
-        <select value={ott} onChange={(e) => setOtt(e.target.value)}>
+        <select value={ott} onChange={e => setOtt(e.target.value)}>
           <option value="">OTT 전체</option>
           {isLoggedIn && <option value="subscribed">구독 중인 OTT</option>}
-          {ottList.map((item) => (
+          {ottList.map(item => (
             <option key={item.id} value={item.id}>
               {item.name}
             </option>
@@ -80,7 +81,7 @@ const MoviesPage = ({ isLoggedIn }) => {
         </select>
 
         {/* ↕️ 정렬 옵션 */}
-        <select value={ordering} onChange={(e) => setOrdering(e.target.value)}>
+        <select value={ordering} onChange={e => setOrdering(e.target.value)}>
           <option value="">정렬 없음</option>
           <option value="-release_date">최신순</option>
           <option value="-average_rating">평점 높은순</option>
@@ -90,37 +91,42 @@ const MoviesPage = ({ isLoggedIn }) => {
       </div>
 
       {/* ⚠️ 에러 메시지 */}
-      {error && <p className="text-red-500">{error}</p>}
+      {error && (
+        <p style={{ color: '#e50914', textAlign: 'center', marginBottom: '1rem' }}>
+          {error}
+        </p>
+      )}
 
       {/* 🎬 영화 카드 그리드 */}
       <div className="movies-grid">
-        {movies.map((movie) => (
+        {movies.map(movie => (
           <div
             key={movie.id}
             className="movie-card"
             onClick={() => navigate(`/movies/${movie.id}`)}
           >
-            <img
-              src={movie.thumbnail_url}
-              alt={movie.title}
-              className="movie-thumbnail"
-            />
+            <div className="poster-container">
+              <img
+                src={movie.thumbnail_url}
+                alt={movie.title}
+              />
+            </div>
+
             <div className="movie-info">
               <h3>{movie.title}</h3>
-              <p>{movie.release_date}</p>
-              <p style={{ color: '#facc15' }}>⭐ {movie.average_rating}</p>
+              <p className="meta">{movie.release_date}</p>
+              <p className="rating">⭐ {movie.average_rating}</p>
 
               {/* 📺 영화별 OTT 플랫폼 로고 */}
-              <div style={{ display: 'flex', gap: '6px', marginTop: '0.5rem' }}>
-                {movie.ott_services?.map((ottId) => {
-                  const ott = ottList.find(o => o.id === ottId);
-                  return ott ? (
+              <div className="ott-logos">
+                {movie.ott_services?.map(ottId => {
+                  const service = ottList.find(o => o.id === ottId);
+                  return service ? (
                     <img
-                      key={ott.id}
-                      src={ott.logo_url}
-                      alt={ott.name}
-                      title={ott.name}
-                      style={{ width: '24px', height: '24px', borderRadius: '4px' }}
+                      key={service.id}
+                      src={service.logo_url}
+                      alt={service.name}
+                      title={service.name}
                     />
                   ) : null;
                 })}

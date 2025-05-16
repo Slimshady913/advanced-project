@@ -1,134 +1,243 @@
-/* 📄 영화 목록 페이지 전체 배경 */
+/*────────────────────────────────────────────────────────────
+  :root – 커스텀 프로퍼티 (테마 색상 & 간격)
+────────────────────────────────────────────────────────────*/
+:root {
+  --bg-dark: #141414;
+  --bg-card: #111;
+  --bg-poster: #222;
+  --text-light: #fff;
+  --text-muted: #ccc;
+  --accent: #e50914;
+  --accent-hover: #c40812;
+  --gap-sm: 0.75rem;
+  --gap-md: 1.5rem;
+  --radius-base: 6px;
+  --radius-card: 8px;
+}
+
+/*────────────────────────────────────────────────────────────
+  1) Reset & Global
+────────────────────────────────────────────────────────────*/
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  font-family: 'Roboto', sans-serif;
+  overflow-x: hidden;
+}
+
+/* 모든 잔여 Pseudo-element 제거 */
+*::before,
+*::after {
+  content: none !important;
+}
+
+/*────────────────────────────────────────────────────────────
+  2) 스크롤바 스타일 (Webkit)
+────────────────────────────────────────────────────────────*/
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #333;
+  border-radius: 4px;
+}
+
+/*────────────────────────────────────────────────────────────
+  3) 페이지 래퍼 & 타이틀
+────────────────────────────────────────────────────────────*/
 .movies-page {
-  min-height: 100vh;
-  background-color: #141414;
-  color: white;
-  padding: 1.5rem;
+  width: 100%;
+  padding: 1rem 2rem;
+}
+.movies-page h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: var(--gap-md);
+  text-align: center;
 }
 
-/* 🔍 검색/필터 바 */
+/*────────────────────────────────────────────────────────────
+  4) 필터 바
+────────────────────────────────────────────────────────────*/
 .filter-bar {
+  max-width: 1200px;
+  margin: 0 auto var(--gap-md);
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap; /* ✅ 줄바꿈 허용 */
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap-sm);
 }
 
-/* 🔘 필터바 내 입력, 선택, 버튼 공통 스타일 */
-.filter-bar input,
+.filter-bar input[type="text"],
 .filter-bar select,
 .filter-bar .search-button {
-  padding: 0.5rem;
-  border-radius: 6px;
+  flex: none;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
   border: none;
-  font-size: 0.9rem;
-  min-width: 160px;
-  flex: 1;
+  border-radius: var(--radius-base);
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
-/* 🔎 검색 버튼 스타일 */
-.search-button {
-  background-color: #e50914;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+.filter-bar input[type="text"] {
+  width: 250px;
+}
+.filter-bar input[type="text"]::placeholder {
+  color: #999;
+}
+.filter-bar input[type="text"]:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.filter-bar select {
+  width: 160px;
+  background-color: #fff;
+  color: #000;
+}
+.filter-bar select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.filter-bar .search-button {
+  background-color: var(--accent);
+  color: var(--text-light);
+  font-weight: 600;
   cursor: pointer;
 }
-
-.search-button:hover {
-  background-color: #c40812;
+.filter-bar .search-button:hover {
+  background-color: var(--accent-hover);
 }
 
-/* 🎞️ 영화 카드 그리드 */
+/*────────────────────────────────────────────────────────────
+  5) 영화 카드 그리드
+────────────────────────────────────────────────────────────*/
 .movies-grid {
+  max-width: 1200px;
+  margin: 0 auto;
   display: grid;
-  gap: 1rem;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--gap-md);
+  justify-items: center;
 }
 
-/* 🃏 영화 카드 */
+/* 초소형 화면: 2열 고정 */
+@media (max-width: 480px) {
+  .movies-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+/* 태블릿 화면 추가 브레이크포인트 */
+@media (max-width: 1024px) {
+  .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+/*────────────────────────────────────────────────────────────
+  6) 카드 스타일 & 호버
+────────────────────────────────────────────────────────────*/
 .movie-card {
   position: relative;
-  overflow: hidden;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.movie-card:hover {
-  transform: scale(1.05);
-}
-
-/* 🖼️ 영화 썸네일 이미지 */
-.movie-thumbnail {
   width: 100%;
-  height: 250px;
-  object-fit: cover;
+  max-width: 180px;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.movie-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.7);
 }
 
-/* 📋 영화 카드 하단 정보 */
-.movie-info {
+/*────────────────────────────────────────────────────────────
+  7) 포스터 컨테이너 (2:3 비율 유지)
+────────────────────────────────────────────────────────────*/
+.poster-container {
+  position: relative;
+  width: 100%;
+  padding-top: 150%; /* 2:3 비율 (height = width * 1.5) */
+  background-color: var(--bg-poster);
+}
+.poster-container img {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.75rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  top: 0; left: 0; right: 0; bottom: 0;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
 }
 
+/*────────────────────────────────────────────────────────────
+  8) 카드 내부 정보
+────────────────────────────────────────────────────────────*/
+.movie-info {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 4.5rem; /* 일정 높이 확보 */
+}
 .movie-info h3 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.movie-info p {
-  margin: 0.25rem 0;
-  font-size: 0.75rem;
-  color: #ccc;
+.movie-info p.meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.movie-info .rating {
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0;
 }
 
-/* 📱 반응형 필터바: 세로 정렬 */
+/*────────────────────────────────────────────────────────────
+  9) OTT 로고
+────────────────────────────────────────────────────────────*/
+.ott-logos {
+  display: flex;
+  gap: 6px;
+  margin-top: 0.4rem;
+}
+.ott-logos img {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+/*────────────────────────────────────────────────────────────
+  10) 반응형 보완
+────────────────────────────────────────────────────────────*/
 @media (max-width: 768px) {
   .filter-bar {
     flex-direction: column;
-    align-items: stretch;
+    gap: 1rem;
   }
-
   .filter-bar input,
   .filter-bar select,
   .filter-bar .search-button {
     width: 100%;
-    box-sizing: border-box; /* ✅ padding 포함한 너비 계산 */
   }
-}
-
-/* ✅ 리뷰 관련 추가 스타일 */
-.edited-label {
-  color: #999;
-  font-size: 0.85rem;
-  margin-left: 6px;
-}
-
-.review-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.review-actions button {
-  background-color: #555;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.review-actions button:hover {
-  background-color: #e50914;
+  .movie-card {
+    max-width: 45%;
+  }
 }
