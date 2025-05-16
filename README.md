@@ -47,8 +47,8 @@
 | 구분       | 기술 |
 |------------|------|
 | **Backend** | Django, Django REST Framework, SimpleJWT |
-| **Frontend** | React (예정) |
-| **DB**      | PostgreSQL or SQLite |
+| **Frontend** | React |
+| **DB**      | PostgreSQL(에정) or SQLite (사용중) |
 | **Docs**    | Swagger (drf-yasg) |
 | **Auth**    | JWT (Access/Refresh Token) |
 | **DevOps**  | GitHub, Docker (예정) |
@@ -151,6 +151,8 @@ advanced-project/
     - 게시글 상세 페이지에 밝은 배경(`#f9f9f9`) + 어두운 글자색(`#333`)
     - 댓글/카드에 흰 배경 적용, 버튼은 하늘색 유지 (`#00AEEF`)
     - 기존 넷플릭스 스타일과 자연스럽게 연결되도록 통일된 UI 적용
+  - **디자인 개선 (메인페이지, 영화 상세페이지)**
+    - MoviesPage, MovieDetailPage 리팩토링
 
 ### v0.0.2 (2025-05-12)
 - frontend, backend 연결 확인
