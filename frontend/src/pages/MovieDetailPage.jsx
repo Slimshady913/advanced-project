@@ -1,4 +1,4 @@
-// MovieDetailPage.jsx - 전문가 스타일 적용 및 반응형 대응 포함
+// MovieDetailPage.jsx - OTT id 매핑 통일, 전문가 스타일
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import { useParams } from 'react-router-dom';
@@ -9,6 +9,7 @@ const MovieDetailPage = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [ottList, setOttList] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editReviewId, setEditReviewId] = useState(null);
@@ -16,6 +17,14 @@ const MovieDetailPage = () => {
   const [newComment, setNewComment] = useState({});
   const token = localStorage.getItem('access');
 
+  // OTT 전체 목록 불러오기
+  useEffect(() => {
+    axios.get('/ott/')
+      .then(res => setOttList(res.data))
+      .catch(err => console.error('OTT 목록 불러오기 실패:', err));
+  }, []);
+
+  // 영화 상세 정보 불러오기
   const fetchMovieDetail = async () => {
     try {
       const response = await axios.get(`/movies/${id}/`);
@@ -32,6 +41,7 @@ const MovieDetailPage = () => {
     fetchMovieDetail();
   }, [id]);
 
+  // 리뷰 작성 핸들러
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -53,6 +63,7 @@ const MovieDetailPage = () => {
     setIsSubmitting(false);
   };
 
+  // 리뷰 좋아요
   const handleLike = async (reviewId) => {
     if (!token) return alert('로그인이 필요합니다.');
     try {
@@ -65,6 +76,7 @@ const MovieDetailPage = () => {
     }
   };
 
+  // 리뷰 삭제
   const handleDelete = async (reviewId) => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
     try {
@@ -77,16 +89,19 @@ const MovieDetailPage = () => {
     }
   };
 
+  // 리뷰 수정 시작
   const startEditing = (review) => {
     setEditReviewId(review.id);
     setEditReviewData({ rating: review.rating, comment: review.comment });
   };
 
+  // 리뷰 수정 취소
   const cancelEditing = () => {
     setEditReviewId(null);
     setEditReviewData({ rating: 5, comment: '' });
   };
 
+  // 리뷰 수정 저장
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -105,6 +120,7 @@ const MovieDetailPage = () => {
     }
   };
 
+  // 댓글 입력/작성
   const handleCommentChange = (reviewId, value) => {
     setNewComment({ ...newComment, [reviewId]: value });
   };
@@ -147,6 +163,12 @@ const MovieDetailPage = () => {
 
   if (!movie) return <p className="movie-not-found">영화 정보를 찾을 수 없습니다.</p>;
 
+  // ⭐ ott id → 객체 변환 (MoviesPage 방식과 동일)
+  const movieOttList = (movie.ott_services || [])
+    .map(id => ottList.find(ott => ott.id === id))
+    .filter(Boolean);
+
+  // Top 3 리뷰, 기타 리뷰 분리
   const top3Reviews = [...(movie.reviews || [])]
     .sort((a, b) => b.like_count - a.like_count)
     .slice(0, 3);
@@ -155,6 +177,7 @@ const MovieDetailPage = () => {
     (review) => !top3Reviews.find((top) => top.id === review.id)
   );
 
+  // 리뷰 카드 렌더링 함수
   const renderReviewCard = (review, isTop = false) => {
     const isEditing = editReviewId === review.id;
     const cardClass = `review-card${isTop ? ' top-review' : ''}`;
@@ -241,19 +264,23 @@ const MovieDetailPage = () => {
         <div className="movie-text-info">
           <h1 className="movie-title">{movie.title}</h1>
           <p className="movie-description">{movie.description}</p>
+          {/* OTT 로고 리스트 */}
           <div className="ott-logos">
-            {movie.ott_list?.map((ott) => (
-              <img key={ott.id} src={ott.logo_url} alt={ott.name} className="ott-logo" />
-            ))}
+            {movieOttList.length > 0
+              ? movieOttList.map(ott => (
+                  <img key={ott.id} src={ott.logo_url} alt={ott.name} className="ott-logo" />
+                ))
+              : <span className="no-ott">제공하는 OTT가 없습니다.</span>
+            }
           </div>
         </div>
       </div>
-      {/* OTT 제공 정보 섹션 */}
+      {/* OTT에서 바로 보러가기 */}
       <div className="ott-section">
         <h3>OTT에서 바로 보러가기</h3>
-        {movie.ott_list && movie.ott_list.length > 0 ? (
+        {movieOttList.length > 0 ? (
           <div className="ott-list">
-            {movie.ott_list.map((ott) => (
+            {movieOttList.map(ott => (
               <a
                 key={ott.id}
                 href={ott.link_url}
