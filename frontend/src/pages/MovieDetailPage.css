@@ -1,169 +1,184 @@
-/* 🎬 영화 상세 페이지 전체 레이아웃 */
+/* 전체 레이아웃 */
 .movie-detail-container {
-  padding: 20px;
-  background-color: #141414;
-  color: white;
+  padding: 40px 20px;
+  background-color: #121212;
+  color: #f0f0f0;
   min-height: 100vh;
+  font-family: 'Helvetica Neue', sans-serif;
 }
 
 .movie-detail-container img {
   max-width: 100%;
-  border-radius: 10px;
-  margin-bottom: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
 }
 
-/* 📺 OTT 로고 표시 */
+/* OTT 로고 */
 .ott-logos {
   display: flex;
-  gap: 10px;
-  margin: 10px 0;
+  gap: 12px;
+  margin: 16px 0;
 }
 
 .ott-logo {
-  width: 50px;
+  width: 48px;
   height: auto;
 }
 
-/* 📝 리뷰 작성 폼 */
+/* 리뷰 작성 폼 */
 .review-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 14px;
+  margin-top: 30px;
 }
 
 .review-form label {
-  display: flex;
-  flex-direction: column;
-  color: white;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.review-form textarea,
+.review-form select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #1e1e1e;
+  color: #fff;
+  font-size: 0.95rem;
 }
 
 .review-form textarea {
   resize: vertical;
-  min-height: 60px;
-  padding: 8px;
-  border-radius: 6px;
-  border: none;
-  background-color: #333;
-  color: white;
-}
-
-.review-form select {
-  padding: 6px;
-  border-radius: 6px;
-  background-color: #333;
-  color: white;
-  border: none;
+  min-height: 70px;
 }
 
 .review-form button {
   background-color: #e50914;
   color: white;
   border: none;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 12px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .review-form button:disabled {
-  background-color: gray;
+  background-color: #555;
+  cursor: not-allowed;
 }
 
-/* 🧾 리뷰 목록 */
+.review-form button:hover:not(:disabled) {
+  background-color: #f6121d;
+}
+
+/* 리뷰 카드 목록 */
 .reviews {
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .review-card {
-  background-color: #222;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  color: white;
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.review-card strong {
+  font-size: 1rem;
+}
+
+.review-card p {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin: 8px 0;
 }
 
 .review-card button {
-  margin-top: 10px;
-  background-color: #444;
+  background-color: #333;
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .review-card button:hover {
   background-color: #e50914;
 }
 
-/* 🌟 추천 Top 3 리뷰 강조 */
+/* Top 3 리뷰 강조 */
 .top-review {
-  border: 2px solid gold;
-  background-color: #333;
+  border: 2px solid #ffd700;
+  background-color: #2a2a2a;
 }
 
-/* ✏️ 수정 / 삭제 버튼 묶음 */
+/* 리뷰 수정/삭제 버튼 */
 .review-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .review-actions button {
-  background-color: #555;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
+  background-color: #444;
+  padding: 6px 12px;
+  font-size: 0.85rem;
 }
 
 .review-actions button:hover {
   background-color: #e50914;
 }
 
-/* 💬 리뷰 댓글 섹션 */
+/* 댓글 영역 */
 .review-comments {
-  margin-top: 10px;
-  background-color: #1c1c1c;
-  padding: 10px;
-  border-radius: 8px;
+  margin-top: 16px;
+  background-color: #191919;
+  padding: 12px 16px;
+  border-radius: 10px;
 }
 
 .review-comments .comment {
-  padding: 5px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 6px 0;
   font-size: 0.9rem;
+  border-bottom: 1px solid #2c2c2c;
+}
+
+.review-comments .comment:last-child {
+  border-bottom: none;
 }
 
 .review-comments .comment button {
   background: none;
   border: none;
   color: #e50914;
+  font-size: 0.85rem;
   cursor: pointer;
 }
 
-/* 🖊️ 댓글 작성 폼 */
+/* 댓글 작성 폼 */
 .comment-form {
-  margin-top: 10px;
+  margin-top: 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .comment-form textarea {
   resize: vertical;
-  padding: 6px;
-  background-color: #2a2a2a;
+  padding: 10px;
+  background-color: #252525;
   color: white;
-  border-radius: 6px;
-  border: none;
-  min-height: 50px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  min-height: 60px;
 }
 
 .comment-form button {
@@ -171,7 +186,12 @@
   background-color: #e50914;
   color: white;
   border: none;
-  padding: 6px 10px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.comment-form button:hover {
+  background-color: #f6121d;
 }
