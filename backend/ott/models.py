@@ -1,6 +1,5 @@
 from django.db import models
 
-
 # ✅ OTT 플랫폼 모델 (예: 넷플릭스, 디즈니+, 왓챠 등)
 class OTT(models.Model):
     name = models.CharField(
@@ -12,6 +11,11 @@ class OTT(models.Model):
         blank=True,
         verbose_name="로고 이미지 URL",
         help_text="OTT 플랫폼의 로고 이미지 URL입니다 (선택사항)"
+    )
+    link_url = models.URLField(
+        blank=True,
+        verbose_name="바로가기 링크 URL",
+        help_text="OTT 플랫폼 영화 상세페이지로 이동할 수 있는 URL입니다 (선택사항)"
     )
 
     def __str__(self):
