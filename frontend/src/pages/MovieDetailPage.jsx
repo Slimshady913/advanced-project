@@ -248,6 +248,28 @@ const MovieDetailPage = () => {
           </div>
         </div>
       </div>
+      {/* OTT 제공 정보 섹션 */}
+      <div className="ott-section">
+        <h3>OTT에서 바로 보러가기</h3>
+        {movie.ott_list && movie.ott_list.length > 0 ? (
+          <div className="ott-list">
+            {movie.ott_list.map((ott) => (
+              <a
+                key={ott.id}
+                href={ott.link_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ott-link"
+                title={ott.name}
+              >
+                <img src={ott.logo_url} alt={ott.name} className="ott-logo" />
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div className="no-ott">제공하는 OTT가 없습니다.</div>
+        )}
+      </div>
 
       <section className="review-section">
         <h2>리뷰 작성</h2>

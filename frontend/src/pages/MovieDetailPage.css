@@ -1,10 +1,10 @@
 /* 전체 컨테이너 */
 .movie-detail-container {
-  padding: 40px 40px;
-  background-color: #121212;
+  padding: 40px;
+  background: #121212;
   color: #f0f0f0;
   min-height: 100vh;
-  font-family: 'Helvetica Neue', sans-serif;
+  font-family: 'Helvetica Neue', 'Roboto', Arial, sans-serif;
 }
 
 /* 영화 정보 레이아웃: 포스터 + 설명 */
@@ -18,10 +18,12 @@
 
 .movie-thumbnail {
   width: 320px;
-  height: auto;
+  max-width: 100%;
   object-fit: contain;
   border-radius: 12px;
   flex-shrink: 0;
+  background: #181818;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.22);
 }
 
 .movie-text-info {
@@ -33,47 +35,87 @@
   font-size: 2rem;
   margin-bottom: 1rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #fff;
 }
 
 .movie-description {
   font-size: 1.05rem;
   line-height: 1.7;
   margin-bottom: 20px;
+  color: #d6d6d6;
 }
 
-.ott-logos {
+/* OTT 섹션 */
+.ott-section {
+  margin-bottom: 2.5rem;
+  padding: 1rem 1.2rem;
+  background: #22262d;
+  border-radius: 1rem;
+  text-align: left;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+}
+
+.ott-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.15rem;
+  color: #61dafb;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.ott-list {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
+  gap: 20px;
+  align-items: center;
+}
+
+.ott-link {
+  display: inline-block;
+  transition: transform 0.16s cubic-bezier(.7,1.5,.8,1.07);
+  border-radius: 0.5rem;
+}
+.ott-link:hover {
+  transform: scale(1.12);
+  box-shadow: 0 4px 12px #222a40bb;
+  background: #282d34;
 }
 
 .ott-logo {
-  width: 50px;
-  height: auto;
-  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
+.no-ott {
+  color: #aaa;
+  font-size: 1.07rem;
+  padding: 0.4rem 0 0.6rem 0;
+}
+
+/* 리뷰 섹션 */
 .review-section {
-  margin-bottom: 3rem;
+  margin-bottom: 2.8rem;
 }
 
 .review-section h2 {
   font-size: 1.4rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
   border-bottom: 2px solid #e50914;
   padding-bottom: 0.5rem;
+  color: #fff;
 }
 
 .review-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background-color: #1a1a1a;
+  background: #171a1f;
   padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #2c2c2c;
+  border-radius: 14px;
+  border: 1px solid #23262f;
 }
 
 .review-form-group {
@@ -83,122 +125,120 @@
 }
 
 .review-form-group label {
-  font-size: 0.95rem;
+  font-size: 0.96rem;
   font-weight: 600;
   margin-bottom: 4px;
+  color: #b7e0ff;
 }
 
 .review-form-group select,
 .review-form-group textarea {
   padding: 10px 12px;
-  background-color: #2a2a2a;
-  color: white;
-  border: 1px solid #444;
+  background: #22252b;
+  color: #e7faff;
+  border: 1px solid #3a3e46;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
 }
 
 .review-form button {
-  background-color: #e50914;
-  color: white;
+  background: #e50914;
+  color: #fff;
   border: none;
   padding: 12px;
   border-radius: 8px;
-  cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+  transition: background 0.19s;
 }
 
 .review-form button:disabled {
-  background-color: #555;
+  background: #555;
   cursor: not-allowed;
 }
-
 .review-form button:hover:not(:disabled) {
-  background-color: #f6121d;
+  background: #f6121d;
 }
 
+/* 리뷰 리스트 및 카드 */
 .reviews {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
 .review-card {
-  background-color: #1a1a1a;
+  background: #181a1d;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.13);
+  border: 1.5px solid #20232a;
+  color: #ececec;
 }
 
 .top-review {
-  border: 2px solid gold;
-  background-color: #2a2a2a;
+  border: 2px solid #ffd700;
+  background: #262626;
 }
 
 .review-card p {
   margin: 8px 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.review-card button {
-  background-color: #333;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  margin-top: 10px;
-  transition: background-color 0.2s ease;
-}
-
-.review-card button:hover {
-  background-color: #e50914;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: #dedede;
 }
 
 .review-actions {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .review-actions button {
-  background-color: #444;
+  background: #26292e;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: background 0.16s;
 }
-
 .review-actions button:hover {
-  background-color: #e50914;
+  background: #e50914;
 }
 
 .edited-label {
   color: #aaa;
   font-style: italic;
-  margin-left: 6px;
+  margin-left: 8px;
+  font-size: 0.9rem;
 }
 
+/* 리뷰 댓글 */
 .review-comments {
   margin-top: 16px;
-  background-color: #191919;
-  padding: 12px 16px;
+  background: #191a1e;
+  padding: 13px 17px;
   border-radius: 10px;
+  color: #e3e3e3;
 }
 
 .review-comments h4 {
   margin-bottom: 10px;
   font-size: 1rem;
+  color: #7fd3fa;
 }
 
 .review-comments .comment {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
-  font-size: 0.9rem;
-  border-bottom: 1px solid #2c2c2c;
+  padding: 7px 0;
+  font-size: 0.93rem;
+  border-bottom: 1px solid #252730;
 }
-
 .review-comments .comment:last-child {
   border-bottom: none;
 }
@@ -207,113 +247,102 @@
   background: none;
   border: none;
   color: #e50914;
-  font-size: 0.85rem;
+  font-size: 0.87rem;
   cursor: pointer;
 }
 
 .comment-form {
-  margin-top: 12px;
+  margin-top: 13px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 11px;
 }
 
 .comment-form textarea {
   padding: 10px;
-  background-color: #252525;
-  color: white;
+  background: #23242a;
+  color: #fff;
   border-radius: 8px;
-  border: 1px solid #444;
+  border: 1px solid #3a3e46;
   min-height: 60px;
+  font-size: 0.99rem;
 }
 
 .comment-form button {
   align-self: flex-end;
-  background-color: #e50914;
-  color: white;
+  background: #e50914;
+  color: #fff;
   border: none;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  font-size: 0.98rem;
+  transition: background 0.16s;
 }
-
 .comment-form button:hover {
-  background-color: #f6121d;
+  background: #f6121d;
 }
 
+/* 공통 - 로딩/404 등 */
 .loading-screen {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #141414;
+  background: #141414;
   flex-direction: column;
-  color: white;
+  color: #fff;
 }
-
 .movie-not-found {
   padding: 2rem;
   text-align: center;
   color: #ddd;
 }
 
-@media (max-width: 768px) {
+/* 반응형 */
+@media (max-width: 900px) {
   .movie-detail-container {
-    padding: 24px 16px;
+    padding: 26px 8px;
   }
-
   .movie-info-section {
     flex-direction: column;
     align-items: center;
+    gap: 28px;
   }
-
   .movie-thumbnail {
-    width: 100%;
-    height: auto;
-    max-height: unset;
+    width: 98%;
+    min-width: 180px;
+    max-width: 340px;
   }
-
   .movie-description {
     text-align: center;
+    font-size: 1rem;
   }
-
   .movie-title {
-    font-size: 1.6rem;
+    font-size: 1.45rem;
   }
-
-  .review-form select,
-  .review-form textarea,
-  .comment-form textarea {
-    font-size: 0.9rem;
-  }
-
-  .review-card {
-    padding: 16px;
-  }
-
-  .review-actions button,
-  .review-card button {
-    font-size: 0.8rem;
-    padding: 6px 10px;
-  }
-
   .ott-logo {
-    width: 40px;
+    width: 38px;
+    height: 38px;
+  }
+  .review-card {
+    padding: 13px;
+  }
+  .review-actions button {
+    font-size: 0.87rem;
+    padding: 7px 10px;
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   .review-form-group-horizontal {
     flex-direction: row;
     align-items: center;
   }
-
   .review-form-group-horizontal label {
-    min-width: 60px;
+    min-width: 64px;
     margin-bottom: 0;
   }
-
   .review-form-group-horizontal select,
   .review-form-group-horizontal textarea {
     flex: 1;
