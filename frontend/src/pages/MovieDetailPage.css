@@ -1,56 +1,101 @@
-/* 전체 레이아웃 */
+/* 전체 컨테이너 */
 .movie-detail-container {
-  padding: 40px 20px;
+  padding: 40px 40px;
   background-color: #121212;
   color: #f0f0f0;
   min-height: 100vh;
   font-family: 'Helvetica Neue', sans-serif;
 }
 
-.movie-detail-container img {
-  max-width: 100%;
+/* 영화 정보 레이아웃: 포스터 + 설명 */
+.movie-info-section {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.movie-thumbnail {
+  width: 320px;
+  height: auto;
+  object-fit: contain;
   border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.movie-text-info {
+  flex: 1;
+  min-width: 260px;
+}
+
+.movie-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.movie-description {
+  font-size: 1.05rem;
+  line-height: 1.7;
   margin-bottom: 20px;
 }
 
-/* OTT 로고 */
 .ott-logos {
   display: flex;
-  gap: 12px;
-  margin: 16px 0;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
 }
 
 .ott-logo {
-  width: 48px;
+  width: 50px;
   height: auto;
+  border-radius: 6px;
 }
 
-/* 리뷰 작성 폼 */
+.review-section {
+  margin-bottom: 3rem;
+}
+
+.review-section h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #e50914;
+  padding-bottom: 0.5rem;
+}
+
 .review-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 30px;
+  gap: 16px;
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #2c2c2c;
 }
 
-.review-form label {
+.review-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-form-group label {
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
-.review-form textarea,
-.review-form select {
-  padding: 10px;
-  border-radius: 8px;
+.review-form-group select,
+.review-form-group textarea {
+  padding: 10px 12px;
+  background-color: #2a2a2a;
+  color: white;
   border: 1px solid #444;
-  background-color: #1e1e1e;
-  color: #fff;
+  border-radius: 8px;
   font-size: 0.95rem;
-}
-
-.review-form textarea {
-  resize: vertical;
-  min-height: 70px;
 }
 
 .review-form button {
@@ -73,27 +118,28 @@
   background-color: #f6121d;
 }
 
-/* 리뷰 카드 목록 */
 .reviews {
-  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .review-card {
   background-color: #1a1a1a;
   padding: 20px;
   border-radius: 12px;
-  margin-bottom: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-.review-card strong {
-  font-size: 1rem;
+.top-review {
+  border: 2px solid gold;
+  background-color: #2a2a2a;
 }
 
 .review-card p {
-  font-size: 0.95rem;
-  line-height: 1.4;
   margin: 8px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .review-card button {
@@ -103,21 +149,15 @@
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s ease-in-out;
+  font-size: 0.85rem;
+  margin-top: 10px;
+  transition: background-color 0.2s ease;
 }
 
 .review-card button:hover {
   background-color: #e50914;
 }
 
-/* Top 3 리뷰 강조 */
-.top-review {
-  border: 2px solid #ffd700;
-  background-color: #2a2a2a;
-}
-
-/* 리뷰 수정/삭제 버튼 */
 .review-actions {
   display: flex;
   gap: 10px;
@@ -126,20 +166,28 @@
 
 .review-actions button {
   background-color: #444;
-  padding: 6px 12px;
-  font-size: 0.85rem;
 }
 
 .review-actions button:hover {
   background-color: #e50914;
 }
 
-/* 댓글 영역 */
+.edited-label {
+  color: #aaa;
+  font-style: italic;
+  margin-left: 6px;
+}
+
 .review-comments {
   margin-top: 16px;
   background-color: #191919;
   padding: 12px 16px;
   border-radius: 10px;
+}
+
+.review-comments h4 {
+  margin-bottom: 10px;
+  font-size: 1rem;
 }
 
 .review-comments .comment {
@@ -163,16 +211,14 @@
   cursor: pointer;
 }
 
-/* 댓글 작성 폼 */
 .comment-form {
-  margin-top: 14px;
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .comment-form textarea {
-  resize: vertical;
   padding: 10px;
   background-color: #252525;
   color: white;
@@ -194,4 +240,82 @@
 
 .comment-form button:hover {
   background-color: #f6121d;
+}
+
+.loading-screen {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #141414;
+  flex-direction: column;
+  color: white;
+}
+
+.movie-not-found {
+  padding: 2rem;
+  text-align: center;
+  color: #ddd;
+}
+
+@media (max-width: 768px) {
+  .movie-detail-container {
+    padding: 24px 16px;
+  }
+
+  .movie-info-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .movie-thumbnail {
+    width: 100%;
+    height: auto;
+    max-height: unset;
+  }
+
+  .movie-description {
+    text-align: center;
+  }
+
+  .movie-title {
+    font-size: 1.6rem;
+  }
+
+  .review-form select,
+  .review-form textarea,
+  .comment-form textarea {
+    font-size: 0.9rem;
+  }
+
+  .review-card {
+    padding: 16px;
+  }
+
+  .review-actions button,
+  .review-card button {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+
+  .ott-logo {
+    width: 40px;
+  }
+}
+
+@media (min-width: 768px) {
+  .review-form-group-horizontal {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .review-form-group-horizontal label {
+    min-width: 60px;
+    margin-bottom: 0;
+  }
+
+  .review-form-group-horizontal select,
+  .review-form-group-horizontal textarea {
+    flex: 1;
+  }
 }

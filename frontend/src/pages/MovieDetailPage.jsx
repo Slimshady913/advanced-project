@@ -1,3 +1,4 @@
+// MovieDetailPage.jsx - 전문가 스타일 적용 및 반응형 대응 포함
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import { useParams } from 'react-router-dom';
@@ -162,9 +163,10 @@ const MovieDetailPage = () => {
       <div key={review.id} className={cardClass}>
         {isEditing ? (
           <form onSubmit={handleEditSubmit} className="review-form">
-            <label>
-              평점
+            <div className="review-form-group review-form-group-horizontal">
+              <label htmlFor="edit-rating">평점</label>
               <select
+                id="edit-rating"
                 value={editReviewData.rating}
                 onChange={(e) =>
                   setEditReviewData({ ...editReviewData, rating: e.target.value })
@@ -174,16 +176,17 @@ const MovieDetailPage = () => {
                   <option key={num} value={num}>{num}</option>
                 ))}
               </select>
-            </label>
-            <label>
-              코멘트
+            </div>
+            <div className="review-form-group">
+              <label htmlFor="edit-comment">코멘트</label>
               <textarea
+                id="edit-comment"
                 value={editReviewData.comment}
                 onChange={(e) =>
                   setEditReviewData({ ...editReviewData, comment: e.target.value })
                 }
               />
-            </label>
+            </div>
             <div className="review-actions">
               <button type="submit">저장</button>
               <button type="button" onClick={cancelEditing}>취소</button>
@@ -233,27 +236,26 @@ const MovieDetailPage = () => {
 
   return (
     <div className="movie-detail-container">
-      <h1 className="movie-title">{movie.title}</h1>
-      <img src={movie.thumbnail_url} alt={movie.title} className="movie-thumbnail" />
-      <p className="movie-description">{movie.description}</p>
-
-      <div className="ott-logos">
-        {movie.ott_list?.map(ott => (
-          <img
-            key={ott.id}
-            src={ott.logo_url}
-            alt={ott.name}
-            className="ott-logo"
-          />
-        ))}
+      <div className="movie-info-section">
+        <img src={movie.thumbnail_url} alt={movie.title} className="movie-thumbnail" />
+        <div className="movie-text-info">
+          <h1 className="movie-title">{movie.title}</h1>
+          <p className="movie-description">{movie.description}</p>
+          <div className="ott-logos">
+            {movie.ott_list?.map((ott) => (
+              <img key={ott.id} src={ott.logo_url} alt={ott.name} className="ott-logo" />
+            ))}
+          </div>
+        </div>
       </div>
 
       <section className="review-section">
         <h2>리뷰 작성</h2>
         <form onSubmit={handleSubmit} className="review-form">
-          <label>
-            평점
+          <div className="review-form-group review-form-group-horizontal">
+            <label htmlFor="rating">평점</label>
             <select
+              id="rating"
               value={newReview.rating}
               onChange={(e) => setNewReview({ ...newReview, rating: e.target.value })}
             >
@@ -261,14 +263,15 @@ const MovieDetailPage = () => {
                 <option key={num} value={num}>{num}</option>
               ))}
             </select>
-          </label>
-          <label>
-            코멘트
+          </div>
+          <div className="review-form-group">
+            <label htmlFor="comment">코멘트</label>
             <textarea
+              id="comment"
               value={newReview.comment}
               onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
             />
-          </label>
+          </div>
           <button type="submit" disabled={isSubmitting}>
             {isSubmitting ? '작성 중...' : '작성'}
           </button>
