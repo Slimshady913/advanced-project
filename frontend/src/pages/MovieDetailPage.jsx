@@ -264,15 +264,6 @@ const MovieDetailPage = () => {
         <div className="movie-text-info">
           <h1 className="movie-title">{movie.title}</h1>
           <p className="movie-description">{movie.description}</p>
-          {/* OTT 로고 리스트 */}
-          <div className="ott-logos">
-            {movieOttList.length > 0
-              ? movieOttList.map(ott => (
-                  <img key={ott.id} src={ott.logo_url} alt={ott.name} className="ott-logo" />
-                ))
-              : <span className="no-ott">제공하는 OTT가 없습니다.</span>
-            }
-          </div>
         </div>
       </div>
       {/* OTT에서 바로 보러가기 */}
@@ -281,16 +272,22 @@ const MovieDetailPage = () => {
         {movieOttList.length > 0 ? (
           <div className="ott-list">
             {movieOttList.map(ott => (
-              <a
-                key={ott.id}
-                href={ott.link_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ott-link"
-                title={ott.name}
-              >
-                <img src={ott.logo_url} alt={ott.name} className="ott-logo" />
-              </a>
+              ott.link_url ? (
+                <a
+                  key={ott.id}
+                  href={ott.link_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ott-link"
+                  title={ott.name}
+                >
+                  <img src={ott.logo_url} alt={ott.name} className="ott-logo" />
+                </a>
+              ) : (
+                <span key={ott.id} className="ott-link-disabled" title="링크 없음">
+                  <img src={ott.logo_url} alt={ott.name} className="ott-logo" style={{ opacity: 0.5 }} />
+                </span>
+              )
             ))}
           </div>
         ) : (
