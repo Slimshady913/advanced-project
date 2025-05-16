@@ -26,11 +26,11 @@ function Header({ isLoggedIn, username, onLogout }) {
         {isLoggedIn ? (
           <>
             <span className="welcome">{username}님</span>
-            <button className="btn" onClick={() => navigate('/profile')}>
-              회원정보
-            </button>
             <button className="btn" onClick={onLogout}>
               로그아웃
+            </button>
+            <button className="btn" onClick={() => navigate('/profile')}>
+              회원정보
             </button>
           </>
         ) : (
