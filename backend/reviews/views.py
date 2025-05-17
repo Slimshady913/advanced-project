@@ -6,7 +6,7 @@ from rest_framework.filters import OrderingFilter
 from django.db.models import Count
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from django.db import transaction
+
 from .models import (
     Review, ReviewCommentReaction, ReviewHistory, ReviewLike,
     ReviewComment, ReviewReaction
@@ -16,8 +16,6 @@ from .serializers import (
     ReviewLikeSerializer, ReviewReactionSerializer, ReviewHistorySerializer
 )
 from .permissions import IsOwnerOrReadOnly
-
-
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 목록 조회 및 작성
@@ -140,7 +138,7 @@ class ToggleReviewReaction(APIView):
 
         try:
             reaction = ReviewReaction.objects.get(user=user, review=review)
-            # 동일한 반응이면 == 취소 허용
+            # 동일한 반응이면 == 취소
             if reaction.is_like == is_like:
                 reaction.delete()
                 if is_like:
@@ -154,14 +152,25 @@ class ToggleReviewReaction(APIView):
                     "like_count": review.like_count,
                     "dislike_count": review.dislike_count,
                 }, status=200)
-            # 반대 반응이면 == **무조건 409로 거부**
+            # 반대 반응이면 == 이동
             else:
-                if reaction.is_like:
-                    return Response({"error": "이미 추천을 눌렀습니다."}, status=409)
+                if is_like:
+                    review.like_count += 1
+                    review.dislike_count = max(review.dislike_count - 1, 0)
                 else:
-                    return Response({"error": "이미 비추천을 눌렀습니다."}, status=409)
+                    review.dislike_count += 1
+                    review.like_count = max(review.like_count - 1, 0)
+                reaction.is_like = is_like
+                reaction.save()
+                review.save()
+                return Response({
+                    "message": "반응이 변경되었습니다.",
+                    "my_vote": 1 if is_like else -1,
+                    "like_count": review.like_count,
+                    "dislike_count": review.dislike_count,
+                }, status=200)
         except ReviewReaction.DoesNotExist:
-            # 첫 투표만 허용
+            # 첫 투표
             ReviewReaction.objects.create(user=user, review=review, is_like=is_like)
             if is_like:
                 review.like_count += 1
@@ -174,6 +183,7 @@ class ToggleReviewReaction(APIView):
                 "like_count": review.like_count,
                 "dislike_count": review.dislike_count,
             }, status=201)
+
 # ---------------------------------------------------------------------
 # ✅ 리뷰 댓글 목록 조회 + 작성 (상위 3개 추천순 정렬 포함)
 # ---------------------------------------------------------------------

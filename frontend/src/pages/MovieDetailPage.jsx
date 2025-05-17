@@ -1,15 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from '../api/axios';
 import { useParams } from 'react-router-dom';
 import './MovieDetailPage.css';
 import { ClipLoader } from 'react-spinners';
 
+// 간단 Toast 컴포넌트
+const Toast = React.forwardRef(({ message, duration = 1800 }, ref) => {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    if (message) {
+      setVisible(true);
+      const timer = setTimeout(() => setVisible(false), duration);
+      return () => clearTimeout(timer);
+    }
+  }, [message, duration]);
+  React.useImperativeHandle(ref, () => ({
+    show: () => setVisible(true),
+    hide: () => setVisible(false),
+  }));
+  return visible ? (
+    <div className="custom-toast">{message}</div>
+  ) : null;
+});
+
 // 날짜 포맷 함수
 function formatDate(dateString) {
   const date = new Date(dateString);
-  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
-    + ' ' +
-    date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+  return (
+    date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }) +
+    ' ' +
+    date.toLocaleTimeString('ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  );
 }
 
 const MovieDetailPage = () => {
@@ -22,19 +50,19 @@ const MovieDetailPage = () => {
   const [editReviewId, setEditReviewId] = useState(null);
   const [editReviewData, setEditReviewData] = useState({ rating: 5, comment: '', is_spoiler: false });
   const [showSpoiler, setShowSpoiler] = useState({});
+  const [toastMsg, setToastMsg] = useState('');
+  const toastRef = useRef();
 
-  // 항상 최신 토큰/유저명 불러오기 (함수형: useState 대신 매번 getItem)
   const getToken = () => localStorage.getItem('access');
   const getCurrentUser = () => localStorage.getItem('username');
 
-  // OTT 목록 불러오기
   useEffect(() => {
-    axios.get('/ott/')
-      .then(res => setOttList(res.data))
-      .catch(err => console.error('OTT 목록 불러오기 실패:', err));
+    axios
+      .get('/ott/')
+      .then((res) => setOttList(res.data))
+      .catch((err) => console.error('OTT 목록 불러오기 실패:', err));
   }, []);
 
-  // 영화 상세 + 리뷰 데이터
   const fetchMovieDetail = async () => {
     try {
       const response = await axios.get(`/movies/${id}/`);
@@ -73,42 +101,47 @@ const MovieDetailPage = () => {
       fetchMovieDetail();
     } catch (error) {
       if (error.response?.data?.non_field_errors) {
-        alert(error.response.data.non_field_errors[0]);
+        setToastMsg(error.response.data.non_field_errors[0]);
       } else {
-        alert('리뷰 작성 실패');
+        setToastMsg('리뷰 작성 실패');
       }
     }
     setIsSubmitting(false);
   };
 
-  // 추천/비추천 네이버웹툰 스타일
+  // 추천/비추천
   const handleVote = async (reviewId, type, myVote) => {
-  const token = getToken();
-  if (!token) return alert('로그인이 필요합니다.');
-  try {
-    await axios.post(
-      `/reviews/${reviewId}/${type}/`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    fetchMovieDetail();
-  } catch (error) {
-    // 409 Conflict: 서버에서 이미 눌렀다고 막음!
-    if (error.response?.status === 409 && error.response?.data?.error) {
-      alert(error.response.data.error);
-      // **여기서 반드시 fetchMovieDetail()을 실행하지 않는다**
+    const token = getToken();
+    if (!token) return setToastMsg('로그인이 필요합니다.');
+
+    // 이미 추천(1) 상태에서 비추천(-1) 클릭 → 안내
+    // 이미 비추천(-1) 상태에서 추천(1) 클릭 → 안내
+    if (type === 'dislike' && myVote === 1) {
+      setToastMsg('이미 좋아요를 누르셨습니다.');
       return;
     }
-    alert('추천/비추천 처리 실패');
-  }
-};
+    if (type === 'like' && myVote === -1) {
+      setToastMsg('이미 싫어요를 누르셨습니다.');
+      return;
+    }
 
-  // 스포일러 토글
-  const handleSpoilerToggle = (reviewId) => {
-    setShowSpoiler(prev => ({ ...prev, [reviewId]: !prev[reviewId] }));
+    try {
+      await axios.post(
+        `/reviews/${reviewId}/${type}/`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      fetchMovieDetail();
+    } catch (error) {
+      setToastMsg('추천/비추천 처리 실패');
+    }
   };
 
-  // 리뷰 수정 시작/취소/저장
+  const handleSpoilerToggle = (reviewId) => {
+    setShowSpoiler((prev) => ({ ...prev, [reviewId]: !prev[reviewId] }));
+  };
+
+  // 리뷰 수정 관련
   const startEditing = (review) => {
     setEditReviewId(review.id);
     setEditReviewData({ rating: review.rating, comment: review.comment, is_spoiler: review.is_spoiler });
@@ -128,10 +161,10 @@ const MovieDetailPage = () => {
       cancelEditing();
       fetchMovieDetail();
     } catch (error) {
-      alert('리뷰 수정 실패');
+      setToastMsg('리뷰 수정 실패');
     }
   };
-  // 리뷰 삭제
+
   const handleDelete = async (reviewId) => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
     try {
@@ -140,7 +173,7 @@ const MovieDetailPage = () => {
       });
       fetchMovieDetail();
     } catch (error) {
-      alert('리뷰 삭제 실패');
+      setToastMsg('리뷰 삭제 실패');
     }
   };
 
@@ -148,8 +181,8 @@ const MovieDetailPage = () => {
   const getTopReviews = () => {
     if (!movie?.reviews) return [];
     return [...movie.reviews]
-      .map(r => ({ ...r, voteDiff: (r.like_count || 0) - (r.dislike_count || 0) }))
-      .filter(r => r.voteDiff >= 10)
+      .map((r) => ({ ...r, voteDiff: (r.like_count || 0) - (r.dislike_count || 0) }))
+      .filter((r) => r.voteDiff >= 10)
       .sort((a, b) => b.voteDiff - a.voteDiff)
       .slice(0, 3);
   };
@@ -170,10 +203,10 @@ const MovieDetailPage = () => {
   const renderReviewCard = (review, isTop = false) => {
     const isSpoiler = review.is_spoiler;
     const spoilerHidden = isSpoiler && !showSpoiler[review.id];
-    // 서버에서 is_owner 제공시: 그걸 사용, 아니면 user 비교
-    const isOwner = review.is_owner !== undefined
-      ? review.is_owner
-      : (getCurrentUser() && review.user === getCurrentUser());
+    const isOwner =
+      review.is_owner !== undefined
+        ? review.is_owner
+        : getCurrentUser() && review.user === getCurrentUser();
     const myVote = review.my_vote ?? 0;
 
     return (
@@ -186,21 +219,24 @@ const MovieDetailPage = () => {
         <div className="review-rating">
           {renderStars(review.rating)} <span className="score">{review.rating} / 5</span>
         </div>
+        {/* 추천/비추천 */}
         <div className="review-actions-bar">
           <button
             className={`vote-btn up${myVote === 1 ? ' active' : ''}`}
             onClick={() => handleVote(review.id, 'like', myVote)}
+            aria-pressed={myVote === 1}
           >
             <span className="vote-icon" role="img" aria-label="추천">👍</span>
-            <span>추천</span>
+            <span className="vote-label">추천</span>
             <span className="vote-count">{review.like_count || 0}</span>
           </button>
           <button
             className={`vote-btn down${myVote === -1 ? ' active' : ''}`}
             onClick={() => handleVote(review.id, 'dislike', myVote)}
+            aria-pressed={myVote === -1}
           >
             <span className="vote-icon" role="img" aria-label="비추천">👎</span>
-            <span>비추천</span>
+            <span className="vote-label">비추천</span>
             <span className="vote-count">{review.dislike_count || 0}</span>
           </button>
         </div>
@@ -224,7 +260,11 @@ const MovieDetailPage = () => {
             {spoilerHidden ? (
               <button
                 className="show-spoiler-btn"
-                onClick={(e) => { e.stopPropagation(); handleSpoilerToggle(review.id); }}>
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSpoilerToggle(review.id);
+                }}
+              >
                 내용 보기
               </button>
             ) : null}
@@ -300,17 +340,18 @@ const MovieDetailPage = () => {
 
   // ott id → 객체 변환
   const movieOttList = (movie.ott_services || [])
-    .map(id => ottList.find(ott => ott.id === id))
+    .map((id) => ottList.find((ott) => ott.id === id))
     .filter(Boolean);
 
   return (
     <div className="movie-detail-container">
+      {/* Toast 메시지 출력 */}
+      <Toast ref={toastRef} message={toastMsg} />
       {/* 영화 상세 정보 */}
       <div className="movie-info-section">
         <img src={movie.thumbnail_url} alt={movie.title} className="movie-thumbnail" />
         <div className="movie-text-info">
           <h1 className="movie-title">{movie.title}</h1>
-          {/* 평균 평점 */}
           <div className="movie-average-rating">
             {renderStars(movie.average_rating)}
             <span className="rating-num">{movie.average_rating} / 5</span>
@@ -324,7 +365,7 @@ const MovieDetailPage = () => {
         <h3>OTT에서 바로 보러가기</h3>
         {movieOttList.length > 0 ? (
           <div className="ott-list">
-            {movieOttList.map(ott => (
+            {movieOttList.map((ott) =>
               ott.link_url ? (
                 <a
                   key={ott.id}
@@ -341,7 +382,7 @@ const MovieDetailPage = () => {
                   <img src={ott.logo_url} alt={ott.name} className="ott-logo" style={{ opacity: 0.5 }} />
                 </span>
               )
-            ))}
+            )}
           </div>
         ) : (
           <div className="no-ott">제공하는 OTT가 없습니다.</div>
@@ -407,7 +448,7 @@ const MovieDetailPage = () => {
           {getTopReviews().length === 0 ? (
             <p>Top 리뷰가 없습니다.</p>
           ) : (
-            getTopReviews().map(review => renderReviewCard(review, true))
+            getTopReviews().map((review) => renderReviewCard(review, true))
           )}
         </div>
       </section>
@@ -419,7 +460,7 @@ const MovieDetailPage = () => {
           {getAllReviews().length === 0 ? (
             <p>다른 리뷰가 없습니다.</p>
           ) : (
-            getAllReviews().map(review => renderReviewCard(review, false))
+            getAllReviews().map((review) => renderReviewCard(review, false))
           )}
         </div>
       </section>
