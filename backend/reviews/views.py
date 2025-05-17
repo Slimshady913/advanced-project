@@ -154,14 +154,14 @@ class ToggleReviewReaction(APIView):
                     "like_count": review.like_count,
                     "dislike_count": review.dislike_count,
                 }, status=200)
-            # 반대 반응이면 거부
+            # 반대 반응이면 == **무조건 409로 거부**
             else:
                 if reaction.is_like:
                     return Response({"error": "이미 추천을 눌렀습니다."}, status=409)
                 else:
                     return Response({"error": "이미 비추천을 눌렀습니다."}, status=409)
         except ReviewReaction.DoesNotExist:
-            # 첫 투표
+            # 첫 투표만 허용
             ReviewReaction.objects.create(user=user, review=review, is_like=is_like)
             if is_like:
                 review.like_count += 1
