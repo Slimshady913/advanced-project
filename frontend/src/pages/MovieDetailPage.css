@@ -252,22 +252,36 @@
   margin-bottom: 8px;
 }
 
+/* 추천/비추천 버튼 UX + 강조 */
 .vote-btn {
-  border: none;
+  border: 1.5px solid transparent;
   outline: none;
   background: #232b39;
   color: #fff;
-  font-size: 1em;
+  font-size: 1.05em;
   font-weight: 600;
   border-radius: 18px;
-  padding: 6px 22px;
+  padding: 8px 24px;
   cursor: pointer;
-  transition: background 0.18s, color 0.12s;
+  transition: background 0.18s, color 0.12s, border 0.18s;
   box-shadow: 0 2px 10px #191d2290;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  margin-right: 6px;
+  position: relative;
 }
+.vote-btn .vote-label {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 3px 0 1px;
+}
+.vote-btn .vote-icon {
+  font-size: 1.15em;
+  margin-right: 1px;
+}
+
+/* 추천 */
 .vote-btn.up {
   background: linear-gradient(90deg, #53f16e 60%, #19a548 100%);
   color: #14360e;
@@ -276,22 +290,48 @@
   background: linear-gradient(90deg, #ff8080 60%, #e50914 100%);
   color: #fff;
 }
-.vote-btn:disabled {
-  background: #33393f;
-  color: #aaa;
-  cursor: not-allowed;
-  opacity: 0.75;
+
+/* active(내가 누른 상태) 강조 */
+.vote-btn.active {
+  border: 2.5px solid #2ee787 !important;
+  box-shadow: 0 0 10px #11fa9455, 0 1.5px 12px #223;
+  background: linear-gradient(90deg, #3cf193 70%, #17be74 100%);
+  color: #161c11 !important;
+  transition: 0.18s;
 }
-.vote-icon {
-  font-size: 1.1em;
+.vote-btn.down.active {
+  border: 2.5px solid #ff5370 !important;
+  box-shadow: 0 0 12px #ff5e7a55, 0 1.5px 12px #311;
+  background: linear-gradient(90deg, #ff9393 55%, #f95f41 100%);
+  color: #370303 !important;
 }
 
+/* hover 효과 */
+.vote-btn:not(.active):hover {
+  border: 2px solid #7fffd4;
+  background: #232b39ee;
+  color: #11fa94;
+}
+.vote-btn.down:not(.active):hover {
+  border: 2px solid #ff8a9a;
+  color: #ff6666;
+}
+
+/* 추천/비추천 숫자 강조 */
 .vote-count {
   font-weight: bold;
-  font-size: 1.01em;
-  margin-left: 4px;
+  font-size: 1.07em;
+  margin-left: 5px;
+  color: #ff5252;
+}
+.vote-btn.up .vote-count {
+  color: #06c270;
+}
+.vote-btn.down .vote-count {
+  color: #ef5350;
 }
 
+/* 리뷰 본문 */
 .review-content {
   font-size: 1.03em;
   color: #e6e6e6;
@@ -398,6 +438,29 @@
   color: #ddd;
 }
 
+/* 토스트 알림 (상단 고정) */
+.custom-toast {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222e39;
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px #0005, 0 1.5px 8px #1786ff88;
+  font-size: 1.08rem;
+  font-weight: 600;
+  z-index: 9999;
+  opacity: 0.98;
+  animation: fadeInToast 0.3s;
+  pointer-events: none;
+}
+@keyframes fadeInToast {
+  from { opacity: 0; transform: translateX(-50%) translateY(-14px);}
+  to   { opacity: 0.98; transform: translateX(-50%) translateY(0);}
+}
+
 /* 반응형 */
 @media (max-width: 900px) {
   .movie-detail-container {
@@ -434,6 +497,16 @@
   .review-content.spoiler .show-spoiler-btn {
     left: 90px;
   }
+  .custom-toast {
+    font-size: 0.96rem;
+    padding: 8px 16px;
+    top: 24px;
+  }
+  .vote-btn {
+    padding: 7px 10px;
+    font-size: 0.97em;
+  }
+  .vote-count { font-size: 1em; }
 }
 
 @media (min-width: 900px) {
@@ -480,4 +553,66 @@
   min-width: 40px;
   min-height: 16px;
   vertical-align: middle;
+}
+
+/* 네이버웹툰 추천/비추천 버튼 */
+.webtoon-vote-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 62px;
+  min-height: 52px;
+  border-radius: 26px;
+  border: none;
+  outline: none;
+  margin-right: 12px;
+  font-size: 1.03rem;
+  background: #fff;
+  color: #222;
+  font-weight: bold;
+  box-shadow: 0 2px 10px #0003;
+  transition: all 0.15s;
+  cursor: pointer;
+  border: 2.5px solid transparent;
+  position: relative;
+  gap: 4px;
+}
+.webtoon-vote-btn .vote-icon {
+  font-size: 1.6em;
+  margin-bottom: 2px;
+}
+.webtoon-vote-btn.up {
+  background: #e7fff3;
+  color: #00b570;
+}
+.webtoon-vote-btn.down {
+  background: #ffeaea;
+  color: #f8594a;
+}
+.webtoon-vote-btn.up.active,
+.webtoon-vote-btn.up:focus {
+  border-color: #11cf7d;
+  background: #c2ffd8;
+  color: #008c50;
+  box-shadow: 0 4px 24px #56ffc33d;
+}
+.webtoon-vote-btn.down.active,
+.webtoon-vote-btn.down:focus {
+  border-color: #ff4e73;
+  background: #ffd9de;
+  color: #cc2424;
+  box-shadow: 0 4px 24px #ffb2c09e;
+}
+.webtoon-vote-btn:disabled {
+  opacity: 0.7;
+  background: #f5f5f5 !important;
+  color: #aaa !important;
+  cursor: not-allowed;
+}
+.webtoon-vote-btn .vote-count {
+  font-size: 1.11em;
+  font-weight: 700;
+  margin-top: 2px;
+  letter-spacing: -0.01em;
 }

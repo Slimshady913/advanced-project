@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import './MovieDetailPage.css';
 import { ClipLoader } from 'react-spinners';
 
-// 간단 Toast 컴포넌트
+// 네이버 웹툰 스타일 Toast
 const Toast = React.forwardRef(({ message, duration = 1800 }, ref) => {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -23,7 +23,6 @@ const Toast = React.forwardRef(({ message, duration = 1800 }, ref) => {
   ) : null;
 });
 
-// 날짜 포맷 함수
 function formatDate(dateString) {
   const date = new Date(dateString);
   return (
@@ -109,22 +108,27 @@ const MovieDetailPage = () => {
     setIsSubmitting(false);
   };
 
-  // 추천/비추천
+  // 네이버 웹툰 스타일 추천/비추천
   const handleVote = async (reviewId, type, myVote) => {
     const token = getToken();
     if (!token) return setToastMsg('로그인이 필요합니다.');
-
-    // 이미 추천(1) 상태에서 비추천(-1) 클릭 → 안내
-    // 이미 비추천(-1) 상태에서 추천(1) 클릭 → 안내
-    if (type === 'dislike' && myVote === 1) {
-      setToastMsg('이미 좋아요를 누르셨습니다.');
-      return;
+    // 중복 투표 UX 방지
+    if (type === 'like') {
+      if (myVote === 1) {
+        // 이미 추천 → 취소 (toggle)
+      } else if (myVote === -1) {
+        setToastMsg('이미 싫어요를 누르셨습니다.');
+        return;
+      }
     }
-    if (type === 'like' && myVote === -1) {
-      setToastMsg('이미 싫어요를 누르셨습니다.');
-      return;
+    if (type === 'dislike') {
+      if (myVote === -1) {
+        // 이미 비추천 → 취소 (toggle)
+      } else if (myVote === 1) {
+        setToastMsg('이미 좋아요를 누르셨습니다.');
+        return;
+      }
     }
-
     try {
       await axios.post(
         `/reviews/${reviewId}/${type}/`,
@@ -219,25 +223,39 @@ const MovieDetailPage = () => {
         <div className="review-rating">
           {renderStars(review.rating)} <span className="score">{review.rating} / 5</span>
         </div>
-        {/* 추천/비추천 */}
-        <div className="review-actions-bar">
+        {/* 네이버웹툰 스타일 추천/비추천 */}
+        <div className="review-actions-bar" style={{gap: '16px'}}>
+          {/* 추천 */}
           <button
-            className={`vote-btn up${myVote === 1 ? ' active' : ''}`}
-            onClick={() => handleVote(review.id, 'like', myVote)}
+            className={`webtoon-vote-btn up${myVote === 1 ? ' active' : ''}`}
+            onClick={() => {
+              if (myVote === 1) handleVote(review.id, 'like', myVote);
+              else if (myVote === -1) setToastMsg('이미 싫어요를 누르셨습니다.');
+              else handleVote(review.id, 'like', myVote);
+            }}
             aria-pressed={myVote === 1}
+            disabled={myVote === -1}
+            title={myVote === 1 ? "추천 취소" : "추천"}
+            type="button"
           >
             <span className="vote-icon" role="img" aria-label="추천">👍</span>
-            <span className="vote-label">추천</span>
-            <span className="vote-count">{review.like_count || 0}</span>
+            <span className="vote-count">{review.like_count ?? 0}</span>
           </button>
+          {/* 비추천 */}
           <button
-            className={`vote-btn down${myVote === -1 ? ' active' : ''}`}
-            onClick={() => handleVote(review.id, 'dislike', myVote)}
+            className={`webtoon-vote-btn down${myVote === -1 ? ' active' : ''}`}
+            onClick={() => {
+              if (myVote === -1) handleVote(review.id, 'dislike', myVote);
+              else if (myVote === 1) setToastMsg('이미 좋아요를 누르셨습니다.');
+              else handleVote(review.id, 'dislike', myVote);
+            }}
             aria-pressed={myVote === -1}
+            disabled={myVote === 1}
+            title={myVote === -1 ? "비추천 취소" : "비추천"}
+            type="button"
           >
             <span className="vote-icon" role="img" aria-label="비추천">👎</span>
-            <span className="vote-label">비추천</span>
-            <span className="vote-count">{review.dislike_count || 0}</span>
+            <span className="vote-count">{review.dislike_count ?? 0}</span>
           </button>
         </div>
         {/* 이미지 첨부 */}
@@ -345,7 +363,6 @@ const MovieDetailPage = () => {
 
   return (
     <div className="movie-detail-container">
-      {/* Toast 메시지 출력 */}
       <Toast ref={toastRef} message={toastMsg} />
       {/* 영화 상세 정보 */}
       <div className="movie-info-section">
