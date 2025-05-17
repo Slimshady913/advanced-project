@@ -83,19 +83,24 @@ const MovieDetailPage = () => {
 
   // 추천/비추천 네이버웹툰 스타일
   const handleVote = async (reviewId, type, myVote) => {
-    const token = getToken();
-    if (!token) return alert('로그인이 필요합니다.');
-    try {
-      await axios.post(
-        `/reviews/${reviewId}/${type}/`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchMovieDetail();
-    } catch (error) {
+  const token = getToken();
+  if (!token) return alert('로그인이 필요합니다.');
+  try {
+    await axios.post(
+      `/reviews/${reviewId}/${type}/`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    fetchMovieDetail();
+  } catch (error) {
+    // 409(중복) 에러일 경우 서버 메시지를 alert로 노출
+    if (error.response?.status === 409 && error.response?.data?.error) {
+      alert(error.response.data.error);
+    } else {
       alert('추천/비추천 처리 실패');
     }
-  };
+  }
+};
 
   // 스포일러 토글
   const handleSpoilerToggle = (reviewId) => {
