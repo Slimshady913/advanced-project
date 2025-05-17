@@ -18,11 +18,15 @@ class ReviewImageSerializer(serializers.ModelSerializer):
 # ---------------------------------------------------------------------
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
-    rating = serializers.IntegerField(min_value=1, max_value=5)
+    rating = serializers.FloatField(min_value=0.5, max_value=5.0)
     is_spoiler = serializers.BooleanField(default=False)
     like_count = serializers.SerializerMethodField()
     is_edited = serializers.SerializerMethodField()
     images = ReviewImageSerializer(many=True, read_only=True)
+    def validate_rating(self, value):
+        if value * 2 != int(value * 2):
+            raise serializers.ValidationError("평점은 0.5점 단위로만 입력할 수 있습니다.")
+        return value
 
     def get_like_count(self, obj):
         return obj.likes.count()

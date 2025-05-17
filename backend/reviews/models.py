@@ -10,7 +10,7 @@ User = get_user_model()
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # 리뷰 작성자
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')  # 대상 영화
-    rating = models.IntegerField()  # 평점 (1~5)
+    rating = models.FloatField() # 평점 (1~5)
     comment = models.TextField(blank=True)  # 코멘트 (선택 사항)
     created_at = models.DateTimeField(auto_now_add=True)  # 작성 일시
     updated_at = models.DateTimeField(auto_now=True)      # 수정 일시
