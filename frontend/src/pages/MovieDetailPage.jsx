@@ -93,12 +93,13 @@ const MovieDetailPage = () => {
     );
     fetchMovieDetail();
   } catch (error) {
-    // 409(중복) 에러일 경우 서버 메시지를 alert로 노출
+    // 409 Conflict: 서버에서 이미 눌렀다고 막음!
     if (error.response?.status === 409 && error.response?.data?.error) {
       alert(error.response.data.error);
-    } else {
-      alert('추천/비추천 처리 실패');
+      // **여기서 반드시 fetchMovieDetail()을 실행하지 않는다**
+      return;
     }
+    alert('추천/비추천 처리 실패');
   }
 };
 
