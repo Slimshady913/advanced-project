@@ -95,6 +95,14 @@
   padding: 0.4rem 0 0.6rem 0;
 }
 
+.ott-link-disabled {
+  display: inline-block;
+  cursor: not-allowed;
+}
+.ott-link-disabled img {
+  opacity: 0.45;
+}
+
 /* 리뷰 섹션 */
 .review-section {
   margin-bottom: 2.8rem;
@@ -347,4 +355,38 @@
   .review-form-group-horizontal textarea {
     flex: 1;
   }
+}
+
+.movie-average-rating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.18rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.star-rating {
+  color: #ffd700;
+  font-size: 1.4em;
+  letter-spacing: -2px;
+}
+
+.rating-num {
+  color: #ff5757;
+  font-size: 1.08em;
+  margin-left: 6px;
+}
+.rating-count {
+  color: #aaa;
+  font-size: 0.97em;
+}
+
+.review-card .star-rating {
+  color: #ffd700;
+  font-size: 1.1em;
+  letter-spacing: -1.5px;
+  margin-left: 3px;
+  margin-right: 5px;
+  vertical-align: middle;
 }

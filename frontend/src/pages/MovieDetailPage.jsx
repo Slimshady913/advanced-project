@@ -1,4 +1,4 @@
-// MovieDetailPage.jsx - OTT id 매핑 통일, 전문가 스타일
+// MovieDetailPage.jsx - 평균 평점 및 리뷰별 별점 시각화 반영
 import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import { useParams } from 'react-router-dom';
@@ -39,6 +39,7 @@ const MovieDetailPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchMovieDetail();
+    // eslint-disable-next-line
   }, [id]);
 
   // 리뷰 작성 핸들러
@@ -163,7 +164,7 @@ const MovieDetailPage = () => {
 
   if (!movie) return <p className="movie-not-found">영화 정보를 찾을 수 없습니다.</p>;
 
-  // ⭐ ott id → 객체 변환 (MoviesPage 방식과 동일)
+  // ott id → 객체 변환
   const movieOttList = (movie.ott_services || [])
     .map(id => ottList.find(ott => ott.id === id))
     .filter(Boolean);
@@ -176,6 +177,19 @@ const MovieDetailPage = () => {
   const otherReviews = (movie.reviews || []).filter(
     (review) => !top3Reviews.find((top) => top.id === review.id)
   );
+
+  // 별점 표시 함수 (평균 or 리뷰)
+  const renderStars = (score) => {
+    const filled = Math.round(score); // 평균은 반올림
+    return (
+      <>
+        <span className="star-rating">
+          {'★'.repeat(filled)}
+          {'☆'.repeat(5 - filled)}
+        </span>
+      </>
+    );
+  };
 
   // 리뷰 카드 렌더링 함수
   const renderReviewCard = (review, isTop = false) => {
@@ -218,7 +232,9 @@ const MovieDetailPage = () => {
         ) : (
           <>
             <p><strong>작성자:</strong> {review.user}</p>
-            <p><strong>평점:</strong> {review.rating} / 5</p>
+            <p>
+              <strong>평점:</strong> {renderStars(review.rating)} {review.rating} / 5
+            </p>
             <p>
               <strong>내용:</strong> {review.comment}
               {review.is_edited && <span className="edited-label"> (수정됨)</span>}
@@ -263,6 +279,12 @@ const MovieDetailPage = () => {
         <img src={movie.thumbnail_url} alt={movie.title} className="movie-thumbnail" />
         <div className="movie-text-info">
           <h1 className="movie-title">{movie.title}</h1>
+          {/* 평균 평점 섹션 */}
+          <div className="movie-average-rating">
+            {renderStars(movie.average_rating)}
+            <span className="rating-num">{movie.average_rating} / 5</span>
+            <span className="rating-count">({movie.reviews.length}명 참여)</span>
+          </div>
           <p className="movie-description">{movie.description}</p>
         </div>
       </div>
