@@ -196,6 +196,88 @@
   color: #dedede;
 }
 
+/* ------ 추천/비추천 버튼 디자인 업그레이드 ------ */
+.review-actions-bar {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 8px;
+  margin-top: 2px;
+}
+
+/* 공통 버튼 스타일 */
+.vote-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  outline: none;
+  border-radius: 999px;
+  font-size: 1.03em;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.45em 1.7em 0.45em 1.1em;
+  transition: 
+    background 0.18s,
+    box-shadow 0.17s,
+    transform 0.12s;
+  box-shadow: 0 2px 14px #0001;
+  letter-spacing: 0.01em;
+  user-select: none;
+  position: relative;
+}
+
+/* 추천 버튼 */
+.vote-btn.up {
+  background: linear-gradient(90deg, #70e18d 40%, #36c467 100%);
+  color: #145428;
+  border: 1.5px solid #8df7c0;
+  box-shadow: 0 1px 9px #2fce587c;
+}
+.vote-btn.up .vote-icon {
+  font-size: 1.15em;
+  margin-right: 2px;
+}
+
+/* 비추천 버튼 */
+.vote-btn.down {
+  background: linear-gradient(90deg, #ff9898 40%, #ff3535 100%);
+  color: #a61919;
+  border: 1.5px solid #ffcaca;
+  box-shadow: 0 1px 9px #e945458c;
+}
+.vote-btn.down .vote-icon {
+  font-size: 1.15em;
+  margin-right: 2px;
+}
+
+.vote-btn:disabled {
+  opacity: 0.6;
+  filter: grayscale(0.2);
+  cursor: not-allowed;
+}
+
+/* 호버 효과 */
+.vote-btn:not(:disabled):hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 24px #2222;
+  filter: brightness(1.09);
+}
+
+/* 숫자(배지) */
+.vote-count {
+  display: inline-block;
+  min-width: 22px;
+  background: rgba(255,255,255,0.28);
+  color: inherit;
+  font-size: 1em;
+  font-weight: 700;
+  padding: 0.11em 0.9em 0.11em 0.5em;
+  margin-left: 0.23em;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+/* --------------------------------------------------- */
+
 .review-actions {
   display: flex;
   gap: 10px;
@@ -389,4 +471,104 @@
   margin-left: 3px;
   margin-right: 5px;
   vertical-align: middle;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.review-author {
+  font-weight: 600;
+  color: #fff;
+}
+.review-date {
+  font-size: 0.98em;
+  color: #a1a1a1;
+  margin-left: 12px;
+}
+.top-label {
+  background: linear-gradient(90deg, #ffc700 60%, #ff5c00 100%);
+  color: #1a1a1a;
+  border-radius: 8px;
+  padding: 2px 12px;
+  font-weight: 700;
+  font-size: 0.93em;
+  margin-left: 12px;
+  box-shadow: 0 1px 7px #ffe99088;
+  letter-spacing: 0.03em;
+}
+
+.review-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 1.25em;
+  font-weight: 600;
+}
+.star-rating {
+  color: #ffd700;
+  font-size: 1.1em;
+  margin-right: 7px;
+}
+.score {
+  color: #ff5959;
+  font-size: 0.97em;
+}
+
+.review-content {
+  font-size: 1.03em;
+  color: #e6e6e6;
+  padding: 7px 0 3px 0;
+  line-height: 1.6;
+}
+.review-content.spoiler {
+  position: relative;
+}
+.review-content.blurred {
+  filter: blur(0.23rem);
+  user-select: none;
+  pointer-events: none;
+  background: repeating-linear-gradient(45deg, #242427 0 4px, #39393c 4px 8px);
+}
+.spoiler-label {
+  display: inline-block;
+  margin-right: 10px;
+  color: #ffd700;
+  background: #232220;
+  border-radius: 5px;
+  padding: 1px 7px;
+  font-size: 0.9em;
+  font-weight: 700;
+}
+.show-spoiler-btn {
+  background: #ffc107;
+  color: #231a07;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 18px;
+  font-size: 0.97em;
+  font-weight: 700;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.show-spoiler-btn:hover {
+  background: #ffd700;
+}
+
+.review-images {
+  display: flex;
+  gap: 13px;
+  margin: 6px 0 10px 0;
+}
+.review-image-thumb {
+  width: 74px;
+  height: 74px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1.3px solid #222;
+  background: #282828;
+  box-shadow: 0 2px 7px #0002;
 }
