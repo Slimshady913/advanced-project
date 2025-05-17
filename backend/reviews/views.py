@@ -8,12 +8,12 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from .models import (
-    Review, ReviewCommentReaction, ReviewHistory, ReviewLike,
+    Review, ReviewCommentReaction, ReviewHistory,
     ReviewComment, ReviewReaction
 )
 from .serializers import (
     ReviewImageSerializer, ReviewSerializer, ReviewCommentSerializer,
-    ReviewLikeSerializer, ReviewReactionSerializer, ReviewHistorySerializer
+    ReviewReactionSerializer, ReviewHistorySerializer
 )
 from .permissions import IsOwnerOrReadOnly
 
@@ -96,37 +96,16 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
         return context
 
 # ---------------------------------------------------------------------
-# ✅ 리뷰 좋아요 토글 (ReviewLike)
-# ---------------------------------------------------------------------
-class ReviewLikeToggleView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_summary="리뷰 좋아요 토글",
-        operation_description="리뷰에 대해 좋아요를 토글합니다.",
-        responses={
-            200: openapi.Response(description="좋아요 취소됨"),
-            201: openapi.Response(description="좋아요 등록됨")
-        }
-    )
-    def post(self, request, pk):
-        try:
-            review = Review.objects.get(pk=pk)
-        except Review.DoesNotExist:
-            return Response({'detail': '리뷰를 찾을 수 없습니다.'}, status=404)
-
-        like, created = ReviewLike.objects.get_or_create(user=request.user, review=review)
-        if not created:
-            like.delete()
-            return Response({'liked': False}, status=200)
-        return Response({'liked': True}, status=201)
-
-# ---------------------------------------------------------------------
-# ✅ 리뷰 추천/비추천 기능 (ReviewReaction) - 네이버 웹툰 스타일
+# ✅ 리뷰 추천/비추천 기능 (ReviewReaction)
 # ---------------------------------------------------------------------
 class ToggleReviewReaction(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="리뷰 추천/비추천 토글",
+        operation_description="네이버 웹툰 스타일: 추천/비추천 토글 (1인 1표, 중복/반대 투표 반영)",
+        responses={200: openapi.Response(description="성공")}
+    )
     def post(self, request, review_id, reaction_type):
         user = request.user
         is_like = reaction_type == 'like'
@@ -138,7 +117,6 @@ class ToggleReviewReaction(APIView):
 
         try:
             reaction = ReviewReaction.objects.get(user=user, review=review)
-            # 동일한 반응이면 == 취소
             if reaction.is_like == is_like:
                 reaction.delete()
                 if is_like:
@@ -152,8 +130,8 @@ class ToggleReviewReaction(APIView):
                     "like_count": review.like_count,
                     "dislike_count": review.dislike_count,
                 }, status=200)
-            # 반대 반응이면 == 이동
             else:
+                # 반대 투표로 변경
                 if is_like:
                     review.like_count += 1
                     review.dislike_count = max(review.dislike_count - 1, 0)

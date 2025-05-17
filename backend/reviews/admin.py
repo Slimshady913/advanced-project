@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
-    Review, ReviewLike, ReviewComment,
+    Review, ReviewComment,
     ReviewReaction, ReviewCommentReaction,
     ReviewHistory, ReviewImage
 )
@@ -16,13 +16,6 @@ class ReviewAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'movie__title', 'comment')
     ordering = ('-created_at',)
 
-# ---------------------------------------------------------------------
-# ✅ 리뷰 좋아요 모델 관리자 설정
-# ---------------------------------------------------------------------
-@admin.register(ReviewLike)
-class ReviewLikeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'review', 'created_at')
-    search_fields = ('user__username',)
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 댓글 모델 관리자 설정

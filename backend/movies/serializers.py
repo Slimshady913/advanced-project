@@ -42,5 +42,6 @@ class MovieSerializer(serializers.ModelSerializer):
         return round(obj.calculate_average_rating(), 1)
 
     def get_reviews(self, obj):
-        # context=self.context 를 반드시 전달!
-        return ReviewSerializer(obj.reviews.all(), many=True, context=self.context).data
+        request = self.context.get('request')
+        reviews_qs = obj.reviews.all()
+        return ReviewSerializer(reviews_qs, many=True, context={'request': request}).data

@@ -39,20 +39,6 @@ class Review(models.Model):
         return f"{self.user.username} - {self.movie.title} ({self.rating}점)"
 
 # ---------------------------------------------------------------------
-# ✅ 리뷰 좋아요 모델: 사용자-리뷰 좋아요 연결
-# ---------------------------------------------------------------------
-class ReviewLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='likes')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('user', 'review')  # 중복 방지
-
-    def __str__(self):
-        return f"{self.user.username} ❤️ {self.review}"
-
-# ---------------------------------------------------------------------
 # ✅ 리뷰 댓글 모델
 # ---------------------------------------------------------------------
 class ReviewComment(models.Model):
