@@ -100,7 +100,7 @@ class ReviewReaction(models.Model):
 class ReviewHistory(models.Model):
     review = models.ForeignKey('Review', on_delete=models.CASCADE, related_name='histories')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    previous_rating = models.IntegerField()
+    previous_rating = models.FloatField()
     previous_comment = models.TextField()
     edited_at = models.DateTimeField(auto_now_add=True)
 
