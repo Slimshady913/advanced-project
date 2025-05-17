@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
 import './AuthPage.css';
 import { ClipLoader } from 'react-spinners';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 /**
  * AuthPage: 로그인 / 회원가입 통합 페이지

@@ -14,6 +14,7 @@ import BoardListPage from './pages/BoardListPage.jsx';
 import BoardWritePage from './pages/BoardWritePage.jsx';
 import BoardDetailPage from './pages/BoardDetailPage.jsx';
 import BoardEditPage from './pages/BoardEditPage.jsx';
+
 /**
  * App: 루트 컴포넌트
  * - 로그인 상태 체크 및 헤더 렌더링
@@ -27,14 +28,19 @@ function App() {
 
   // 🔐 JWT 토큰 기반 사용자 인증 상태 초기화
   const initializeAuth = async () => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('access'); // 'accessToken' -> 'access'로 수정
     if (token) {
       try {
         const decoded = jwtDecode(token);
         setIsLoggedIn(true);
         setUserEmail(decoded.email);
-        const res = await axios.get('/users/profile/');
-        setUsername(res.data.username);
+        // 토큰에 username이 있으면 즉시 세팅, 없으면 서버에서 fetch
+        if (decoded.username) {
+          setUsername(decoded.username);
+        } else {
+          const res = await axios.get('/users/profile/');
+          setUsername(res.data.username);
+        }
       } catch {
         setIsLoggedIn(false);
         setUserEmail('');
@@ -50,6 +56,7 @@ function App() {
 
   useEffect(() => {
     initializeAuth();
+    // 의존성 없이, 앱 최초 마운트시 한 번만 실행
   }, []);
 
   return (
@@ -61,8 +68,8 @@ function App() {
           userEmail={userEmail}
           username={username}
           onLogout={() => {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('access'); // 'accessToken' → 'access'로 통일
+            localStorage.removeItem('refresh');
             setIsLoggedIn(false);
             setUserEmail('');
             setUsername(null);
