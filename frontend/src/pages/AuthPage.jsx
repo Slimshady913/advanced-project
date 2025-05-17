@@ -3,12 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
 import './AuthPage.css';
 import { ClipLoader } from 'react-spinners';
+import jwtDecode from 'jwt-decode';
 
 /**
  * AuthPage: 로그인 / 회원가입 통합 페이지
- * - mode 상태에 따라 화면 전환
- * - 로그인 성공 시 메인으로 이동
- * - 회원가입 성공 시 구독 선택 페이지로 이동
  */
 function AuthPage({ onLoginSuccess }) {
   const navigate = useNavigate();
@@ -31,6 +29,21 @@ function AuthPage({ onLoginSuccess }) {
     }
   }, [location.key]);
 
+  // JWT에서 username/email 추출 및 저장
+  const saveUsernameFromToken = (token) => {
+    try {
+      const decoded = jwtDecode(token);
+      // username이 있으면 저장, 없으면 email로 대체 저장
+      if (decoded.username) {
+        localStorage.setItem('username', decoded.username);
+      } else if (decoded.email) {
+        localStorage.setItem('username', decoded.email);
+      }
+    } catch (e) {
+      // 토큰 디코딩 실패시 무시
+    }
+  };
+
   // 🚀 로그인 또는 회원가입 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,17 +53,19 @@ function AuthPage({ onLoginSuccess }) {
     try {
       if (mode === 'login') {
         const res = await axios.post('/token/', { email, password });
-        localStorage.setItem('accessToken', res.data.access);
-        localStorage.setItem('refreshToken', res.data.refresh);
+        localStorage.setItem('access', res.data.access);
+        localStorage.setItem('refresh', res.data.refresh);
+        saveUsernameFromToken(res.data.access);
         onLoginSuccess?.();
         navigate('/');
       } else {
         await axios.post('/users/register/', { email, username, password });
         const res = await axios.post('/token/', { email, password });
-        localStorage.setItem('accessToken', res.data.access);
-        localStorage.setItem('refreshToken', res.data.refresh);
+        localStorage.setItem('access', res.data.access);
+        localStorage.setItem('refresh', res.data.refresh);
+        saveUsernameFromToken(res.data.access);
         onLoginSuccess?.();
-        navigate('/subscribe'); // ✅ 회원가입 후 구독 설정 페이지로 이동
+        navigate('/subscribe');
       }
 
       setEmail('');
