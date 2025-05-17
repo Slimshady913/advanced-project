@@ -8,11 +8,11 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from .models import (
-    Review, ReviewCommentReaction, ReviewHistory, ReviewLike, 
+    Review, ReviewCommentReaction, ReviewHistory, ReviewLike,
     ReviewComment, ReviewReaction
 )
 from .serializers import (
-    ReviewImageSerializer, ReviewSerializer, ReviewCommentSerializer, 
+    ReviewImageSerializer, ReviewSerializer, ReviewCommentSerializer,
     ReviewLikeSerializer, ReviewReactionSerializer, ReviewHistorySerializer
 )
 from .permissions import IsOwnerOrReadOnly
@@ -58,6 +58,11 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
 # ---------------------------------------------------------------------
 # ✅ 리뷰 상세 조회 / 수정 / 삭제 및 수정 이력 저장
 # ---------------------------------------------------------------------
@@ -84,6 +89,11 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     @swagger_auto_schema(operation_summary="리뷰 삭제")
     def delete(self, request, *args, **kwargs):
         return super().delete(request, *args, **kwargs)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 좋아요 토글 (ReviewLike)
@@ -112,7 +122,7 @@ class ReviewLikeToggleView(APIView):
         return Response({'liked': True}, status=201)
 
 # ---------------------------------------------------------------------
-# ✅ 리뷰 추천/비추천 기능 (ReviewReaction)
+# ✅ 리뷰 추천/비추천 기능 (ReviewReaction) - 네이버 웹툰 스타일
 # ---------------------------------------------------------------------
 class ToggleReviewReaction(APIView):
     permission_classes = [IsAuthenticated]
@@ -128,30 +138,51 @@ class ToggleReviewReaction(APIView):
 
         try:
             reaction = ReviewReaction.objects.get(user=user, review=review)
-            # 이미 해당 반응을 했으면 중복 차단 (아무 변화 없음)
+            # 동일한 반응이면 == 취소
             if reaction.is_like == is_like:
-                return Response({"message": "이미 반영한 투표입니다."}, status=409)
-            # 반대 반응을 했으면 카운트 이동
+                reaction.delete()
+                if is_like:
+                    review.like_count = max(review.like_count - 1, 0)
+                else:
+                    review.dislike_count = max(review.dislike_count - 1, 0)
+                review.save()
+                return Response({
+                    "message": "투표가 취소되었습니다.",
+                    "my_vote": 0,
+                    "like_count": review.like_count,
+                    "dislike_count": review.dislike_count,
+                }, status=200)
+            # 반대 반응이면 == 이동
             else:
                 if is_like:
                     review.like_count += 1
-                    review.dislike_count -= 1
+                    review.dislike_count = max(review.dislike_count - 1, 0)
                 else:
                     review.dislike_count += 1
-                    review.like_count -= 1
+                    review.like_count = max(review.like_count - 1, 0)
                 reaction.is_like = is_like
                 reaction.save()
                 review.save()
-                return Response({"message": "반응이 변경되었습니다."})
+                return Response({
+                    "message": "반응이 변경되었습니다.",
+                    "my_vote": 1 if is_like else -1,
+                    "like_count": review.like_count,
+                    "dislike_count": review.dislike_count,
+                }, status=200)
         except ReviewReaction.DoesNotExist:
-            # 처음 투표
+            # 첫 투표
             ReviewReaction.objects.create(user=user, review=review, is_like=is_like)
             if is_like:
                 review.like_count += 1
             else:
                 review.dislike_count += 1
             review.save()
-            return Response({"message": "투표가 반영되었습니다."})
+            return Response({
+                "message": "투표가 반영되었습니다.",
+                "my_vote": 1 if is_like else -1,
+                "like_count": review.like_count,
+                "dislike_count": review.dislike_count,
+            }, status=201)
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 댓글 목록 조회 + 작성 (상위 3개 추천순 정렬 포함)

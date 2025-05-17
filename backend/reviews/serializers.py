@@ -24,6 +24,18 @@ class ReviewSerializer(serializers.ModelSerializer):
     dislike_count = serializers.IntegerField(read_only=True)
     is_edited = serializers.SerializerMethodField()
     images = ReviewImageSerializer(many=True, read_only=True)
+    my_vote = serializers.SerializerMethodField()
+
+    def get_my_vote(self, obj):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            try:
+                reaction = ReviewReaction.objects.get(user=request.user, review=obj)
+                return 1 if reaction.is_like else -1
+            except ReviewReaction.DoesNotExist:
+                return 0
+        return 0
+
     def validate_rating(self, value):
         if value * 2 != int(value * 2):
             raise serializers.ValidationError("평점은 0.5점 단위로만 입력할 수 있습니다.")
@@ -50,7 +62,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = [
             'id', 'user', 'movie', 'rating', 'comment', 'is_spoiler',
-            'created_at', 'like_count', 'dislike_count', 'is_edited', 'images'
+            'created_at', 'like_count', 'dislike_count', 'is_edited', 'images', 'my_vote'
         ]
         read_only_fields = ['user', 'created_at', 'like_count', 'dislike_count', 'is_edited']
 
