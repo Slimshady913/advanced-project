@@ -13,21 +13,21 @@ const SubscribePage = () => {
   const [selectedOtts, setSelectedOtts] = useState([]);
   const navigate = useNavigate();
 
-  // 🔄 OTT 목록 불러오기
+  // OTT 목록 불러오기
   useEffect(() => {
     axios.get('/ott/')
       .then(res => setOttList(res.data))
       .catch(err => console.error('OTT 목록 불러오기 실패:', err));
   }, []);
 
-  // ✅ 선택된 OTT 토글 (체크박스)
+  // 선택된 OTT 토글 (체크박스)
   const toggleOtt = (id) => {
     setSelectedOtts(prev =>
       prev.includes(id) ? prev.filter(ottId => ottId !== id) : [...prev, id]
     );
   };
 
-  // 💾 저장 요청 → 메인페이지 이동
+  // 저장 요청 → 메인페이지 이동
   const handleSubmit = async () => {
     try {
       await axios.post('/users/subscribe/', { ott_ids: selectedOtts });
@@ -37,29 +37,35 @@ const SubscribePage = () => {
     }
   };
 
-  // 🧾 렌더링
+  // 렌더링
   return (
     <div className="subscribe-page">
-      <h2>🎬 구독 중인 OTT를 선택해주세요</h2>
-      <p>구독 중인 OTT가 없다면 선택하지 않고 '저장하기'를 눌러도 됩니다.</p>
-
-      <div className="ott-list">
-        {ottList.map(ott => (
-          <label key={ott.id} className="ott-item">
-            <input
-              type="checkbox"
-              checked={selectedOtts.includes(ott.id)}
-              onChange={() => toggleOtt(ott.id)}
-            />
-            <img src={ott.logo_url} alt={ott.name} />
-            <span>{ott.name}</span>
-          </label>
-        ))}
+      <div className="subscribe-background">
+        <div className="subscribe-center-area">
+          <div className="subscribe-box">
+            <h2>구독 중인 OTT를 선택해주세요</h2>
+            <p className="desc">
+              구독 중인 OTT가 없다면 선택하지 않고 &lsquo;저장하기&rsquo;를 눌러도 됩니다.
+            </p>
+            <div className="ott-list">
+              {ottList.map(ott => (
+                <label key={ott.id} className={`ott-item${selectedOtts.includes(ott.id) ? ' selected' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={selectedOtts.includes(ott.id)}
+                    onChange={() => toggleOtt(ott.id)}
+                  />
+                  <img src={ott.logo_url} alt={ott.name} />
+                  <span>{ott.name}</span>
+                </label>
+              ))}
+            </div>
+            <button onClick={handleSubmit} className="save-btn">저장하기</button>
+          </div>
+        </div>
       </div>
-
-      <button onClick={handleSubmit} className="save-btn">저장하기</button>
-    </div>
-  );
-};
-
-export default SubscribePage;
+      </div>
+    );
+  };
+  
+  export default SubscribePage;

@@ -1,44 +1,168 @@
-/* 📄 구독 설정 페이지 전체 레이아웃 */
 .subscribe-page {
-  padding: 2rem;
-  color: white;
-  background-color: #141414;
   min-height: 100vh;
-}
-
-/* 📺 OTT 목록 그리드 (가로 정렬 + 줄바꿈) */
-.ott-list {
+  background: linear-gradient(120deg, #16161d 0%, #181818 100%);
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin: 1rem 0;
+  align-items: flex-start;     /* 상단 쪽으로 */
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* 🧩 개별 OTT 항목 카드 */
+/* 약간의 어두운 오버레이 (몰입감) */
+.subscribe-background::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  z-index: 0;
+  background: linear-gradient(120deg, rgba(20,20,30,0.96) 70%, rgba(24,24,24,0.85) 100%);
+  pointer-events: none;
+}
+
+/* 메인 카드 영역: 화면의 상단 20~30% 지점에서 중앙 정렬 */
+.subscribe-center-area {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 85vh;
+  padding-top: 7vh;  /* 화면 상단과 간격 */
+  z-index: 2;
+}
+
+.subscribe-box {
+  background: #181818;
+  padding: 3.2rem 2.8rem 2.3rem 2.8rem;
+  border-radius: 32px;
+  box-shadow: 0 16px 48px 0 rgba(0,0,0,0.26), 0 0px 2px 0 rgba(0,0,0,0.13);
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.subscribe-box h2 {
+  margin-bottom: 1.15rem;
+  font-size: 2.13rem;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  letter-spacing: -0.7px;
+}
+
+.subscribe-box .desc {
+  color: #bbbbbb;
+  margin-bottom: 2.3rem;
+  font-size: 1.12rem;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: -0.4px;
+}
+
+.ott-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 1.45rem;
+  width: 100%;
+  margin-bottom: 2.8rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* ...아래는 이전 카드 디자인 유지... */
 .ott-item {
+  background: #232323;
+  border-radius: 14px;
+  box-shadow: 0 3px 14px rgba(30,30,30,0.13);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background-color: #222;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  gap: 0.8rem;
+  padding: 1.05rem 1.25rem;
   cursor: pointer;
+  transition: background 0.19s, box-shadow 0.18s, border 0.16s;
+  border: 2px solid transparent;
+  font-size: 1.17rem;
+  color: #ececec;
+  position: relative;
 }
 
-/* 🖼️ OTT 로고 이미지 */
+.ott-item.selected {
+  border: 2px solid #e50914;
+  background: #210b0e;
+  color: #fff;
+}
+
+.ott-item:hover {
+  background: #27273c;
+  box-shadow: 0 5px 19px rgba(229,9,20,0.13);
+}
+
+.ott-item input[type="checkbox"] {
+  width: 1.18em;
+  height: 1.18em;
+  accent-color: #e50914;
+  margin-right: 0.28em;
+}
+
 .ott-item img {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 0 7px rgba(0,0,0,0.09);
 }
 
-/* 💾 저장 버튼 */
+.ott-item span {
+  flex: 1;
+  font-weight: 500;
+  font-size: 1.13rem;
+}
+
 .save-btn {
   background-color: #e50914;
-  color: white;
+  color: #fff;
   border: none;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 6px;
+  outline: none;
+  padding: 1.10rem 2.8rem;
+  font-size: 1.18rem;
+  border-radius: 11px;
+  font-weight: 700;
   cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.16s, box-shadow 0.16s;
+  box-shadow: 0 3px 15px rgba(229,9,20,0.12);
+}
+.save-btn:hover, .save-btn:focus {
+  background-color: #bf0810;
+  box-shadow: 0 6px 26px rgba(229,9,20,0.18);
+}
+
+@media (max-width: 700px) {
+  .subscribe-center-area {
+    padding-top: 3vw;
+    min-height: 80vh;
+  }
+  .subscribe-box {
+    padding: 1.2rem 0.3rem 1.6rem 0.3rem;
+    max-width: 99vw;
+    border-radius: 0;
+  }
+  .ott-list {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.7rem;
+    max-height: 240px;
+  }
+  .ott-item {
+    padding: 0.59rem 0.63rem;
+    font-size: 0.99rem;
+  }
+  .ott-item img {
+    width: 30px;
+    height: 30px;
+  }
+  .save-btn {
+    font-size: 1rem;
+    padding: 0.85rem 1.6rem;
+  }
 }
