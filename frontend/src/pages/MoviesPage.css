@@ -241,3 +241,39 @@ html, body {
     max-width: 45%;
   }
 }
+
+/*────────────────────────────────────────────────────────────
+  11) 리뷰 추천/비추천 버튼 (네이버 웹툰 스타일)
+────────────────────────────────────────────────────────────*/
+.vote-btn {
+  background: #232323;
+  color: #bbbbbb;
+  border: none;
+  border-radius: 18px;
+  padding: 0.45em 1.1em;
+  margin-right: 0.65em;
+  font-size: 1.08em;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s, font-weight 0.16s, box-shadow 0.13s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36em;
+}
+
+.vote-btn:hover:not(.active) {
+  background: #333344;
+  color: #fff;
+}
+
+.vote-btn.active {
+  background: var(--accent);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 14px rgba(229,9,20,0.18);
+}
+
+.vote-count {
+  font-weight: 600;
+  margin-left: 0.18em;
+  font-size: 1em;
+}

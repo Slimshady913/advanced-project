@@ -22,7 +22,6 @@ const MovieDetailPage = () => {
   const [editReviewId, setEditReviewId] = useState(null);
   const [editReviewData, setEditReviewData] = useState({ rating: 5, comment: '', is_spoiler: false });
   const [showSpoiler, setShowSpoiler] = useState({});
-  const [reviewVoteStatus, setReviewVoteStatus] = useState({});
 
   // 항상 최신 토큰/유저명 불러오기 (함수형: useState 대신 매번 getItem)
   const getToken = () => localStorage.getItem('access');
@@ -82,26 +81,19 @@ const MovieDetailPage = () => {
     setIsSubmitting(false);
   };
 
-  // 추천/비추천
-  const handleVote = async (reviewId, type) => {
+  // 추천/비추천 네이버웹툰 스타일
+  const handleVote = async (reviewId, type, myVote) => {
     const token = getToken();
     if (!token) return alert('로그인이 필요합니다.');
-    if (reviewVoteStatus[reviewId]) return alert('이미 반영한 투표입니다.');
     try {
       await axios.post(
         `/reviews/${reviewId}/${type}/`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setReviewVoteStatus({ ...reviewVoteStatus, [reviewId]: true });
       fetchMovieDetail();
     } catch (error) {
-      if (error.response?.status === 409) {
-        alert('이미 반영한 투표입니다.');
-        setReviewVoteStatus({ ...reviewVoteStatus, [reviewId]: true });
-      } else {
-        alert('추천/비추천 실패');
-      }
+      alert('추천/비추천 처리 실패');
     }
   };
 
@@ -176,6 +168,7 @@ const MovieDetailPage = () => {
     const isOwner = review.is_owner !== undefined
       ? review.is_owner
       : (getCurrentUser() && review.user === getCurrentUser());
+    const myVote = review.my_vote ?? 0;
 
     return (
       <div key={review.id} className={`review-card${isTop ? ' top-review' : ''}`}>
@@ -189,18 +182,16 @@ const MovieDetailPage = () => {
         </div>
         <div className="review-actions-bar">
           <button
-            className="vote-btn up"
-            onClick={() => handleVote(review.id, 'like')}
-            disabled={reviewVoteStatus[review.id]}
+            className={`vote-btn up${myVote === 1 ? ' active' : ''}`}
+            onClick={() => handleVote(review.id, 'like', myVote)}
           >
             <span className="vote-icon" role="img" aria-label="추천">👍</span>
             <span>추천</span>
             <span className="vote-count">{review.like_count || 0}</span>
           </button>
           <button
-            className="vote-btn down"
-            onClick={() => handleVote(review.id, 'dislike')}
-            disabled={reviewVoteStatus[review.id]}
+            className={`vote-btn down${myVote === -1 ? ' active' : ''}`}
+            onClick={() => handleVote(review.id, 'dislike', myVote)}
           >
             <span className="vote-icon" role="img" aria-label="비추천">👎</span>
             <span>비추천</span>
@@ -231,7 +222,7 @@ const MovieDetailPage = () => {
                 내용 보기
               </button>
             ) : null}
-            <span className={spoilerHidden ? 'blurred' : ''} style={{marginLeft: '16px'}}>
+            <span className={spoilerHidden ? 'blurred' : ''} style={{ marginLeft: '16px' }}>
               {review.comment}
             </span>
           </div>
