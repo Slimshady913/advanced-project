@@ -22,7 +22,7 @@ function BoardWritePage() {
     }
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('access');
       const res = await axios.post(
         '/board/posts/',
         { title, content, category },

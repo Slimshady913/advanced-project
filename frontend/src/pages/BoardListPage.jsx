@@ -36,7 +36,7 @@ function BoardListPage() {
     navigate(`/community/${postId}`);
   };
 
-  const isLoggedIn = !!localStorage.getItem('accessToken');
+  const isLoggedIn = !!localStorage.getItem('access');
 
   return (
     <div className="board-container">

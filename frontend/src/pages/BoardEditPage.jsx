@@ -40,7 +40,7 @@ function BoardEditPage() {
     }
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('access');
       await axios.put(
         `/board/posts/${id}/`,
         { title, content, category },

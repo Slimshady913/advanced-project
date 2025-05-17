@@ -11,7 +11,7 @@ function BoardDetailPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem('access');
   const username = localStorage.getItem('username');
 
   useEffect(() => {
