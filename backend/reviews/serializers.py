@@ -21,6 +21,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     rating = serializers.FloatField(min_value=0.5, max_value=5.0)
     is_spoiler = serializers.BooleanField(default=False)
     like_count = serializers.SerializerMethodField()
+    dislike_count = serializers.IntegerField(read_only=True)
     is_edited = serializers.SerializerMethodField()
     images = ReviewImageSerializer(many=True, read_only=True)
     def validate_rating(self, value):
@@ -49,9 +50,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = [
             'id', 'user', 'movie', 'rating', 'comment', 'is_spoiler',
-            'created_at', 'like_count', 'is_edited', 'images'
+            'created_at', 'like_count', 'dislike_count', 'is_edited', 'images'
         ]
-        read_only_fields = ['user', 'created_at', 'like_count', 'is_edited']
+        read_only_fields = ['user', 'created_at', 'like_count', 'dislike_count', 'is_edited']
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 좋아요 Serializer (내부 로직 처리용)

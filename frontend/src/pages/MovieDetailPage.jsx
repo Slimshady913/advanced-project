@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import './MovieDetailPage.css';
 import { ClipLoader } from 'react-spinners';
 
+// 날짜 포맷 함수
 function formatDate(dateString) {
   const date = new Date(dateString);
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
@@ -19,18 +20,22 @@ const MovieDetailPage = () => {
   const [newReview, setNewReview] = useState({ rating: 5, comment: '', is_spoiler: false, images: [] });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editReviewId, setEditReviewId] = useState(null);
-  const [editReviewData, setEditReviewData] = useState({ rating: 5, comment: '', is_spoiler: false, images: [] });
-  const [newComment, setNewComment] = useState({});
+  const [editReviewData, setEditReviewData] = useState({ rating: 5, comment: '', is_spoiler: false });
   const [showSpoiler, setShowSpoiler] = useState({});
   const [reviewVoteStatus, setReviewVoteStatus] = useState({});
-  const token = localStorage.getItem('access');
 
+  // 항상 최신 토큰/유저명 불러오기 (함수형: useState 대신 매번 getItem)
+  const getToken = () => localStorage.getItem('access');
+  const getCurrentUser = () => localStorage.getItem('username');
+
+  // OTT 목록 불러오기
   useEffect(() => {
     axios.get('/ott/')
       .then(res => setOttList(res.data))
       .catch(err => console.error('OTT 목록 불러오기 실패:', err));
   }, []);
 
+  // 영화 상세 + 리뷰 데이터
   const fetchMovieDetail = async () => {
     try {
       const response = await axios.get(`/movies/${id}/`);
@@ -63,20 +68,25 @@ const MovieDetailPage = () => {
       await axios.post(
         `/reviews/`,
         formData,
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+        { headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' } }
       );
       setNewReview({ rating: 5, comment: '', is_spoiler: false, images: [] });
       fetchMovieDetail();
     } catch (error) {
-      console.error('리뷰 작성 실패:', error);
+      if (error.response?.data?.non_field_errors) {
+        alert(error.response.data.non_field_errors[0]);
+      } else {
+        alert('리뷰 작성 실패');
+      }
     }
     setIsSubmitting(false);
   };
 
   // 추천/비추천
   const handleVote = async (reviewId, type) => {
+    const token = getToken();
     if (!token) return alert('로그인이 필요합니다.');
-    if (reviewVoteStatus[reviewId]) return alert('이미 추천한 리뷰입니다.');
+    if (reviewVoteStatus[reviewId]) return alert('이미 반영한 투표입니다.');
     try {
       await axios.post(
         `/reviews/${reviewId}/${type}/`,
@@ -87,10 +97,10 @@ const MovieDetailPage = () => {
       fetchMovieDetail();
     } catch (error) {
       if (error.response?.status === 409) {
-        alert('이미 추천한 리뷰입니다.');
+        alert('이미 반영한 투표입니다.');
         setReviewVoteStatus({ ...reviewVoteStatus, [reviewId]: true });
       } else {
-        console.error('추천/비추천 실패:', error);
+        alert('추천/비추천 실패');
       }
     }
   };
@@ -100,7 +110,43 @@ const MovieDetailPage = () => {
     setShowSpoiler(prev => ({ ...prev, [reviewId]: !prev[reviewId] }));
   };
 
-  // Top 리뷰 선정 기준
+  // 리뷰 수정 시작/취소/저장
+  const startEditing = (review) => {
+    setEditReviewId(review.id);
+    setEditReviewData({ rating: review.rating, comment: review.comment, is_spoiler: review.is_spoiler });
+  };
+  const cancelEditing = () => {
+    setEditReviewId(null);
+    setEditReviewData({ rating: 5, comment: '', is_spoiler: false });
+  };
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(
+        `/reviews/${editReviewId}/`,
+        editReviewData,
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      cancelEditing();
+      fetchMovieDetail();
+    } catch (error) {
+      alert('리뷰 수정 실패');
+    }
+  };
+  // 리뷰 삭제
+  const handleDelete = async (reviewId) => {
+    if (!window.confirm('정말 삭제하시겠습니까?')) return;
+    try {
+      await axios.delete(`/reviews/${reviewId}/`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      fetchMovieDetail();
+    } catch (error) {
+      alert('리뷰 삭제 실패');
+    }
+  };
+
+  // Top 리뷰/전체 리뷰
   const getTopReviews = () => {
     if (!movie?.reviews) return [];
     return [...movie.reviews]
@@ -109,11 +155,9 @@ const MovieDetailPage = () => {
       .sort((a, b) => b.voteDiff - a.voteDiff)
       .slice(0, 3);
   };
-
-  // 전체 리뷰(Top 포함)
   const getAllReviews = () => movie?.reviews || [];
 
-  // 별점 표시 함수
+  // 별점 표시
   const renderStars = (score) => {
     const stars = [];
     let full = Math.floor(score);
@@ -128,6 +172,11 @@ const MovieDetailPage = () => {
   const renderReviewCard = (review, isTop = false) => {
     const isSpoiler = review.is_spoiler;
     const spoilerHidden = isSpoiler && !showSpoiler[review.id];
+    // 서버에서 is_owner 제공시: 그걸 사용, 아니면 user 비교
+    const isOwner = review.is_owner !== undefined
+      ? review.is_owner
+      : (getCurrentUser() && review.user === getCurrentUser());
+
     return (
       <div key={review.id} className={`review-card${isTop ? ' top-review' : ''}`}>
         <div className="review-header">
@@ -171,18 +220,71 @@ const MovieDetailPage = () => {
             ))}
           </div>
         )}
-        {/* 스포일러 처리 */}
+        {/* 스포일러 분리 처리 */}
         {isSpoiler ? (
-          <div className={`review-content spoiler${spoilerHidden ? ' blurred' : ''}`}>
+          <div className="review-content spoiler">
             <span className="spoiler-label">스포일러 포함</span>
             {spoilerHidden ? (
-              <button className="show-spoiler-btn" onClick={() => handleSpoilerToggle(review.id)}>내용 보기</button>
-            ) : (
-              <span>{review.comment}</span>
-            )}
+              <button
+                className="show-spoiler-btn"
+                onClick={(e) => { e.stopPropagation(); handleSpoilerToggle(review.id); }}>
+                내용 보기
+              </button>
+            ) : null}
+            <span className={spoilerHidden ? 'blurred' : ''} style={{marginLeft: '16px'}}>
+              {review.comment}
+            </span>
           </div>
         ) : (
           <div className="review-content">{review.comment}</div>
+        )}
+        {/* 본인만 수정/삭제 */}
+        {isOwner && (
+          <div className="review-actions">
+            {editReviewId === review.id ? (
+              <form onSubmit={handleEditSubmit} className="review-form">
+                <div className="review-form-group review-form-group-horizontal">
+                  <label htmlFor="edit-rating">평점</label>
+                  <select
+                    id="edit-rating"
+                    value={editReviewData.rating}
+                    onChange={e => setEditReviewData({ ...editReviewData, rating: parseFloat(e.target.value) })}
+                  >
+                    {[...Array(10)].map((_, i) => (
+                      <option key={i} value={(i + 1) * 0.5}>{((i + 1) * 0.5).toFixed(1)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="review-form-group">
+                  <label htmlFor="edit-comment">코멘트</label>
+                  <textarea
+                    id="edit-comment"
+                    value={editReviewData.comment}
+                    onChange={e => setEditReviewData({ ...editReviewData, comment: e.target.value })}
+                  />
+                </div>
+                <div className="review-form-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={editReviewData.is_spoiler}
+                      onChange={e => setEditReviewData({ ...editReviewData, is_spoiler: e.target.checked })}
+                    />
+                    스포일러 포함
+                  </label>
+                </div>
+                <div className="review-actions">
+                  <button type="submit">저장</button>
+                  <button type="button" onClick={cancelEditing}>취소</button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <button onClick={() => startEditing(review)}>수정</button>
+                <button onClick={() => handleDelete(review.id)}>삭제</button>
+              </>
+            )}
+          </div>
         )}
       </div>
     );
@@ -206,7 +308,7 @@ const MovieDetailPage = () => {
 
   return (
     <div className="movie-detail-container">
-      {/* ✅ 영화 상세 정보 */}
+      {/* 영화 상세 정보 */}
       <div className="movie-info-section">
         <img src={movie.thumbnail_url} alt={movie.title} className="movie-thumbnail" />
         <div className="movie-text-info">
@@ -220,7 +322,7 @@ const MovieDetailPage = () => {
           <p className="movie-description">{movie.description}</p>
         </div>
       </div>
-      {/* ✅ OTT에서 바로 보러가기 */}
+      {/* OTT에서 바로 보러가기 */}
       <div className="ott-section">
         <h3>OTT에서 바로 보러가기</h3>
         {movieOttList.length > 0 ? (
@@ -249,13 +351,12 @@ const MovieDetailPage = () => {
         )}
       </div>
 
-      {/* ✅ 리뷰 작성 */}
+      {/* 리뷰 작성 */}
       <section className="review-section">
         <h2>리뷰 작성</h2>
         <form onSubmit={handleSubmit} className="review-form" encType="multipart/form-data">
           <div className="review-form-group review-form-group-horizontal">
             <label htmlFor="rating">평점</label>
-            {/* 0.5 단위 드롭다운 */}
             <select
               id="rating"
               value={newReview.rating}
@@ -302,7 +403,7 @@ const MovieDetailPage = () => {
         </form>
       </section>
 
-      {/* ✅ Top 리뷰 */}
+      {/* Top 리뷰 */}
       <section className="review-section">
         <h2>Top 리뷰</h2>
         <div className="reviews">
@@ -314,7 +415,7 @@ const MovieDetailPage = () => {
         </div>
       </section>
 
-      {/* ✅ 전체 리뷰 */}
+      {/* 전체 리뷰 */}
       <section className="review-section">
         <h2>전체 리뷰</h2>
         <div className="reviews">
