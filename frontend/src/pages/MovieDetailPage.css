@@ -246,89 +246,95 @@
   font-size: 0.97em;
 }
 
-.review-actions-bar {
+/* 리뷰 추천/비추천 - 네이버 웹툰 스타일 최신화 */
+.review-actions-bar.webtoon-bar {
   display: flex;
-  gap: 15px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin: 8px 0 8px 0;
 }
 
-/* 추천/비추천 버튼 UX + 강조 */
-.vote-btn {
-  border: 1.5px solid transparent;
-  outline: none;
-  background: #232b39;
-  color: #fff;
-  font-size: 1.05em;
-  font-weight: 600;
-  border-radius: 18px;
-  padding: 8px 24px;
-  cursor: pointer;
-  transition: background 0.18s, color 0.12s, border 0.18s;
-  box-shadow: 0 2px 10px #191d2290;
+.webtoon-vote-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
+  min-width: 78px;
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 22px;
+  border: 2.5px solid transparent;
+  font-size: 1.05rem;
+  font-weight: 600;
+  background: #181f23;
+  color: #c8e1e8;
+  box-shadow: 0 2px 7px #0002;
+  transition: all 0.18s;
+  cursor: pointer;
   gap: 7px;
-  margin-right: 6px;
   position: relative;
+  outline: none;
 }
-.vote-btn .vote-label {
+
+/* 추천 기본 */
+.webtoon-vote-btn.up {
+  background: linear-gradient(90deg, #22372b 65%, #10351e 100%);
+  color: #7cfdc0;
+  border-color: #265441;
+}
+.webtoon-vote-btn.down {
+  background: linear-gradient(90deg, #422e2e 70%, #371a1a 100%);
+  color: #ffb5b5;
+  border-color: #624646;
+}
+.webtoon-vote-btn .vote-icon {
+  font-size: 1.32em;
+  margin-right: 3px;
+}
+.webtoon-vote-btn .vote-count {
+  font-size: 1.09em;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0 3px 0 1px;
-}
-.vote-btn .vote-icon {
-  font-size: 1.15em;
-  margin-right: 1px;
+  min-width: 22px;
+  text-align: left;
+  margin-left: 0px;
+  letter-spacing: 0;
 }
 
-/* 추천 */
-.vote-btn.up {
-  background: linear-gradient(90deg, #53f16e 60%, #19a548 100%);
-  color: #14360e;
-}
-.vote-btn.down {
-  background: linear-gradient(90deg, #ff8080 60%, #e50914 100%);
+/* "내가 누른" 상태 확실하게 강조 */
+.webtoon-vote-btn.up.active,
+.webtoon-vote-btn.up[aria-pressed="true"] {
+  background: linear-gradient(90deg, #19e288 80%, #09865d 100%);
   color: #fff;
+  border-color: #19ffad;
+  box-shadow: 0 0 0 3px #23ffbd40, 0 1.5px 10px #2ffdbe44;
+  font-weight: 900;
+  outline: 2.5px solid #70ffd7;
+  z-index: 2;
+}
+.webtoon-vote-btn.down.active,
+.webtoon-vote-btn.down[aria-pressed="true"] {
+  background: linear-gradient(90deg, #ff6464 82%, #a80825 100%);
+  color: #fff;
+  border-color: #ff3e7d;
+  box-shadow: 0 0 0 3px #ff6a9655, 0 1.5px 10px #ffbac088;
+  font-weight: 900;
+  outline: 2.5px solid #ffd6d6;
+  z-index: 2;
 }
 
-/* active(내가 누른 상태) 강조 */
-.vote-btn.active {
-  border: 2.5px solid #2ee787 !important;
-  box-shadow: 0 0 10px #11fa9455, 0 1.5px 12px #223;
-  background: linear-gradient(90deg, #3cf193 70%, #17be74 100%);
-  color: #161c11 !important;
-  transition: 0.18s;
+/* "비활성화" (상대쪽 누름) 확실하게 처리 */
+.webtoon-vote-btn:disabled {
+  opacity: 0.37 !important;
+  background: #232528 !important;
+  color: #aaa !important;
+  border-color: #292d33 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: grayscale(0.25);
 }
-.vote-btn.down.active {
-  border: 2.5px solid #ff5370 !important;
-  box-shadow: 0 0 12px #ff5e7a55, 0 1.5px 12px #311;
-  background: linear-gradient(90deg, #ff9393 55%, #f95f41 100%);
-  color: #370303 !important;
-}
-
-/* hover 효과 */
-.vote-btn:not(.active):hover {
-  border: 2px solid #7fffd4;
-  background: #232b39ee;
-  color: #11fa94;
-}
-.vote-btn.down:not(.active):hover {
-  border: 2px solid #ff8a9a;
-  color: #ff6666;
-}
-
-/* 추천/비추천 숫자 강조 */
-.vote-count {
-  font-weight: bold;
-  font-size: 1.07em;
-  margin-left: 5px;
-  color: #ff5252;
-}
-.vote-btn.up .vote-count {
-  color: #06c270;
-}
-.vote-btn.down .vote-count {
-  color: #ef5350;
+.webtoon-vote-btn:not(:disabled):hover {
+  filter: brightness(1.14) contrast(1.06);
+  border-width: 2.9px;
+  z-index: 2;
 }
 
 /* 리뷰 본문 */
@@ -502,11 +508,6 @@
     padding: 8px 16px;
     top: 24px;
   }
-  .vote-btn {
-    padding: 7px 10px;
-    font-size: 0.97em;
-  }
-  .vote-count { font-size: 1em; }
 }
 
 @media (min-width: 900px) {
@@ -555,64 +556,40 @@
   vertical-align: middle;
 }
 
-/* 네이버웹툰 추천/비추천 버튼 */
-.webtoon-vote-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 62px;
-  min-height: 52px;
-  border-radius: 26px;
-  border: none;
-  outline: none;
-  margin-right: 12px;
-  font-size: 1.03rem;
-  background: #fff;
-  color: #222;
-  font-weight: bold;
-  box-shadow: 0 2px 10px #0003;
-  transition: all 0.15s;
-  cursor: pointer;
-  border: 2.5px solid transparent;
-  position: relative;
-  gap: 4px;
-}
-.webtoon-vote-btn .vote-icon {
-  font-size: 1.6em;
-  margin-bottom: 2px;
-}
-.webtoon-vote-btn.up {
-  background: #e7fff3;
-  color: #00b570;
-}
-.webtoon-vote-btn.down {
-  background: #ffeaea;
-  color: #f8594a;
-}
+/* 추천 활성화: 녹색 + 강조 */
 .webtoon-vote-btn.up.active,
-.webtoon-vote-btn.up:focus {
-  border-color: #11cf7d;
-  background: #c2ffd8;
-  color: #008c50;
-  box-shadow: 0 4px 24px #56ffc33d;
+.webtoon-vote-btn.up[aria-pressed="true"] {
+  background: linear-gradient(90deg, #11ce6c 70%, #028d3e 100%);
+  color: #fff;
+  border-color: #29ff94;
+  box-shadow: 0 0 0 3px #34fa9d50, 0 2px 16px #2ffdbe88;
+  font-weight: 900;
+  outline: 2.5px solid #00e98a;
+  z-index: 2;
+  transition: all 0.16s;
 }
+
+/* 비추천 활성화: 진한 빨강 + 강조 */
 .webtoon-vote-btn.down.active,
-.webtoon-vote-btn.down:focus {
-  border-color: #ff4e73;
-  background: #ffd9de;
-  color: #cc2424;
-  box-shadow: 0 4px 24px #ffb2c09e;
+.webtoon-vote-btn.down[aria-pressed="true"] {
+  background: linear-gradient(90deg, #ff6464 82%, #a80825 100%);
+  color: #fff;
+  border-color: #ff3e7d;
+  box-shadow: 0 0 0 3px #ff6a9655, 0 1.5px 10px #ffbac088;
+  font-weight: 900;
+  outline: 2.5px solid #ffd6d6;
+  z-index: 2;
+  transition: all 0.16s;
 }
+
+/* 버튼 비활성화(누르기 불가 상태) */
 .webtoon-vote-btn:disabled {
-  opacity: 0.7;
-  background: #f5f5f5 !important;
+  opacity: 0.35 !important;
+  background: #232528 !important;
   color: #aaa !important;
-  cursor: not-allowed;
-}
-.webtoon-vote-btn .vote-count {
-  font-size: 1.11em;
-  font-weight: 700;
-  margin-top: 2px;
-  letter-spacing: -0.01em;
+  border-color: #292d33 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  outline: none !important;
+  filter: grayscale(0.5);
 }

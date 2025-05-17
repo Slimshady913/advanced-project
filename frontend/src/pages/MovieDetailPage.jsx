@@ -213,6 +213,8 @@ const MovieDetailPage = () => {
         : getCurrentUser() && review.user === getCurrentUser();
     const myVote = review.my_vote ?? 0;
 
+    console.log(`Review ID: ${review.id}, my_vote:`, myVote, 'review:', review);
+
     return (
       <div key={review.id} className={`review-card${isTop ? ' top-review' : ''}`}>
         <div className="review-header">
@@ -224,53 +226,41 @@ const MovieDetailPage = () => {
           {renderStars(review.rating)} <span className="score">{review.rating} / 5</span>
         </div>
         {/* 네이버웹툰 스타일 추천/비추천 */}
-        <div className="review-actions-bar" style={{gap: '16px'}}>
-          {/* 추천 */}
+        <div className="review-actions-bar webtoon-bar">
           <button
-            className={`webtoon-vote-btn up${myVote === 1 ? ' active' : ''}`}
-            onClick={() => {
-              if (myVote === 1) handleVote(review.id, 'like', myVote);
-              else if (myVote === -1) setToastMsg('이미 싫어요를 누르셨습니다.');
-              else handleVote(review.id, 'like', myVote);
-            }}
-            aria-pressed={myVote === 1}
-            disabled={myVote === -1}
-            title={myVote === 1 ? "추천 취소" : "추천"}
+            className={`webtoon-vote-btn up${review.my_vote === 1 ? ' active' : ''}`}
+            onClick={() => handleVote(review.id, 'like', review.my_vote)}
+            aria-pressed={review.my_vote === 1}
+            disabled={review.my_vote === -1}
             type="button"
           >
             <span className="vote-icon" role="img" aria-label="추천">👍</span>
             <span className="vote-count">{review.like_count ?? 0}</span>
           </button>
-          {/* 비추천 */}
           <button
-            className={`webtoon-vote-btn down${myVote === -1 ? ' active' : ''}`}
-            onClick={() => {
-              if (myVote === -1) handleVote(review.id, 'dislike', myVote);
-              else if (myVote === 1) setToastMsg('이미 좋아요를 누르셨습니다.');
-              else handleVote(review.id, 'dislike', myVote);
-            }}
-            aria-pressed={myVote === -1}
-            disabled={myVote === 1}
-            title={myVote === -1 ? "비추천 취소" : "비추천"}
+            className={`webtoon-vote-btn down${review.my_vote === -1 ? ' active' : ''}`}
+            onClick={() => handleVote(review.id, 'dislike', review.my_vote)}
+            aria-pressed={review.my_vote === -1}
+            disabled={review.my_vote === 1}
             type="button"
           >
             <span className="vote-icon" role="img" aria-label="비추천">👎</span>
             <span className="vote-count">{review.dislike_count ?? 0}</span>
           </button>
+          {/* 이미지 첨부 */}
+          {review.images && review.images.length > 0 && (
+            <div className="review-images">
+              {review.images.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img.image_url || img.url}
+                  alt="리뷰 이미지"
+                  className="review-image-thumb"
+                />
+              ))}
+            </div>
+          )}
         </div>
-        {/* 이미지 첨부 */}
-        {review.images && review.images.length > 0 && (
-          <div className="review-images">
-            {review.images.map((img, idx) => (
-              <img
-                key={idx}
-                src={img.image_url || img.url}
-                alt="리뷰 이미지"
-                className="review-image-thumb"
-              />
-            ))}
-          </div>
-        )}
         {/* 스포일러 분리 처리 */}
         {isSpoiler ? (
           <div className="review-content spoiler">
