@@ -126,35 +126,32 @@ class ToggleReviewReaction(APIView):
         except Review.DoesNotExist:
             return Response({"error": "리뷰를 찾을 수 없습니다."}, status=404)
 
-        reaction, created = ReviewReaction.objects.get_or_create(user=user, review=review)
-
-        if not created and reaction.is_like == is_like:
-            reaction.delete()
-            if is_like:
-                review.like_count -= 1
+        try:
+            reaction = ReviewReaction.objects.get(user=user, review=review)
+            # 이미 해당 반응을 했으면 중복 차단 (아무 변화 없음)
+            if reaction.is_like == is_like:
+                return Response({"message": "이미 반영한 투표입니다."}, status=409)
+            # 반대 반응을 했으면 카운트 이동
             else:
-                review.dislike_count -= 1
+                if is_like:
+                    review.like_count += 1
+                    review.dislike_count -= 1
+                else:
+                    review.dislike_count += 1
+                    review.like_count -= 1
+                reaction.is_like = is_like
+                reaction.save()
+                review.save()
+                return Response({"message": "반응이 변경되었습니다."})
+        except ReviewReaction.DoesNotExist:
+            # 처음 투표
+            ReviewReaction.objects.create(user=user, review=review, is_like=is_like)
+            if is_like:
+                review.like_count += 1
+            else:
+                review.dislike_count += 1
             review.save()
-            return Response({"message": "반응이 취소되었습니다."})
-
-        if not created:
-            if is_like:
-                review.like_count += 1
-                review.dislike_count -= 1
-            else:
-                review.dislike_count += 1
-                review.like_count -= 1
-            reaction.is_like = is_like
-            reaction.save()
-        else:
-            reaction.is_like = is_like
-            reaction.save()
-            if is_like:
-                review.like_count += 1
-            else:
-                review.dislike_count += 1
-        review.save()
-        return Response({"message": "반응이 처리되었습니다."})
+            return Response({"message": "투표가 반영되었습니다."})
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 댓글 목록 조회 + 작성 (상위 3개 추천순 정렬 포함)
