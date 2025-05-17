@@ -152,7 +152,7 @@ class ToggleReviewReaction(APIView):
                     "like_count": review.like_count,
                     "dislike_count": review.dislike_count,
                 }, status=200)
-            # 반대 반응이면 == 이동
+            # 반대 반응이면 == 이동(추천→비추천 또는 비추천→추천)
             else:
                 if is_like:
                     review.like_count += 1
