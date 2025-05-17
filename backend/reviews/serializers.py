@@ -33,6 +33,17 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def get_is_edited(self, obj):
         return obj.histories.exists()
+    
+    def validate(self, data):
+        request = self.context.get('request')
+        user = request.user if request else None
+        movie = data.get('movie')
+
+        # 생성일 때만(수정 제외)
+        if self.instance is None and user and movie:
+            if Review.objects.filter(user=user, movie=movie).exists():
+                raise serializers.ValidationError("이미 이 영화에 대한 리뷰를 작성하셨습니다. 한 영화당 한 번만 리뷰 작성이 가능합니다.")
+        return data
 
     class Meta:
         model = Review
