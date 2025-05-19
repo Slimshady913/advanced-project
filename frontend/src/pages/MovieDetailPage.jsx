@@ -195,11 +195,41 @@ const MovieDetailPage = () => {
   // 별점 표시
   const renderStars = (score) => {
     const stars = [];
-    let full = Math.floor(score);
-    let half = score % 1 >= 0.5;
-    for (let i = 0; i < full; i++) stars.push(<span key={i}>★</span>);
-    if (half) stars.push(<span key="half">☆</span>);
-    for (let i = stars.length; i < 5; i++) stars.push(<span key={i + 10}>☆</span>);
+    const full = Math.floor(score);
+    const half = score % 1 >= 0.5;
+    for (let i = 0; i < full; i++) {
+      stars.push(
+        <span key={i}>
+          <svg width="22" height="22" viewBox="0 0 20 20" fill="#ffd700" style={{ verticalAlign: 'middle' }}>
+            <polygon points="10,2 12.6,7.6 18.7,8.3 14,12.4 15.3,18.5 10,15.2 4.7,18.5 6,12.4 1.3,8.3 7.4,7.6" />
+          </svg>
+        </span>
+      );
+    }
+    if (half) {
+      stars.push(
+        <span key="half">
+          <svg width="22" height="22" viewBox="0 0 20 20" style={{ verticalAlign: 'middle' }}>
+            <defs>
+              <linearGradient id="half-grad">
+                <stop offset="50%" stopColor="#ffd700" />
+                <stop offset="50%" stopColor="#242424" />
+              </linearGradient>
+            </defs>
+            <polygon points="10,2 12.6,7.6 18.7,8.3 14,12.4 15.3,18.5 10,15.2 4.7,18.5 6,12.4 1.3,8.3 7.4,7.6" fill="url(#half-grad)" />
+          </svg>
+        </span>
+      );
+    }
+    for (let i = stars.length; i < 5; i++) {
+      stars.push(
+        <span key={i + 10}>
+          <svg width="22" height="22" viewBox="0 0 20 20" style={{ verticalAlign: 'middle' }}>
+            <polygon points="10,2 12.6,7.6 18.7,8.3 14,12.4 15.3,18.5 10,15.2 4.7,18.5 6,12.4 1.3,8.3 7.4,7.6" fill="#333" />
+          </svg>
+        </span>
+      );
+    }
     return <span className="star-rating">{stars}</span>;
   };
 
