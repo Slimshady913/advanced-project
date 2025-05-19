@@ -308,7 +308,7 @@ const MovieDetailPage = () => {
               {review.images.map((img, idx) => (
                 <img
                   key={idx}
-                  src={img.image_url || img.url}
+                  src={img.image_url}
                   alt="리뷰 이미지"
                   className="review-image-thumb"
                 />

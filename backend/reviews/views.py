@@ -56,12 +56,17 @@ class ReviewListCreateView(generics.ListCreateAPIView):
         return Review.objects.filter(movie_id=movie_id) if movie_id else Review.objects.all()
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        review = serializer.save(user=self.request.user)
+        images = self.request.FILES.getlist('images')
+        for image in images:
+            from .models import ReviewImage
+            ReviewImage.objects.create(review=review, image=image)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+    
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 상세 조회 / 수정 / 삭제 및 수정 이력 저장
@@ -94,6 +99,13 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+    
+    def perform_update(self, serializer):
+        review = serializer.save()
+        images = self.request.FILES.getlist('images')
+        for image in images:
+            from .models import ReviewImage
+            ReviewImage.objects.create(review=review, image=image)
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 추천/비추천 기능 (ReviewReaction)

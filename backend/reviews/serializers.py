@@ -8,9 +8,17 @@ from .models import (
 # ✅ 리뷰 이미지 Serializer (이미지 업로드용)
 # ---------------------------------------------------------------------
 class ReviewImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            return request.build_absolute_uri(obj.image.url) if request else obj.image.url
+        return None
+
     class Meta:
         model = ReviewImage
-        fields = ['id', 'image', 'uploaded_at']
+        fields = ['id', 'image', 'uploaded_at', 'image_url']  # image_url 추가
         read_only_fields = ['id', 'uploaded_at']
 
 # ---------------------------------------------------------------------
