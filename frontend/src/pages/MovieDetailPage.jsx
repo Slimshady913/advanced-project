@@ -186,7 +186,7 @@ const MovieDetailPage = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(
+      await axios.patch(
         `/reviews/${editReviewId}/`,
         editReviewData,
         { headers: { Authorization: `Bearer ${getToken()}` } }
