@@ -39,28 +39,28 @@ function formatDate(dateString) {
   );
 }
 
-// ⭐️ 평균 평점용 부분별 함수
+// ⭐️ 평균 평점용 부분별 함수 (id 고유화)
 const renderAverageStars = (score) => {
   const stars = [];
   for (let i = 0; i < 5; i++) {
     let fillPercent = 0;
     if (score >= i + 1) {
-      fillPercent = 100; // 꽉찬 별
+      fillPercent = 100;
     } else if (score > i) {
-      fillPercent = (score - i) * 100; // 일부만 채운 별
+      fillPercent = (score - i) * 100;
     }
     stars.push(
       <span key={i}>
         <svg width="22" height="22" viewBox="0 0 20 20" style={{ verticalAlign: 'middle' }}>
           <defs>
-            <linearGradient id={`star-grad-${i}`}>
+            <linearGradient id={`star-grad-${i}-avg`}>
               <stop offset={`${fillPercent}%`} stopColor="#ffd700" />
               <stop offset={`${fillPercent}%`} stopColor="#242424" />
             </linearGradient>
           </defs>
           <polygon
             points="10,2 12.6,7.6 18.7,8.3 14,12.4 15.3,18.5 10,15.2 4.7,18.5 6,12.4 1.3,8.3 7.4,7.6"
-            fill={`url(#star-grad-${i})`}
+            fill={`url(#star-grad-${i}-avg)`}
           />
         </svg>
       </span>
@@ -221,8 +221,8 @@ const MovieDetailPage = () => {
   };
   const getAllReviews = () => movie?.reviews || [];
 
-  // ⭐️ 리뷰 별점 표시 (0.5 단위 반별)
-  const renderStars = (score) => {
+  // ⭐️ 리뷰 별점 표시 (0.5 단위 반별, id 고유화)
+  const renderStars = (score, reviewId) => {
     const stars = [];
     const full = Math.floor(score);
     const half = score % 1 >= 0.5;
@@ -240,12 +240,12 @@ const MovieDetailPage = () => {
         <span key="half">
           <svg width="22" height="22" viewBox="0 0 20 20" style={{ verticalAlign: 'middle' }}>
             <defs>
-              <linearGradient id="half-grad">
+              <linearGradient id={`half-grad-${reviewId}`}>
                 <stop offset="50%" stopColor="#ffd700" />
                 <stop offset="50%" stopColor="#242424" />
               </linearGradient>
             </defs>
-            <polygon points="10,2 12.6,7.6 18.7,8.3 14,12.4 15.3,18.5 10,15.2 4.7,18.5 6,12.4 1.3,8.3 7.4,7.6" fill="url(#half-grad)" />
+            <polygon points="10,2 12.6,7.6 18.7,8.3 14,12.4 15.3,18.5 10,15.2 4.7,18.5 6,12.4 1.3,8.3 7.4,7.6" fill={`url(#half-grad-${reviewId})`} />
           </svg>
         </span>
       );
@@ -272,8 +272,6 @@ const MovieDetailPage = () => {
         : getCurrentUser() && review.user === getCurrentUser();
     const myVote = review.my_vote ?? 0;
 
-    // console.log(`Review ID: ${review.id}, my_vote:`, myVote, 'review:', review);
-
     return (
       <div key={review.id} className={`review-card${isTop ? ' top-review' : ''}`}>
         <div className="review-header">
@@ -282,7 +280,7 @@ const MovieDetailPage = () => {
           {isTop && <span className="top-label">Top</span>}
         </div>
         <div className="review-rating">
-          {renderStars(review.rating)} <span className="score">{review.rating} / 5</span>
+          {renderStars(review.rating, review.id)} <span className="score">{review.rating} / 5</span>
         </div>
         <div className="review-actions-bar webtoon-bar">
           <button
@@ -520,7 +518,7 @@ const MovieDetailPage = () => {
         <h2>전체 리뷰</h2>
         <div className="reviews">
           {getAllReviews().length === 0 ? (
-            <p>다른 리뷰가 없습니다.</p>
+            <p>첫 리뷰를 남겨주세요!</p>
           ) : (
             getAllReviews().map((review) => renderReviewCard(review, false))
           )}

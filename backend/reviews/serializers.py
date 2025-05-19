@@ -25,6 +25,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     is_edited = serializers.SerializerMethodField()
     images = ReviewImageSerializer(many=True, read_only=True)
     my_vote = serializers.SerializerMethodField()
+    is_owner = serializers.SerializerMethodField()
+
+    def get_is_owner(self, obj):
+        request = self.context.get('request')
+        # 인증된 사용자가 있고, 해당 리뷰의 user와 동일하면 True
+        return request and request.user and request.user.is_authenticated and obj.user == request.user
+
 
     def get_my_vote(self, obj):
         request = self.context.get('request')
@@ -65,9 +72,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = [
             'id', 'user', 'movie', 'rating', 'comment', 'is_spoiler',
-            'created_at', 'like_count', 'dislike_count', 'is_edited', 'images', 'my_vote'
+            'created_at', 'like_count', 'dislike_count', 'is_edited', 'images', 'my_vote', 'is_owner'
         ]
-        read_only_fields = ['user', 'created_at', 'like_count', 'dislike_count', 'is_edited']
+        read_only_fields = ['user', 'created_at', 'like_count', 'dislike_count', 'is_edited', 'is_owner']
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 댓글 Serializer
