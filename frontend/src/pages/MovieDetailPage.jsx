@@ -39,6 +39,36 @@ function formatDate(dateString) {
   );
 }
 
+// ⭐️ 평균 평점용 부분별 함수
+const renderAverageStars = (score) => {
+  const stars = [];
+  for (let i = 0; i < 5; i++) {
+    let fillPercent = 0;
+    if (score >= i + 1) {
+      fillPercent = 100; // 꽉찬 별
+    } else if (score > i) {
+      fillPercent = (score - i) * 100; // 일부만 채운 별
+    }
+    stars.push(
+      <span key={i}>
+        <svg width="22" height="22" viewBox="0 0 20 20" style={{ verticalAlign: 'middle' }}>
+          <defs>
+            <linearGradient id={`star-grad-${i}`}>
+              <stop offset={`${fillPercent}%`} stopColor="#ffd700" />
+              <stop offset={`${fillPercent}%`} stopColor="#242424" />
+            </linearGradient>
+          </defs>
+          <polygon
+            points="10,2 12.6,7.6 18.7,8.3 14,12.4 15.3,18.5 10,15.2 4.7,18.5 6,12.4 1.3,8.3 7.4,7.6"
+            fill={`url(#star-grad-${i})`}
+          />
+        </svg>
+      </span>
+    );
+  }
+  return <span className="star-rating">{stars}</span>;
+};
+
 const MovieDetailPage = () => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
@@ -112,7 +142,6 @@ const MovieDetailPage = () => {
   const handleVote = async (reviewId, type, myVote) => {
     const token = getToken();
     if (!token) return setToastMsg('로그인이 필요합니다.');
-    // 중복 투표 UX 방지
     if (type === 'like') {
       if (myVote === 1) {
         // 이미 추천 → 취소 (toggle)
@@ -192,7 +221,7 @@ const MovieDetailPage = () => {
   };
   const getAllReviews = () => movie?.reviews || [];
 
-  // 별점 표시
+  // ⭐️ 리뷰 별점 표시 (0.5 단위 반별)
   const renderStars = (score) => {
     const stars = [];
     const full = Math.floor(score);
@@ -243,7 +272,7 @@ const MovieDetailPage = () => {
         : getCurrentUser() && review.user === getCurrentUser();
     const myVote = review.my_vote ?? 0;
 
-    console.log(`Review ID: ${review.id}, my_vote:`, myVote, 'review:', review);
+    // console.log(`Review ID: ${review.id}, my_vote:`, myVote, 'review:', review);
 
     return (
       <div key={review.id} className={`review-card${isTop ? ' top-review' : ''}`}>
@@ -255,7 +284,6 @@ const MovieDetailPage = () => {
         <div className="review-rating">
           {renderStars(review.rating)} <span className="score">{review.rating} / 5</span>
         </div>
-        {/* 네이버웹툰 스타일 추천/비추천 */}
         <div className="review-actions-bar webtoon-bar">
           <button
             className={`webtoon-vote-btn up${review.my_vote === 1 ? ' active' : ''}`}
@@ -277,7 +305,6 @@ const MovieDetailPage = () => {
             <span className="vote-icon" role="img" aria-label="비추천">👎</span>
             <span className="vote-count">{review.dislike_count ?? 0}</span>
           </button>
-          {/* 이미지 첨부 */}
           {review.images && review.images.length > 0 && (
             <div className="review-images">
               {review.images.map((img, idx) => (
@@ -291,7 +318,6 @@ const MovieDetailPage = () => {
             </div>
           )}
         </div>
-        {/* 스포일러 분리 처리 */}
         {isSpoiler ? (
           <div className="review-content spoiler">
             <span className="spoiler-label">스포일러 포함</span>
@@ -313,7 +339,6 @@ const MovieDetailPage = () => {
         ) : (
           <div className="review-content">{review.comment}</div>
         )}
-        {/* 본인만 수정/삭제 */}
         {isOwner && (
           <div className="review-actions">
             {editReviewId === review.id ? (
@@ -390,7 +415,7 @@ const MovieDetailPage = () => {
         <div className="movie-text-info">
           <h1 className="movie-title">{movie.title}</h1>
           <div className="movie-average-rating">
-            {renderStars(movie.average_rating)}
+            {renderAverageStars(movie.average_rating)}
             <span className="rating-num">{movie.average_rating} / 5</span>
             <span className="rating-count">({movie.reviews.length}명 참여)</span>
           </div>
