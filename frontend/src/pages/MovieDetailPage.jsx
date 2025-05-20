@@ -83,6 +83,8 @@ const MovieDetailPage = () => {
   const [deleteImageIds, setDeleteImageIds] = useState([]); // 삭제할 이미지 id (수정시)
   const toastRef = useRef();
   const [modalImageUrl, setModalImageUrl] = useState(null);
+  const [modalImages, setModalImages] = useState([]);
+  const [modalIndex, setModalIndex] = useState(0);
 
   const getToken = () => localStorage.getItem('access');
   const getCurrentUser = () => localStorage.getItem('username');
@@ -93,6 +95,31 @@ const MovieDetailPage = () => {
       .then((res) => setOttList(res.data))
       .catch((err) => console.error('OTT 목록 불러오기 실패:', err));
   }, []);
+
+  useEffect(() => {
+    if (!modalImageUrl) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setModalImageUrl(null);
+      if (modalImages.length > 1) {
+        if (e.key === "ArrowLeft") {
+          setModalIndex(idx => {
+            const newIdx = (idx - 1 + modalImages.length) % modalImages.length;
+            setModalImageUrl(modalImages[newIdx]);
+            return newIdx;
+          });
+        }
+        if (e.key === "ArrowRight") {
+          setModalIndex(idx => {
+            const newIdx = (idx + 1) % modalImages.length;
+            setModalImageUrl(modalImages[newIdx]);
+            return newIdx;
+          });
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [modalImageUrl, modalImages]);
 
   const fetchMovieDetail = async () => {
     try {
@@ -350,7 +377,11 @@ const MovieDetailPage = () => {
                 src={img.image_url}
                 alt="리뷰 이미지"
                 className="review-image-thumb"
-                onClick={() => setModalImageUrl(img.image_url)}
+                onClick={() => {
+                  setModalImages(review.images.map(imgObj => imgObj.image_url));
+                  setModalIndex(idx);
+                  setModalImageUrl(img.image_url);
+                }}
                 style={{ cursor: 'zoom-in' }}
               />
             ))}
@@ -433,13 +464,20 @@ const MovieDetailPage = () => {
                 )}
                 {/* 새 이미지 추가/취소 */}
                 <div className="review-form-group">
-                  <label htmlFor="edit-review-image">이미지 추가</label>
+                  <label htmlFor="edit-review-image">이미지 추가 (Ctrl/Shift로 여러 장 선택 가능)</label>
                   <input
                     id="edit-review-image"
                     type="file"
                     multiple
                     accept="image/*"
-                    onChange={e => setEditReviewData({ ...editReviewData, images: Array.from(e.target.files) })}
+                    onChange={e => {
+                      const files = Array.from(e.target.files);
+                      if (files.length > 5) {
+                        setToastMsg('이미지는 최대 5장까지만 첨부할 수 있습니다.');
+                        return;
+                      }
+                      setEditReviewData({ ...editReviewData, images: files });
+                    }}
                   />
                   {editReviewData.images && editReviewData.images.length > 0 && (
                     <div style={{ marginTop: '7px' }}>
@@ -574,15 +612,20 @@ const MovieDetailPage = () => {
             </label>
           </div>
           <div className="review-form-group">
-            <label htmlFor="review-image">이미지 첨부</label>
+            <label htmlFor="review-image">이미지 첨부 (Ctrl/Shift로 여러 장 선택 가능)</label>
             <input
               id="review-image"
               type="file"
               multiple
               accept="image/*"
-              onChange={e =>
-                setNewReview({ ...newReview, images: Array.from(e.target.files) })
-              }
+              onChange={e => {
+                const files = Array.from(e.target.files);
+                if (files.length > 5) {
+                  setToastMsg('이미지는 최대 5장까지만 첨부할 수 있습니다.');
+                  return;
+                }
+                setNewReview({ ...newReview, images: files });
+              }}
             />
             {/* 미리보기 + 취소 버튼 */}
             {newReview.images && newReview.images.length > 0 && (
@@ -636,20 +679,42 @@ const MovieDetailPage = () => {
       </section>
 
       {modalImageUrl && (
-      <div className="image-modal" onClick={() => setModalImageUrl(null)}>
-        <img
-          src={modalImageUrl}
-          alt="확대 이미지"
-          className="image-modal-img"
-          onClick={e => e.stopPropagation()}
-        />
-        <button
-          className="image-modal-close"
-          onClick={() => setModalImageUrl(null)}
-          aria-label="닫기"
-        >×</button>
-      </div>
-    )}
+        <div className="image-modal" onClick={() => setModalImageUrl(null)}>
+          {modalImages.length > 1 && (
+            <>
+              <button
+                className="image-modal-arrow left"
+                onClick={e => {
+                  e.stopPropagation();
+                  const newIdx = (modalIndex - 1 + modalImages.length) % modalImages.length;
+                  setModalIndex(newIdx);
+                  setModalImageUrl(modalImages[newIdx]);
+                }}
+              >◀</button>
+              <button
+                className="image-modal-arrow right"
+                onClick={e => {
+                  e.stopPropagation();
+                  const newIdx = (modalIndex + 1) % modalImages.length;
+                  setModalIndex(newIdx);
+                  setModalImageUrl(modalImages[newIdx]);
+                }}
+              >▶</button>
+            </>
+          )}
+          <img
+            src={modalImageUrl}
+            alt="확대 이미지"
+            className="image-modal-img"
+            onClick={e => e.stopPropagation()}
+          />
+          <button
+            className="image-modal-close"
+            onClick={() => setModalImageUrl(null)}
+            aria-label="닫기"
+          >×</button>
+        </div>
+      )}
     </div>
   );
 };

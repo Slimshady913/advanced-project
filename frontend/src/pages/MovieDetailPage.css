@@ -618,6 +618,7 @@
 }
 
 .image-modal {
+  overflow-y: auto;
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
   display: flex; align-items: center; justify-content: center;
@@ -625,6 +626,7 @@
   background: rgba(24, 24, 24, 0.70);
   animation: fadeInModal 0.18s;
 }
+
 .image-modal-img {
   max-width: 85vw;
   max-height: 85vh;
@@ -635,6 +637,7 @@
   position: relative;
   animation: scaleIn 0.17s;
 }
+
 .image-modal-close {
   position: absolute;
   top: 40px; right: 42px;
@@ -652,6 +655,32 @@
 .image-modal-close:hover {
   color: #ff6868;
 }
+
+.image-modal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2.4rem;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  z-index: 10002;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 15px;
+  text-shadow: 0 2px 8px #222c;
+  transition: color 0.17s, background 0.17s;
+  opacity: 0.85;
+  user-select: none;
+}
+.image-modal-arrow.left { left: 32px; }
+.image-modal-arrow.right { right: 32px; }
+.image-modal-arrow:hover {
+  color: #61dafb;
+  background: rgba(20,20,20,0.22);
+}
+
 @keyframes fadeInModal {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -659,4 +688,19 @@
 @keyframes scaleIn {
   from { transform: scale(0.86);}
   to { transform: scale(1);}
+}
+
+/* 모바일 대응 */
+@media (max-width: 700px) {
+  .image-modal-img {
+    max-width: 98vw;
+    max-height: 64vh;
+    border-radius: 9px;
+  }
+  .image-modal-close {
+    top: 18px; right: 17px;
+    font-size: 2.0rem;
+  }
+  .image-modal-arrow.left { left: 9px; font-size: 1.7rem; }
+  .image-modal-arrow.right { right: 9px; font-size: 1.7rem; }
 }
