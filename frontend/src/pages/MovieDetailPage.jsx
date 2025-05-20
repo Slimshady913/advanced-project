@@ -191,7 +191,7 @@ const MovieDetailPage = () => {
   const handleImageDelete = async (imgId, reviewId) => {
     if (!window.confirm('이미지를 삭제하시겠습니까?')) return;
     try {
-      await axios.delete(`/review-images/${imgId}/`, {
+      await axios.delete(`/reviews/review-images/${imgId}/`, {
         headers: { Authorization: `Bearer ${getToken()}` }
       });
       // 영화 상세 정보를 다시 불러오기 (리뷰 내부 이미지 갱신)

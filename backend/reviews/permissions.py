@@ -8,19 +8,15 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        # 안전한 요청이면 항상 허용
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # 객체가 Review라면
+        print("Method:", request.method)
+        print("Request User:", request.user)
+        print("Object:", obj)
+        # Review
         if hasattr(obj, 'user'):
+            print("Review User:", obj.user)
             return obj.user == request.user
-        # 객체가 ReviewImage라면 (review 필드가 있고, 그 review의 user가 요청자여야 함)
+        # ReviewImage
         if hasattr(obj, 'review') and hasattr(obj.review, 'user'):
+            print("ReviewImage Review User:", obj.review.user)
             return obj.review.user == request.user
-        # 객체가 ReviewComment라면 (필요시 추가)
-        if hasattr(obj, 'review') and hasattr(obj.review, 'user'):
-            return obj.review.user == request.user
-        # 추가적으로 다른 객체가 있다면 그에 맞는 소유권 체크 추가
-
         return False
