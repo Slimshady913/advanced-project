@@ -90,6 +90,7 @@ const MoviesPage = ({ isLoggedIn }) => {
           <option value="release_date">오래된순</option>
           <option value="-average_rating_cache">평점 높은순</option>
           <option value="average_rating_cache">평점 낮은순</option>
+          <option value="-review_count">리뷰 많은 순</option>
           <option value="title">제목순</option>
         </select>
       </div>
@@ -119,7 +120,11 @@ const MoviesPage = ({ isLoggedIn }) => {
             <div className="movie-info">
               <h3>{movie.title}</h3>
               <p className="meta">{movie.release_date}</p>
-              <p className="rating">⭐ {movie.average_rating}</p>
+              <p className="rating">⭐ {movie.average_rating}
+                <span className="rating-count">
+                  ({movie.review_count}명 참여)
+                </span>
+              </p>
 
               {/* 📺 영화별 OTT 플랫폼 로고 */}
               <div className="ott-logos">

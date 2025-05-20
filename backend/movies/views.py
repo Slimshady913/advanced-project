@@ -10,7 +10,7 @@ from drf_yasg import openapi
 from .models import Movie
 from .serializers import MovieSerializer
 from .filters import MovieFilter
-
+from django.db.models import Count
 
 # ✅ 영화 목록 조회 (정렬 가능)
 class MovieListView(generics.ListAPIView):
@@ -19,7 +19,7 @@ class MovieListView(generics.ListAPIView):
     filter_backends = [filters.OrderingFilter]
 
     # ✅ 수정: 존재하는 필드 이름으로 교체
-    ordering_fields = ['average_rating_cache', 'release_date', 'title']
+    ordering_fields = ['average_rating_cache', 'release_date', 'title', 'review_count']
     ordering = ['-average_rating_cache']
 
     @swagger_auto_schema(
@@ -39,7 +39,10 @@ class MovieListView(generics.ListAPIView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Movie.objects.prefetch_related('reviews', 'ott_services')
+        return (
+            Movie.objects.annotate(review_count=Count('reviews'))
+            .prefetch_related('reviews', 'ott_services')
+        )
 
 
 # ✅ 영화 등록
@@ -124,10 +127,10 @@ class MovieDetailEditDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class MovieSearchView(ListAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]  # ← 여기 추가
+    filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter] 
     search_fields = ['title']
     filterset_class = MovieFilter
-    ordering_fields = ['average_rating_cache', 'release_date', 'title']  # ← 이 부분도 명시
+    ordering_fields = ['average_rating_cache', 'release_date', 'title',  'review_count']
     ordering = ['-average_rating_cache']
 
     @swagger_auto_schema(
@@ -151,3 +154,9 @@ class MovieSearchView(ListAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        return (
+            Movie.objects.annotate(review_count=Count('reviews'))
+            .prefetch_related('reviews', 'ott_services')
+        )

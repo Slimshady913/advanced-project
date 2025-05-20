@@ -25,6 +25,8 @@ class MovieSerializer(serializers.ModelSerializer):
         help_text="영화의 평균 평점 (소수점 첫째자리까지)"
     )
 
+    review_count = serializers.SerializerMethodField(help_text="리뷰 참여 인원(리뷰 개수)")
+
     class Meta:
         model = Movie
         fields = [
@@ -35,7 +37,8 @@ class MovieSerializer(serializers.ModelSerializer):
             'thumbnail_url',
             'ott_services',
             'reviews',
-            'average_rating'
+            'average_rating',
+            'review_count',
         ]
 
     def get_average_rating(self, obj):
@@ -45,3 +48,6 @@ class MovieSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         reviews_qs = obj.reviews.all()
         return ReviewSerializer(reviews_qs, many=True, context={'request': request}).data
+    
+    def get_review_count(self, obj):
+        return obj.reviews.count()  # ← 리뷰 개수 반환
