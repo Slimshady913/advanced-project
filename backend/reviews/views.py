@@ -9,7 +9,7 @@ from drf_yasg import openapi
 
 from .models import (
     Review, ReviewCommentReaction, ReviewHistory,
-    ReviewComment, ReviewReaction
+    ReviewComment, ReviewReaction, ReviewImage
 )
 from .serializers import (
     ReviewImageSerializer, ReviewSerializer, ReviewCommentSerializer,
@@ -59,14 +59,12 @@ class ReviewListCreateView(generics.ListCreateAPIView):
         review = serializer.save(user=self.request.user)
         images = self.request.FILES.getlist('images')
         for image in images:
-            from .models import ReviewImage
             ReviewImage.objects.create(review=review, image=image)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
-    
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 상세 조회 / 수정 / 삭제 및 수정 이력 저장
@@ -99,13 +97,35 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
-    
+
     def perform_update(self, serializer):
         review = serializer.save()
+        # 새 이미지 파일 추가
         images = self.request.FILES.getlist('images')
         for image in images:
-            from .models import ReviewImage
             ReviewImage.objects.create(review=review, image=image)
+        # 삭제할 이미지 id 처리
+        delete_image_ids = self.request.data.get('delete_image_ids', [])
+        if isinstance(delete_image_ids, str):
+            try:
+                import json
+                delete_image_ids = json.loads(delete_image_ids)
+            except Exception:
+                delete_image_ids = []
+        for img_id in delete_image_ids:
+            ReviewImage.objects.filter(id=img_id, review=review).delete()
+
+# ---------------------------------------------------------------------
+# ✅ 리뷰 이미지 개별 삭제 API
+# ---------------------------------------------------------------------
+class ReviewImageDestroyView(generics.DestroyAPIView):
+    queryset = ReviewImage.objects.all()
+    serializer_class = ReviewImageSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    @swagger_auto_schema(operation_summary="리뷰 이미지 삭제")
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 추천/비추천 기능 (ReviewReaction)
@@ -131,47 +151,28 @@ class ToggleReviewReaction(APIView):
             reaction = ReviewReaction.objects.get(user=user, review=review)
             if reaction.is_like == is_like:
                 reaction.delete()
-                if is_like:
-                    review.like_count = max(review.like_count - 1, 0)
-                else:
-                    review.dislike_count = max(review.dislike_count - 1, 0)
-                review.save()
                 return Response({
                     "message": "투표가 취소되었습니다.",
                     "my_vote": 0,
-                    "like_count": review.like_count,
-                    "dislike_count": review.dislike_count,
+                    "like_count": review.reactions.filter(is_like=True).count(),
+                    "dislike_count": review.reactions.filter(is_like=False).count(),
                 }, status=200)
             else:
-                # 반대 투표로 변경
-                if is_like:
-                    review.like_count += 1
-                    review.dislike_count = max(review.dislike_count - 1, 0)
-                else:
-                    review.dislike_count += 1
-                    review.like_count = max(review.like_count - 1, 0)
                 reaction.is_like = is_like
                 reaction.save()
-                review.save()
                 return Response({
                     "message": "반응이 변경되었습니다.",
                     "my_vote": 1 if is_like else -1,
-                    "like_count": review.like_count,
-                    "dislike_count": review.dislike_count,
+                    "like_count": review.reactions.filter(is_like=True).count(),
+                    "dislike_count": review.reactions.filter(is_like=False).count(),
                 }, status=200)
         except ReviewReaction.DoesNotExist:
-            # 첫 투표
             ReviewReaction.objects.create(user=user, review=review, is_like=is_like)
-            if is_like:
-                review.like_count += 1
-            else:
-                review.dislike_count += 1
-            review.save()
             return Response({
                 "message": "투표가 반영되었습니다.",
                 "my_vote": 1 if is_like else -1,
-                "like_count": review.like_count,
-                "dislike_count": review.dislike_count,
+                "like_count": review.reactions.filter(is_like=True).count(),
+                "dislike_count": review.reactions.filter(is_like=False).count(),
             }, status=201)
 
 # ---------------------------------------------------------------------

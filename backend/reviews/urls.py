@@ -7,7 +7,8 @@ from .views import (
     ReviewCommentDestroyView,         # 리뷰 댓글 삭제
     ToggleReviewCommentReaction,      # 리뷰 댓글 좋아요 토글
     ReviewHistoryListView,            # 리뷰 수정 이력 조회
-    ReviewImageUploadView             # 리뷰 이미지 업로드
+    ReviewImageUploadView,             # 리뷰 이미지 업로드
+    ReviewImageDestroyView,            # 리뷰 이미지 삭제
 )
 
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
     path('comments/<int:comment_id>/like/', ToggleReviewCommentReaction.as_view(), name='comment-like-toggle'),
     path('<int:review_id>/history/', ReviewHistoryListView.as_view(), name='review-history'),
     path('<int:review_id>/images/', ReviewImageUploadView.as_view(), name='review-image-upload'),
+    path('review-images/<int:pk>/', ReviewImageDestroyView.as_view(), name='review-image-destroy'),
 ]

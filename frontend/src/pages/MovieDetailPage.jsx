@@ -496,6 +496,26 @@ const MovieDetailPage = () => {
                 setNewReview({ ...newReview, images: Array.from(e.target.files) })
               }
             />
+            {/* 미리보기 + 취소 버튼 */}
+            {newReview.images && newReview.images.length > 0 && (
+              <div style={{ marginTop: '7px' }}>
+                {newReview.images.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={URL.createObjectURL(img)}
+                    alt="첨부 이미지 미리보기"
+                    style={{ width: 48, height: 48, borderRadius: 6, objectFit: 'cover', marginRight: 7 }}
+                  />
+                ))}
+                <button
+                  type="button"
+                  style={{ marginLeft: 8, color: '#e74c3c', background: '#222', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
+                  onClick={() => setNewReview({ ...newReview, images: [] })}
+                >
+                  선택 취소
+                </button>
+              </div>
+            )}
           </div>
           <button type="submit" disabled={isSubmitting}>
             {isSubmitting ? '작성 중...' : '작성'}
