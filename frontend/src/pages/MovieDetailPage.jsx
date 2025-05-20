@@ -276,7 +276,9 @@ const MovieDetailPage = () => {
       <div key={review.id} className={`review-card${isTop ? ' top-review' : ''}`}>
         <div className="review-header">
           <span className="review-author">{review.user}</span>
-          <span className="review-date">{formatDate(review.created_at)}</span>
+          <span className="review-date">
+            {formatDate(review.created_at)}
+            {review.is_edited && <span className="review-edited-label"> (수정됨)</span>}</span>
           {isTop && <span className="top-label">Top</span>}
         </div>
         <div className="review-rating">

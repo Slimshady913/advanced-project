@@ -428,6 +428,18 @@
   background: #e50914;
 }
 
+.review-edited-label {
+  color: #7ed5f7;
+  font-size: 0.89em;
+  margin-left: 6px;
+  font-weight: 600;
+  background: #1c232b;
+  border-radius: 6px;
+  padding: 2px 8px;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}
+
 /* 공통 - 로딩/404 등 */
 .loading-screen {
   height: 100vh;
