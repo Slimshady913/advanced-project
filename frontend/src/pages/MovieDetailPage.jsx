@@ -85,6 +85,9 @@ const MovieDetailPage = () => {
   const [modalImageUrl, setModalImageUrl] = useState(null);
   const [modalImages, setModalImages] = useState([]);
   const [modalIndex, setModalIndex] = useState(0);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [ordering, setOrdering] = useState('-created_at'); // 기본 최신순
 
   const getToken = () => localStorage.getItem('access');
   const getCurrentUser = () => localStorage.getItem('username');
@@ -136,6 +139,20 @@ const MovieDetailPage = () => {
     window.scrollTo(0, 0);
     fetchMovieDetail();
   }, [id]);
+  const fetchReviews = async () => {
+    setReviewsLoading(true);
+    try {
+      const response = await axios.get(`/reviews/?movie=${id}&ordering=${ordering}`);
+      setReviews(response.data);
+    } catch {
+      setReviews([]);
+    }
+    setReviewsLoading(false);
+  };
+  useEffect(() => {
+    if (id) fetchReviews();
+  }, [id, ordering]);
+
 
   // 리뷰 작성
   const handleSubmit = async (e) => {
@@ -156,6 +173,7 @@ const MovieDetailPage = () => {
         { headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' } }
       );
       setNewReview({ rating: 5, comment: '', is_spoiler: false, images: [] });
+      fetchReviews();  // ✅ 리뷰 새로고침
       fetchMovieDetail();
     } catch (error) {
       if (error.response?.data?.non_field_errors) {
@@ -193,6 +211,7 @@ const MovieDetailPage = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      fetchReviews();      // ✅ 리뷰(추천수 등) 새로고침
       fetchMovieDetail();
     } catch (error) {
       setToastMsg('추천/비추천 처리 실패');
@@ -254,6 +273,7 @@ const MovieDetailPage = () => {
         { headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' } }
       );
       cancelEditing();
+      fetchReviews();      // ✅ 리뷰(추천수 등) 새로고침
       fetchMovieDetail();
     } catch (error) {
       setToastMsg('리뷰 수정 실패');
@@ -266,6 +286,7 @@ const MovieDetailPage = () => {
       await axios.delete(`/reviews/${reviewId}/`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+      fetchReviews();      // ✅ 리뷰(추천수 등) 새로고침
       fetchMovieDetail();
     } catch (error) {
       setToastMsg('리뷰 삭제 실패');
@@ -274,14 +295,15 @@ const MovieDetailPage = () => {
 
   // Top 리뷰/전체 리뷰
   const getTopReviews = () => {
-    if (!movie?.reviews) return [];
-    return [...movie.reviews]
-      .map((r) => ({ ...r, voteDiff: (r.like_count || 0) - (r.dislike_count || 0) }))
-      .filter((r) => r.voteDiff >= 10)
+    if (!reviews) return [];
+    return [...reviews]
+      .map(r => ({ ...r, voteDiff: (r.like_count || 0) - (r.dislike_count || 0) }))
+      .filter(r => r.voteDiff >= 10)
       .sort((a, b) => b.voteDiff - a.voteDiff)
       .slice(0, 3);
   };
-  const getAllReviews = () => movie?.reviews || [];
+
+  const getAllReviews = () => reviews || [];
 
   // ⭐️ 리뷰 별점 표시 (0.5 단위 반별, id 고유화)
   const renderStars = (score, reviewId) => {
@@ -669,11 +691,23 @@ const MovieDetailPage = () => {
       {/* 전체 리뷰 */}
       <section className="review-section">
         <h2>전체 리뷰</h2>
+        {/* 정렬 드롭다운 추가 */}
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ fontWeight: 600, marginRight: 10 }}>정렬:</label>
+          <select value={ordering} onChange={e => setOrdering(e.target.value)}>
+            <option value="-created_at">최신순</option>
+            <option value="-like_count">추천순</option>
+            <option value="rating">평점 낮은순</option>
+            <option value="-rating">평점 높은순</option>
+          </select>
+        </div>
         <div className="reviews">
-          {getAllReviews().length === 0 ? (
+          {reviewsLoading ? (
+            <p>리뷰 불러오는 중...</p>
+          ) : reviews.length === 0 ? (
             <p>첫 리뷰를 남겨주세요!</p>
           ) : (
-            getAllReviews().map((review) => renderReviewCard(review, false))
+            reviews.map((review) => renderReviewCard(review, false))
           )}
         </div>
       </section>
@@ -715,6 +749,7 @@ const MovieDetailPage = () => {
           >×</button>
         </div>
       )}
+
     </div>
   );
 };
