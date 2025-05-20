@@ -204,10 +204,22 @@ html, body {
   margin: 0;
 }
 .movie-info .rating {
-  font-size: 0.9rem;
+  font-size: 0.98rem;
   color: var(--accent);
   font-weight: 700;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;   /* 별점과 참여 인원 사이 여백 */
+}
+
+.movie-info .rating-count {
+  color: #bbb;
+  font-size: 0.90em;
+  margin-left: 0.05em; /* 더 벌리고 싶으면 증가 */
+  font-weight: 400;
+  /* 아래로 살짝 내리고 싶으면 */
+  /*position: relative; top: 1px;*/
 }
 
 /*────────────────────────────────────────────────────────────
@@ -215,15 +227,44 @@ html, body {
 ────────────────────────────────────────────────────────────*/
 .ott-logos {
   display: flex;
+  align-items: center;
   gap: 6px;
   margin-top: 0.4rem;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
+
 .ott-logos img {
   width: 24px;
   height: 24px;
   border-radius: 4px;
+  flex-shrink: 0;
 }
 
+.ott-more {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #232323;    /* 다른 OTT 로고 배경과 맞춤 */
+  color: #fff;            /* 기본 텍스트 색상 */
+  border-radius: 4px;     /* 로고와 동일 라운드 */
+  font-size: 0.95em;      /* 숫자 크기 조정 */
+  margin-left: 0;         /* gap으로 자동간격 처리 */
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+  user-select: none;
+  cursor: pointer;
+  transition: background 0.18s;
+  border: none;
+  outline: none;
+}
+
+.ott-more:hover {
+  background: var(--accent);
+  color: #fff;
+}
 /*────────────────────────────────────────────────────────────
   10) 반응형 보완
 ────────────────────────────────────────────────────────────*/

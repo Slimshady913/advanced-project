@@ -120,25 +120,37 @@ const MoviesPage = ({ isLoggedIn }) => {
             <div className="movie-info">
               <h3>{movie.title}</h3>
               <p className="meta">{movie.release_date}</p>
-              <p className="rating">⭐ {movie.average_rating}
-                <span className="rating-count">
-                  ({movie.review_count}명 참여)
-                </span>
+              <p className="rating">
+                ⭐ {movie.average_rating}
+                <span className="rating-count">({movie.review_count}명 참여)</span>
               </p>
 
               {/* 📺 영화별 OTT 플랫폼 로고 */}
               <div className="ott-logos">
-                {movie.ott_services?.map(ottId => {
-                  const service = ottList.find(o => o.id === ottId);
-                  return service ? (
-                    <img
-                      key={service.id}
-                      src={service.logo_url}
-                      alt={service.name}
-                      title={service.name}
-                    />
-                  ) : null;
-                })}
+                {movie.ott_services
+                  .slice(0, 4)
+                  .map(ottId => {
+                    const service = ottList.find(o => o.id === ottId);
+                    return service ? (
+                      <img
+                        key={service.id}
+                        src={service.logo_url}
+                        alt={service.name}
+                        title={service.name}
+                      />
+                    ) : null;
+                  })}
+                {movie.ott_services.length > 4 && (
+                  <span className="ott-more" title={
+                    movie.ott_services
+                      .slice(4)
+                      .map(ottId => ottList.find(o => o.id === ottId)?.name)
+                      .filter(Boolean)
+                      .join(', ')
+                  }>
+                    +{movie.ott_services.length - 4}
+                  </span>
+                )}
               </div>
             </div>
           </div>
