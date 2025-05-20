@@ -1,7 +1,7 @@
 from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.generics import ListAPIView
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter 
 from django_filters.rest_framework import DjangoFilterBackend
 
 from drf_yasg.utils import swagger_auto_schema
@@ -124,9 +124,11 @@ class MovieDetailEditDeleteView(generics.RetrieveUpdateDestroyAPIView):
 class MovieSearchView(ListAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
-    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter]  # ← 여기 추가
     search_fields = ['title']
     filterset_class = MovieFilter
+    ordering_fields = ['average_rating_cache', 'release_date', 'title']  # ← 이 부분도 명시
+    ordering = ['-average_rating_cache']
 
     @swagger_auto_schema(
         operation_summary="영화 검색",

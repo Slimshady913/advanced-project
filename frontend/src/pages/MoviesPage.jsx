@@ -87,8 +87,9 @@ const MoviesPage = ({ isLoggedIn }) => {
         <select value={ordering} onChange={e => setOrdering(e.target.value)}>
           <option value="">정렬 없음</option>
           <option value="-release_date">최신순</option>
-          <option value="-average_rating">평점 높은순</option>
-          <option value="average_rating">평점 낮은순</option>
+          <option value="release_date">오래된순</option>
+          <option value="-average_rating_cache">평점 높은순</option>
+          <option value="average_rating_cache">평점 낮은순</option>
           <option value="title">제목순</option>
         </select>
       </div>
