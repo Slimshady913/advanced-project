@@ -18,7 +18,7 @@ class ReviewImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReviewImage
-        fields = ['id', 'image', 'uploaded_at', 'image_url']  # image_url 추가
+        fields = ['id', 'image', 'uploaded_at', 'image_url']
         read_only_fields = ['id', 'uploaded_at']
 
 # ---------------------------------------------------------------------
@@ -28,8 +28,8 @@ class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     rating = serializers.FloatField(min_value=0.5, max_value=5.0)
     is_spoiler = serializers.BooleanField(default=False)
-    like_count = serializers.SerializerMethodField()
-    dislike_count = serializers.SerializerMethodField()
+    like_count = serializers.IntegerField(read_only=True)      # ← 실제 필드
+    dislike_count = serializers.IntegerField(read_only=True)   # ← 실제 필드
     is_edited = serializers.SerializerMethodField()
     images = ReviewImageSerializer(many=True, read_only=True)
     my_vote = serializers.SerializerMethodField()
@@ -37,9 +37,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def get_is_owner(self, obj):
         request = self.context.get('request')
-        # 인증된 사용자가 있고, 해당 리뷰의 user와 동일하면 True
-        return request and request.user and request.user.is_authenticated and obj.user == request.user
-
+        return (
+            request and request.user and request.user.is_authenticated and obj.user == request.user
+        )
 
     def get_my_vote(self, obj):
         request = self.context.get('request')
@@ -49,14 +49,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         if not reaction:
             return 0
         return 1 if reaction.is_like else -1
-
-    def get_like_count(self, obj):
-        # ReviewReaction을 기준으로 추천(👍) 개수 집계
-        return obj.reactions.filter(is_like=True).count()
-
-    def get_dislike_count(self, obj):
-        # ReviewReaction을 기준으로 비추천(👎) 개수 집계
-        return obj.reactions.filter(is_like=False).count()
 
     def get_is_edited(self, obj):
         return obj.histories.exists()

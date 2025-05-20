@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.filters import OrderingFilter
-from django.db.models import Count
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -53,7 +52,11 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         movie_id = self.request.query_params.get('movie')
-        return Review.objects.filter(movie_id=movie_id) if movie_id else Review.objects.all()
+        qs = Review.objects.all()
+        if movie_id:
+            qs = qs.filter(movie_id=movie_id)
+        # annotate 불필요! (like_count는 모델 필드)
+        return qs
 
     def perform_create(self, serializer):
         review = serializer.save(user=self.request.user)
@@ -100,7 +103,6 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         review = serializer.save()
-        # 새 이미지 파일 추가
         images = self.request.FILES.getlist('images')
         for image in images:
             ReviewImage.objects.create(review=review, image=image)
@@ -117,7 +119,6 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     
     def patch(self, request, *args, **kwargs):
         instance = self.get_object()
-        # 리뷰 수정 전 이력 남기기
         ReviewHistory.objects.create(
             review=instance,
             user=request.user,
@@ -162,29 +163,28 @@ class ToggleReviewReaction(APIView):
             reaction = ReviewReaction.objects.get(user=user, review=review)
             if reaction.is_like == is_like:
                 reaction.delete()
-                return Response({
-                    "message": "투표가 취소되었습니다.",
-                    "my_vote": 0,
-                    "like_count": review.reactions.filter(is_like=True).count(),
-                    "dislike_count": review.reactions.filter(is_like=False).count(),
-                }, status=200)
             else:
                 reaction.is_like = is_like
                 reaction.save()
-                return Response({
-                    "message": "반응이 변경되었습니다.",
-                    "my_vote": 1 if is_like else -1,
-                    "like_count": review.reactions.filter(is_like=True).count(),
-                    "dislike_count": review.reactions.filter(is_like=False).count(),
-                }, status=200)
         except ReviewReaction.DoesNotExist:
             ReviewReaction.objects.create(user=user, review=review, is_like=is_like)
-            return Response({
-                "message": "투표가 반영되었습니다.",
-                "my_vote": 1 if is_like else -1,
-                "like_count": review.reactions.filter(is_like=True).count(),
-                "dislike_count": review.reactions.filter(is_like=False).count(),
-            }, status=201)
+        # ✅ 항상 like_count/dislike_count 필드값을 최신화!
+        review.like_count = review.reactions.filter(is_like=True).count()
+        review.dislike_count = review.reactions.filter(is_like=False).count()
+        review.save(update_fields=['like_count', 'dislike_count'])
+
+        # my_vote 값도 계산
+        my_vote = 0
+        user_reaction = ReviewReaction.objects.filter(user=user, review=review).first()
+        if user_reaction:
+            my_vote = 1 if user_reaction.is_like else -1
+
+        return Response({
+            "message": "투표 결과가 반영되었습니다.",
+            "my_vote": my_vote,
+            "like_count": review.like_count,
+            "dislike_count": review.dislike_count,
+        }, status=200)
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 댓글 목록 조회 + 작성 (상위 3개 추천순 정렬 포함)
