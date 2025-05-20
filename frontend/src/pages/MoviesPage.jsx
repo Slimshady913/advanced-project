@@ -5,15 +5,15 @@ import { useNavigate } from 'react-router-dom';
 
 /**
  * MoviesPage: 영화 목록 화면
- * - 검색, OTT 필터, 정렬 기능 제공
+ * - 검색, OTT 필터(체크박스), 정렬 기능 제공
  * - 클릭 시 상세 페이지로 이동
  */
 const MoviesPage = ({ isLoggedIn }) => {
   const [movies, setMovies] = useState([]);
   const [ottList, setOttList] = useState([]);
+  const [selectedOtts, setSelectedOtts] = useState([]); // 체크된 OTT 배열
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
-  const [ott, setOtt] = useState('');
   const [ordering, setOrdering] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -30,10 +30,9 @@ const MoviesPage = ({ isLoggedIn }) => {
     let url = '/movies/search/?';
     if (search) url += `search=${search}&`;
 
-    if (ott === 'subscribed') {
-      url += `subscribed_only=true&`; // 🔐 구독 OTT 필터링
-    } else if (ott) {
-      url += `ott_services=${ott}&`;
+    // OTT 여러개 체크 가능!
+    if (selectedOtts.length > 0) {
+      url += `ott_services=${selectedOtts.join(',')}&`;
     }
 
     if (ordering) url += `ordering=${ordering}&`;
@@ -41,16 +40,12 @@ const MoviesPage = ({ isLoggedIn }) => {
     axios.get(url)
       .then(res => {
         setMovies(res.data);
-        res.data.forEach(m => {
-          console.log(m.title, m.ott_services);
-        });
         setError('');
       })
       .catch(err => {
-        console.error('영화 목록 불러오기 실패:', err);
         setError('영화 목록을 불러오는 데 실패했습니다.');
       });
-  }, [search, ott, ordering]);
+  }, [search, selectedOtts, ordering]);
 
   return (
     <div className="movies-page">
@@ -72,16 +67,25 @@ const MoviesPage = ({ isLoggedIn }) => {
           검색
         </button>
 
-        {/* 🎛️ OTT 드롭다운 - 구독 필터 포함 */}
-        <select value={ott} onChange={e => setOtt(e.target.value)}>
-          <option value="">OTT 전체</option>
-          {isLoggedIn && <option value="subscribed">구독 중인 OTT</option>}
+        {/* 🎛️ OTT 체크박스 그룹 */}
+        <div className="ott-checkbox-group" style={{ margin: '0.5em 0' }}>
           {ottList.map(item => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
+            <label key={item.id} style={{ marginRight: 12, fontSize: '0.98em' }}>
+              <input
+                type="checkbox"
+                checked={selectedOtts.includes(item.id)}
+                onChange={e => {
+                  if (e.target.checked) {
+                    setSelectedOtts(prev => [...prev, item.id]);
+                  } else {
+                    setSelectedOtts(prev => prev.filter(id => id !== item.id));
+                  }
+                }}
+              />
+              <span style={{ marginLeft: 3 }}>{item.name}</span>
+            </label>
           ))}
-        </select>
+        </div>
 
         {/* ↕️ 정렬 옵션 */}
         <select value={ordering} onChange={e => setOrdering(e.target.value)}>

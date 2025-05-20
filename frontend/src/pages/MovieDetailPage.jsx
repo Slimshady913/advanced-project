@@ -696,6 +696,7 @@ const MovieDetailPage = () => {
           <label style={{ fontWeight: 600, marginRight: 10 }}>정렬:</label>
           <select value={ordering} onChange={e => setOrdering(e.target.value)}>
             <option value="-created_at">최신순</option>
+            <option value="created_at">오래된순</option>
             <option value="-like_count">추천순</option>
             <option value="rating">평점 낮은순</option>
             <option value="-rating">평점 높은순</option>

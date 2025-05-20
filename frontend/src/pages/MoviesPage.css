@@ -313,3 +313,11 @@ html, body {
   margin-left: 0.18em;
   font-size: 1em;
 }
+
+.ott-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em;
+  margin-left: 1.1em;
+}
