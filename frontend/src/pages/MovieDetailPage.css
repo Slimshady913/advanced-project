@@ -394,17 +394,28 @@
 
 .review-images {
   display: flex;
-  gap: 13px;
-  margin: 6px 0 10px 0;
+  flex-wrap: wrap;           /* 여러 줄 자동 정렬 */
+  gap: 10px 14px;            /* 세로, 가로 간격 */
+  margin: 12px 0 2px 0;
+  padding-left: 2px;
+  justify-content: flex-start; /* 왼쪽 정렬 */
 }
+
 .review-image-thumb {
-  width: 74px;
-  height: 74px;
+  width: 70px;
+  height: 70px;
   object-fit: cover;
-  border-radius: 10px;
-  border: 1.3px solid #222;
-  background: #282828;
-  box-shadow: 0 2px 7px #0002;
+  border-radius: 9px;
+  border: 1.5px solid #232328;
+  background: #232328;
+  box-shadow: 0 2px 8px #0002;
+  transition: transform 0.17s;
+  cursor: pointer;
+}
+
+.review-image-thumb:hover {
+  transform: scale(1.09);
+  box-shadow: 0 6px 16px #0005;
 }
 
 /* 리뷰 수정/삭제 버튼 */
@@ -604,4 +615,48 @@
   box-shadow: none !important;
   outline: none !important;
   filter: grayscale(0.5);
+}
+
+.image-modal {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10000;
+  background: rgba(24, 24, 24, 0.70);
+  animation: fadeInModal 0.18s;
+}
+.image-modal-img {
+  max-width: 85vw;
+  max-height: 85vh;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px #0008;
+  background: #222;
+  z-index: 10001;
+  position: relative;
+  animation: scaleIn 0.17s;
+}
+.image-modal-close {
+  position: absolute;
+  top: 40px; right: 42px;
+  font-size: 2.6rem;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  z-index: 10002;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 2px 8px #222c;
+  transition: color 0.17s;
+}
+.image-modal-close:hover {
+  color: #ff6868;
+}
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.86);}
+  to { transform: scale(1);}
 }

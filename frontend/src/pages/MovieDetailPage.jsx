@@ -82,6 +82,7 @@ const MovieDetailPage = () => {
   const [toastMsg, setToastMsg] = useState('');
   const [deleteImageIds, setDeleteImageIds] = useState([]); // 삭제할 이미지 id (수정시)
   const toastRef = useRef();
+  const [modalImageUrl, setModalImageUrl] = useState(null);
 
   const getToken = () => localStorage.getItem('access');
   const getCurrentUser = () => localStorage.getItem('username');
@@ -340,19 +341,21 @@ const MovieDetailPage = () => {
             <span className="vote-icon" role="img" aria-label="비추천">👎</span>
             <span className="vote-count">{review.dislike_count ?? 0}</span>
           </button>
-          {review.images && review.images.length > 0 && (
-            <div className="review-images">
-              {review.images.map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img.image_url}
-                  alt="리뷰 이미지"
-                  className="review-image-thumb"
-                />
-              ))}
-            </div>
-          )}
         </div>
+        {review.images && review.images.length > 0 && (
+          <div className="review-images">
+            {review.images.map((img, idx) => (
+              <img
+                key={idx}
+                src={img.image_url}
+                alt="리뷰 이미지"
+                className="review-image-thumb"
+                onClick={() => setModalImageUrl(img.image_url)}
+                style={{ cursor: 'zoom-in' }}
+              />
+            ))}
+          </div>
+        )}
         {isSpoiler ? (
           <div className="review-content spoiler">
             <span className="spoiler-label">스포일러 포함</span>
@@ -610,10 +613,10 @@ const MovieDetailPage = () => {
 
       {/* Top 리뷰 */}
       <section className="review-section">
-        <h2>Top 리뷰</h2>
+        <h2>BEST 리뷰</h2>
         <div className="reviews">
           {getTopReviews().length === 0 ? (
-            <p>Top 리뷰가 없습니다.</p>
+            <p>BEST 리뷰가 없습니다.</p>
           ) : (
             getTopReviews().map((review) => renderReviewCard(review, true))
           )}
@@ -631,6 +634,22 @@ const MovieDetailPage = () => {
           )}
         </div>
       </section>
+
+      {modalImageUrl && (
+      <div className="image-modal" onClick={() => setModalImageUrl(null)}>
+        <img
+          src={modalImageUrl}
+          alt="확대 이미지"
+          className="image-modal-img"
+          onClick={e => e.stopPropagation()}
+        />
+        <button
+          className="image-modal-close"
+          onClick={() => setModalImageUrl(null)}
+          aria-label="닫기"
+        >×</button>
+      </div>
+    )}
     </div>
   );
 };
