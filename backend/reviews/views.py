@@ -114,6 +114,17 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
                 delete_image_ids = []
         for img_id in delete_image_ids:
             ReviewImage.objects.filter(id=img_id, review=review).delete()
+    
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # 리뷰 수정 전 이력 남기기
+        ReviewHistory.objects.create(
+            review=instance,
+            user=request.user,
+            previous_rating=instance.rating,
+            previous_comment=instance.comment
+        )
+        return super().patch(request, *args, **kwargs)
 
 # ---------------------------------------------------------------------
 # ✅ 리뷰 이미지 개별 삭제 API
