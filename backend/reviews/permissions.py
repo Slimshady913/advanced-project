@@ -12,5 +12,15 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # 요청자가 객체의 작성자인 경우에만 허용
-        return obj.user == request.user
+        # 객체가 Review라면
+        if hasattr(obj, 'user'):
+            return obj.user == request.user
+        # 객체가 ReviewImage라면 (review 필드가 있고, 그 review의 user가 요청자여야 함)
+        if hasattr(obj, 'review') and hasattr(obj.review, 'user'):
+            return obj.review.user == request.user
+        # 객체가 ReviewComment라면 (필요시 추가)
+        if hasattr(obj, 'review') and hasattr(obj.review, 'user'):
+            return obj.review.user == request.user
+        # 추가적으로 다른 객체가 있다면 그에 맞는 소유권 체크 추가
+
+        return False

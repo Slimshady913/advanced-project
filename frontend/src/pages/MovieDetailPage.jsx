@@ -77,9 +77,10 @@ const MovieDetailPage = () => {
   const [newReview, setNewReview] = useState({ rating: 5, comment: '', is_spoiler: false, images: [] });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editReviewId, setEditReviewId] = useState(null);
-  const [editReviewData, setEditReviewData] = useState({ rating: 5, comment: '', is_spoiler: false });
+  const [editReviewData, setEditReviewData] = useState({ rating: 5, comment: '', is_spoiler: false, images: [] });
   const [showSpoiler, setShowSpoiler] = useState({});
   const [toastMsg, setToastMsg] = useState('');
+  const [deleteImageIds, setDeleteImageIds] = useState([]); // 삭제할 이미지 id (수정시)
   const toastRef = useRef();
 
   const getToken = () => localStorage.getItem('access');
@@ -177,19 +178,52 @@ const MovieDetailPage = () => {
   // 리뷰 수정 관련
   const startEditing = (review) => {
     setEditReviewId(review.id);
-    setEditReviewData({ rating: review.rating, comment: review.comment, is_spoiler: review.is_spoiler });
+    setEditReviewData({ rating: review.rating, comment: review.comment, is_spoiler: review.is_spoiler, images: [] });
+    setDeleteImageIds([]);
   };
   const cancelEditing = () => {
     setEditReviewId(null);
-    setEditReviewData({ rating: 5, comment: '', is_spoiler: false });
+    setEditReviewData({ rating: 5, comment: '', is_spoiler: false, images: [] });
+    setDeleteImageIds([]);
   };
+
+  // 이미지 개별 삭제 (수정 폼)
+  const handleImageDelete = async (imgId, reviewId) => {
+    if (!window.confirm('이미지를 삭제하시겠습니까?')) return;
+    try {
+      await axios.delete(`/review-images/${imgId}/`, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      });
+      // 영화 상세 정보를 다시 불러오기 (리뷰 내부 이미지 갱신)
+      fetchMovieDetail();
+      setToastMsg('이미지가 삭제되었습니다.');
+    } catch {
+      setToastMsg('이미지 삭제 실패');
+    }
+  };
+
+  // 리뷰 수정 저장
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append('rating', editReviewData.rating);
+      formData.append('comment', editReviewData.comment);
+      formData.append('is_spoiler', editReviewData.is_spoiler);
+      // 새 이미지 추가
+      if (editReviewData.images) {
+        for (let i = 0; i < editReviewData.images.length; i++) {
+          formData.append('images', editReviewData.images[i]);
+        }
+      }
+      // 삭제할 이미지 id도 함께 전송(비동기 삭제일 경우 생략 가능)
+      if (deleteImageIds.length > 0) {
+        formData.append('delete_image_ids', JSON.stringify(deleteImageIds));
+      }
       await axios.patch(
         `/reviews/${editReviewId}/`,
-        editReviewData,
-        { headers: { Authorization: `Bearer ${getToken()}` } }
+        formData,
+        { headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' } }
       );
       cancelEditing();
       fetchMovieDetail();
@@ -278,7 +312,8 @@ const MovieDetailPage = () => {
           <span className="review-author">{review.user}</span>
           <span className="review-date">
             {formatDate(review.created_at)}
-            {review.is_edited && <span className="review-edited-label"> (수정됨)</span>}</span>
+            {review.is_edited && <span className="review-edited-label"> (수정됨)</span>}
+          </span>
           {isTop && <span className="top-label">Top</span>}
         </div>
         <div className="review-rating">
@@ -342,7 +377,7 @@ const MovieDetailPage = () => {
         {isOwner && (
           <div className="review-actions">
             {editReviewId === review.id ? (
-              <form onSubmit={handleEditSubmit} className="review-form">
+              <form onSubmit={handleEditSubmit} className="review-form" encType="multipart/form-data">
                 <div className="review-form-group review-form-group-horizontal">
                   <label htmlFor="edit-rating">평점</label>
                   <select
@@ -372,6 +407,56 @@ const MovieDetailPage = () => {
                     />
                     스포일러 포함
                   </label>
+                </div>
+                {/* 기존 이미지 미리보기 및 삭제 */}
+                {review.images && review.images.length > 0 && (
+                  <div className="review-edit-images" style={{ margin: "10px 0" }}>
+                    {review.images.map((img) => (
+                      <div key={img.id} style={{ display: 'inline-block', position: 'relative', marginRight: 8 }}>
+                        <img src={img.image_url} alt="리뷰 이미지" style={{ width: 48, height: 48, borderRadius: 6, objectFit: 'cover' }} />
+                        <button
+                          type="button"
+                          onClick={() => handleImageDelete(img.id, review.id)}
+                          style={{
+                            position: 'absolute', top: 0, right: 0, background: '#e74c3c', color: '#fff',
+                            border: 'none', borderRadius: '50%', width: 22, height: 22, fontSize: 14, cursor: 'pointer',
+                            lineHeight: '22px', textAlign: 'center', padding: 0,
+                          }}
+                          title="이미지 삭제"
+                        >×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {/* 새 이미지 추가/취소 */}
+                <div className="review-form-group">
+                  <label htmlFor="edit-review-image">이미지 추가</label>
+                  <input
+                    id="edit-review-image"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={e => setEditReviewData({ ...editReviewData, images: Array.from(e.target.files) })}
+                  />
+                  {editReviewData.images && editReviewData.images.length > 0 && (
+                    <div style={{ marginTop: '7px' }}>
+                      {editReviewData.images.map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={URL.createObjectURL(img)}
+                          alt="첨부 이미지 미리보기"
+                          style={{ width: 48, height: 48, borderRadius: 6, objectFit: 'cover', marginRight: 7 }}
+                        />
+                      ))}
+                      <button
+                        type="button"
+                        style={{ marginLeft: 8, color: '#e74c3c', background: '#222', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer' }}
+                        onClick={() => setEditReviewData({ ...editReviewData, images: [] })}
+                      >
+                        선택 취소
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div className="review-actions">
                   <button type="submit">저장</button>
