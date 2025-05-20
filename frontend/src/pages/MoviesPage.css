@@ -228,10 +228,8 @@ html, body {
 .ott-logos {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;               /* 로고-로고, 로고-+N 간격 일관 */
   margin-top: 0.4rem;
-  flex-wrap: nowrap;
-  overflow: hidden;
 }
 
 .ott-logos img {
@@ -244,23 +242,20 @@ html, body {
 .ott-more {
   width: 24px;
   height: 24px;
+  background: #232323;
+  color: #fff;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #232323;    /* 다른 OTT 로고 배경과 맞춤 */
-  color: #fff;            /* 기본 텍스트 색상 */
-  border-radius: 4px;     /* 로고와 동일 라운드 */
-  font-size: 0.95em;      /* 숫자 크기 조정 */
-  margin-left: 0;         /* gap으로 자동간격 처리 */
   font-weight: 700;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+  font-size: 1em;
+  opacity: 0.95;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.09);
   user-select: none;
   cursor: pointer;
-  transition: background 0.18s;
-  border: none;
-  outline: none;
+  /* margin-left: 0; → gap으로 충분하므로 삭제 */
 }
-
 .ott-more:hover {
   background: var(--accent);
   color: #fff;
