@@ -1,40 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from '../api/axios';
 import './MoviesPage.css';
 import { useNavigate } from 'react-router-dom';
 
 /**
- * MoviesPage: 영화 목록 화면
- * - 검색, OTT 필터(체크박스), 정렬 기능 제공
- * - 클릭 시 상세 페이지로 이동
+ * MoviesPage: 영화 목록 화면 (OTT 필터 체크박스 그룹 → 드롭다운 팝오버)
  */
 const MoviesPage = ({ isLoggedIn }) => {
   const [movies, setMovies] = useState([]);
   const [ottList, setOttList] = useState([]);
-  const [selectedOtts, setSelectedOtts] = useState([]); // 체크된 OTT 배열
+  const [selectedOtts, setSelectedOtts] = useState([]);
+  const [showOttDropdown, setShowOttDropdown] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
   const [ordering, setOrdering] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const ottDropdownRef = useRef();
 
-  // 📺 OTT 목록 불러오기
+  // 외부 클릭시 OTT 드롭다운 닫힘
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (showOttDropdown && ottDropdownRef.current && !ottDropdownRef.current.contains(e.target)) {
+        setShowOttDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showOttDropdown]);
+
+  // OTT 목록 불러오기
   useEffect(() => {
     axios.get('/ott/')
       .then(res => setOttList(res.data))
-      .catch(err => console.error('OTT 목록 불러오기 실패:', err));
+      .catch(() => {});
   }, []);
 
-  // 🎞️ 영화 목록 불러오기
+  // 영화 목록 불러오기
   useEffect(() => {
     let url = '/movies/search/?';
     if (search) url += `search=${search}&`;
-
-    // OTT 여러개 체크 가능!
-    if (selectedOtts.length > 0) {
-      url += `ott_services=${selectedOtts.join(',')}&`;
-    }
-
+    if (selectedOtts.length > 0) url += `ott_services=${selectedOtts.join(',')}&`;
     if (ordering) url += `ordering=${ordering}&`;
 
     axios.get(url)
@@ -42,16 +48,17 @@ const MoviesPage = ({ isLoggedIn }) => {
         setMovies(res.data);
         setError('');
       })
-      .catch(err => {
-        setError('영화 목록을 불러오는 데 실패했습니다.');
-      });
+      .catch(() => setError('영화 목록을 불러오는 데 실패했습니다.'));
   }, [search, selectedOtts, ordering]);
+
+  // 드롭다운 버튼용 텍스트
+  const ottButtonText = selectedOtts.length === 0
+    ? 'OTT 전체'
+    : ottList.filter(ott => selectedOtts.includes(ott.id)).map(ott => ott.name).join(', ');
 
   return (
     <div className="movies-page">
       <h2 className="text-2xl font-bold mb-4">영화 탐색</h2>
-
-      {/* 🔍 검색 및 필터 UI */}
       <div className="filter-bar">
         <input
           type="text"
@@ -66,28 +73,53 @@ const MoviesPage = ({ isLoggedIn }) => {
         >
           검색
         </button>
-
-        {/* 🎛️ OTT 체크박스 그룹 */}
-        <div className="ott-checkbox-group" style={{ margin: '0.5em 0' }}>
-          {ottList.map(item => (
-            <label key={item.id} style={{ marginRight: 12, fontSize: '0.98em' }}>
-              <input
-                type="checkbox"
-                checked={selectedOtts.includes(item.id)}
-                onChange={e => {
-                  if (e.target.checked) {
-                    setSelectedOtts(prev => [...prev, item.id]);
-                  } else {
-                    setSelectedOtts(prev => prev.filter(id => id !== item.id));
-                  }
-                }}
-              />
-              <span style={{ marginLeft: 3 }}>{item.name}</span>
-            </label>
-          ))}
+        {/* ▼ OTT 필터 드롭다운 ▼ */}
+        <div className="ott-dropdown-wrapper" ref={ottDropdownRef}>
+          <button
+            className="ott-dropdown-btn"
+            type="button"
+            onClick={() => setShowOttDropdown(prev => !prev)}
+          >
+            {ottButtonText} <span className="arrow">{showOttDropdown ? '▲' : '▼'}</span>
+          </button>
+          {showOttDropdown && (
+            <div className="ott-dropdown-list">
+              <label className="ott-checkbox all">
+                <input
+                  type="checkbox"
+                  checked={selectedOtts.length === 0}
+                  onChange={() => setSelectedOtts([])}
+                />
+                전체
+              </label>
+              {ottList.map(item => (
+                <label className="ott-checkbox" key={item.id}>
+                  <input
+                    type="checkbox"
+                    checked={selectedOtts.includes(item.id)}
+                    onChange={e => {
+                      if (e.target.checked) {
+                        setSelectedOtts(prev => [...prev, item.id]);
+                      } else {
+                        setSelectedOtts(prev => prev.filter(id => id !== item.id));
+                      }
+                    }}
+                  />
+                  <img src={item.logo_url} alt={item.name} className="ott-filter-logo" />
+                  <span>{item.name}</span>
+                </label>
+              ))}
+              <button
+                type="button"
+                className="ott-reset-btn"
+                onClick={() => setSelectedOtts([])}
+              >
+                초기화
+              </button>
+            </div>
+          )}
         </div>
-
-        {/* ↕️ 정렬 옵션 */}
+        {/* 정렬 드롭다운 */}
         <select value={ordering} onChange={e => setOrdering(e.target.value)}>
           <option value="">정렬 없음</option>
           <option value="-release_date">최신순</option>
@@ -98,7 +130,6 @@ const MoviesPage = ({ isLoggedIn }) => {
           <option value="title">제목순</option>
         </select>
       </div>
-
       {/* ⚠️ 에러 메시지 */}
       {error && (
         <p style={{ color: '#e50914', textAlign: 'center', marginBottom: '1rem' }}>
@@ -120,7 +151,6 @@ const MoviesPage = ({ isLoggedIn }) => {
                 alt={movie.title}
               />
             </div>
-
             <div className="movie-info">
               <h3>{movie.title}</h3>
               <p className="meta">{movie.release_date}</p>
@@ -128,8 +158,6 @@ const MoviesPage = ({ isLoggedIn }) => {
                 ⭐ {movie.average_rating}
                 <span className="rating-count">({movie.review_count}명 참여)</span>
               </p>
-
-              {/* 📺 영화별 OTT 플랫폼 로고 */}
               <div className="ott-logos">
                 {movie.ott_services
                   .slice(0, 4)
