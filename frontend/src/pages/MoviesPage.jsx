@@ -3,12 +3,10 @@ import axios from '../api/axios';
 import './MoviesPage.css';
 import { useNavigate } from 'react-router-dom';
 
-/**
- * MoviesPage: 영화 목록 화면 (OTT 필터 체크박스 그룹 → 드롭다운 팝오버)
- */
 const MoviesPage = ({ isLoggedIn }) => {
   const [movies, setMovies] = useState([]);
   const [ottList, setOttList] = useState([]);
+  const [subscribedOtts, setSubscribedOtts] = useState([]);
   const [selectedOtts, setSelectedOtts] = useState([]);
   const [showOttDropdown, setShowOttDropdown] = useState(false);
   const [searchInput, setSearchInput] = useState('');
@@ -18,7 +16,7 @@ const MoviesPage = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const ottDropdownRef = useRef();
 
-  // 외부 클릭시 OTT 드롭다운 닫힘
+  // ▼ 드롭다운 외부 클릭시 닫기
   useEffect(() => {
     const handleClick = (e) => {
       if (showOttDropdown && ottDropdownRef.current && !ottDropdownRef.current.contains(e.target)) {
@@ -35,6 +33,24 @@ const MoviesPage = ({ isLoggedIn }) => {
       .then(res => setOttList(res.data))
       .catch(() => {});
   }, []);
+
+  // 구독중인 OTT 정보 가져오기
+  useEffect(() => {
+    if (isLoggedIn) {
+      axios.get('/users/profile/')
+        .then(res => {
+          // API에 따라 다를 수 있으니 아래를 맞게 수정
+          if (res.data && res.data.subscribed_ott) {
+            setSubscribedOtts(res.data.subscribed_ott.map(o => o.id));
+          } else {
+            setSubscribedOtts([]);
+          }
+        })
+        .catch(() => setSubscribedOtts([]));
+    } else {
+      setSubscribedOtts([]);
+    }
+  }, [isLoggedIn]);
 
   // 영화 목록 불러오기
   useEffect(() => {
@@ -56,6 +72,10 @@ const MoviesPage = ({ isLoggedIn }) => {
     ? 'OTT 전체'
     : ottList.filter(ott => selectedOtts.includes(ott.id)).map(ott => ott.name).join(', ');
 
+  // 구독/전체 OTT 그룹 구분
+  const subscribedOttObjs = ottList.filter(ott => subscribedOtts.includes(ott.id));
+  const otherOttObjs = ottList.filter(ott => !subscribedOtts.includes(ott.id));
+
   return (
     <div className="movies-page">
       <h2 className="text-2xl font-bold mb-4">영화 탐색</h2>
@@ -73,6 +93,7 @@ const MoviesPage = ({ isLoggedIn }) => {
         >
           검색
         </button>
+
         {/* ▼ OTT 필터 드롭다운 ▼ */}
         <div className="ott-dropdown-wrapper" ref={ottDropdownRef}>
           <button
@@ -92,23 +113,54 @@ const MoviesPage = ({ isLoggedIn }) => {
                 />
                 전체
               </label>
-              {ottList.map(item => (
-                <label className="ott-checkbox" key={item.id}>
-                  <input
-                    type="checkbox"
-                    checked={selectedOtts.includes(item.id)}
-                    onChange={e => {
-                      if (e.target.checked) {
-                        setSelectedOtts(prev => [...prev, item.id]);
-                      } else {
-                        setSelectedOtts(prev => prev.filter(id => id !== item.id));
-                      }
-                    }}
-                  />
-                  <img src={item.logo_url} alt={item.name} className="ott-filter-logo" />
-                  <span>{item.name}</span>
-                </label>
-              ))}
+              {/* ---- 구독중인 OTT 그룹 ---- */}
+              {isLoggedIn && subscribedOttObjs.length > 0 && (
+                <div className="ott-dropdown-group">
+                  <div className="dropdown-group-title">구독중인 OTT</div>
+                  {subscribedOttObjs.map(item => (
+                    <label className="ott-checkbox" key={item.id}>
+                      <input
+                        type="checkbox"
+                        checked={selectedOtts.includes(item.id)}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setSelectedOtts(prev => [...prev, item.id]);
+                          } else {
+                            setSelectedOtts(prev => prev.filter(id => id !== item.id));
+                          }
+                        }}
+                      />
+                      <img src={item.logo_url} alt={item.name} className="ott-filter-logo" />
+                      <span>{item.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              {/* ---- 나머지 OTT 그룹 ---- */}
+              {otherOttObjs.length > 0 && (
+                <div className="ott-dropdown-group">
+                  {isLoggedIn && subscribedOttObjs.length > 0 && (
+                    <div className="dropdown-group-title">기타 OTT</div>
+                  )}
+                  {otherOttObjs.map(item => (
+                    <label className="ott-checkbox" key={item.id}>
+                      <input
+                        type="checkbox"
+                        checked={selectedOtts.includes(item.id)}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setSelectedOtts(prev => [...prev, item.id]);
+                          } else {
+                            setSelectedOtts(prev => prev.filter(id => id !== item.id));
+                          }
+                        }}
+                      />
+                      <img src={item.logo_url} alt={item.name} className="ott-filter-logo" />
+                      <span>{item.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
               <button
                 type="button"
                 className="ott-reset-btn"
@@ -119,6 +171,7 @@ const MoviesPage = ({ isLoggedIn }) => {
             </div>
           )}
         </div>
+
         {/* 정렬 드롭다운 */}
         <select value={ordering} onChange={e => setOrdering(e.target.value)}>
           <option value="">정렬 없음</option>
