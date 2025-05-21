@@ -11,7 +11,9 @@ from django.db import models
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-
+from rest_framework import generics
+from .models import BoardCategory
+from .serializers import BoardCategorySerializer
 
 # ✅ 게시글 목록 조회 + 작성
 class BoardPostListCreateView(generics.ListCreateAPIView):
@@ -121,3 +123,8 @@ class BoardCommentLikeToggleView(APIView):
             defaults={'is_like': is_like}
         )
         return Response({'status': 'updated', 'is_like': is_like})
+    
+    # ✅ 카테고리 목록 조회 API (READ ONLY)
+class BoardCategoryListView(generics.ListAPIView):
+    queryset = BoardCategory.objects.all()
+    serializer_class = BoardCategorySerializer

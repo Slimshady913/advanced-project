@@ -5,13 +5,13 @@ import './BoardListPage.css';
 
 // 카테고리 목록 (핫딜 추가, 인기 포함)
 const categories = [
+  { label: '인기 게시판', value: '인기' },
   { label: '자유', value: '자유' },
   { label: '국내 드라마', value: '국내 드라마' },
   { label: '해외 드라마', value: '해외 드라마' },
   { label: '국내 영화', value: '국내 영화' },
   { label: '해외 영화', value: '해외 영화' },
   { label: '핫딜', value: '핫딜' },
-  { label: '인기 게시판', value: '인기' },
 ];
 
 function BoardListPage() {

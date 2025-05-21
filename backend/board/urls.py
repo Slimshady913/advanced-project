@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    BoardCategoryListView,
     BoardPostListCreateView,
     BoardPostDetailView,
     BoardCommentListCreateView,
@@ -9,6 +10,8 @@ from .views import (
 )
 
 urlpatterns = [
+    # 카테고리 목록 조회
+    path('categories/', BoardCategoryListView.as_view(), name='boardcategory-list'),
     # 게시글 목록 조회 및 작성
     path('posts/', BoardPostListCreateView.as_view(), name='boardpost-list-create'),
     
