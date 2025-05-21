@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import './BoardWritePage.css';
+import { validatePostInput } from '../utils/validatePost';
 
 function BoardWritePage() {
   const [categories, setCategories] = useState([]);
@@ -22,8 +23,9 @@ function BoardWritePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!title || !content) {
-      setError('제목과 내용을 모두 입력해주세요.');
+    const validation = validatePostInput({ title, content });
+    if (validation) {
+      setError(validation);
       return;
     }
     try {

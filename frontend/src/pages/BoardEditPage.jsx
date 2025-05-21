@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '../api/axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './BoardWritePage.css'; // 수정 폼에도 write 스타일이 더 어울림
+import { validatePostInput } from '../utils/validatePost';
 
 function BoardEditPage() {
   const { id } = useParams();
@@ -35,15 +36,17 @@ function BoardEditPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!title || !content) {
-      setError('제목과 내용을 모두 입력해주세요.');
+    // ✅ 유틸 함수로 모든 입력 검증 (길이, 공백, XSS 등)
+    const validation = validatePostInput({ title, content });
+    if (validation) {
+      setError(validation);
       return;
     }
     try {
       const token = localStorage.getItem('access');
       await axios.put(
         `/board/posts/${id}/`,
-        { title, content, category }, // category는 id
+        { title, content, category },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
