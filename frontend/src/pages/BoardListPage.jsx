@@ -10,24 +10,32 @@ function BoardListPage() {
   const [categories, setCategories] = useState([]);
   const [posts, setPosts] = useState([]);
 
-  // 최초 카테고리 목록 불러오기
+  // 1. 카테고리 + "인기" 가상 탭 합치기
+  const customTabs = [{ id: 'hot', name: '인기' }, ...categories];
+
+  // 2. URL 파라미터/기본값 처리
+  const currentCategory =
+    category ||
+    (customTabs.length > 0 ? String(customTabs[0].id) : '');
+
+  // 3. 카테고리 불러오기
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
       setCategories(res.data);
     });
   }, []);
 
-  // 현재 선택된 카테고리 id (없으면 첫 번째 카테고리 id, 없으면 빈 문자열)
-  const currentCategory =
-    category ||
-    (categories.length > 0 ? String(categories[0].id) : '');
-
-  // 게시글 목록 불러오기
+  // 4. 게시글 목록 불러오기 (인기 vs 일반)
   useEffect(() => {
-    if (!currentCategory) return; // 카테고리 로딩 전엔 요청 안함
+    if (!currentCategory) return;
     const fetchPosts = async () => {
       try {
-        let url = `/board/posts/?category=${currentCategory}`;
+        let url = `/board/posts/`;
+        if (currentCategory === 'hot') {
+          url += '?ordering=like_count';
+        } else {
+          url += `?category=${currentCategory}`;
+        }
         const res = await axios.get(url);
         setPosts(res.data);
       } catch (err) {
@@ -39,19 +47,19 @@ function BoardListPage() {
     // eslint-disable-next-line
   }, [currentCategory, categories]);
 
-  // 카테고리 버튼 클릭시 URL 이동
+  // 5. 카테고리 버튼 클릭
   const handleCategoryClick = catId => {
     navigate(`/community/${catId}`);
   };
 
-  // 게시글 클릭시 상세 페이지로 이동
+  // 6. 게시글 클릭
   const handlePostClick = postId => {
     navigate(`/community/${currentCategory}/${postId}`);
   };
 
   const isLoggedIn = !!localStorage.getItem('access');
 
-  // 글쓰기 시 현재 카테고리 전달(선택)
+  // 7. 글쓰기
   const handleWriteClick = () => {
     navigate(`/community/write?category=${encodeURIComponent(currentCategory)}`);
   };
@@ -60,7 +68,7 @@ function BoardListPage() {
     <div className="board-container">
       <h1 className="board-title">커뮤니티</h1>
       <div className="category-tabs">
-        {categories.map(cat => (
+        {customTabs.map(cat => (
           <button
             key={cat.id}
             className={currentCategory === String(cat.id) ? 'active' : ''}
