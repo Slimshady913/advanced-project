@@ -5,36 +5,51 @@ import './BoardListPage.css';
 import { formatDate } from '../utils/formatDate';
 
 function BoardListPage() {
-  const { category } = useParams();
+  const { category: categorySlug } = useParams();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [posts, setPosts] = useState([]);
 
-  // 1. 카테고리 + "인기" 가상 탭 합치기
-  const customTabs = [{ id: 'hot', name: '인기' }, ...categories];
+  // "인기" "핫딜" 가상 탭
+  const customTabs = [
+    { id: 'hot', name: '인기', slug: 'hot' },
+    { id: 'sale', name: '핫딜', slug: 'sale' },
+    // 실제 카테고리도 slug 필드 필요! (ex: { id: 1, name: '자유', slug: 'free' })
+    ...categories,
+  ];
 
-  // 2. URL 파라미터/기본값 처리
-  const currentCategory =
-    category ||
-    (customTabs.length > 0 ? String(customTabs[0].id) : '');
+  // URL에 없으면 hot으로 기본값 (최초 진입)
+  const currentSlug =
+    categorySlug ||
+    (customTabs.length > 0 ? customTabs[0].slug : 'hot');
 
-  // 3. 카테고리 불러오기
+  // 카테고리 목록 불러오기 (slug 필드 포함되어야 함!)
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
-      setCategories(res.data);
+      setCategories(res.data); // res.data: [{id, name, slug}, ...]
     });
   }, []);
 
-  // 4. 게시글 목록 불러오기 (인기 vs 일반)
+  // 게시글 목록 불러오기 (slug에 따라 동작)
   useEffect(() => {
-    if (!currentCategory) return;
+    if (!currentSlug) return;
     const fetchPosts = async () => {
       try {
         let url = `/board/posts/`;
-        if (currentCategory === 'hot') {
+        if (currentSlug === 'hot') {
           url += '?ordering=like_count';
+        } else if (currentSlug === 'sale') {
+          // 실제 "핫딜" 카테고리의 id 찾아서 적용
+          const saleCat = categories.find(cat => cat.slug === 'sale');
+          if (saleCat) {
+            url += `?category=${saleCat.id}`;
+          }
         } else {
-          url += `?category=${currentCategory}`;
+          // 실제 카테고리 (자유, 국내 드라마 등)
+          const selectedCat = categories.find(cat => cat.slug === currentSlug);
+          if (selectedCat) {
+            url += `?category=${selectedCat.id}`;
+          }
         }
         const res = await axios.get(url);
         setPosts(res.data);
@@ -45,23 +60,23 @@ function BoardListPage() {
     };
     fetchPosts();
     // eslint-disable-next-line
-  }, [currentCategory, categories]);
+  }, [currentSlug, categories]);
 
-  // 5. 카테고리 버튼 클릭
-  const handleCategoryClick = catId => {
-    navigate(`/community/${catId}`);
+  // 카테고리 버튼 클릭
+  const handleCategoryClick = slug => {
+    navigate(`/community/${slug}`);
   };
 
-  // 6. 게시글 클릭
+  // 게시글 클릭
   const handlePostClick = postId => {
-    navigate(`/community/${currentCategory}/${postId}`);
+    navigate(`/community/${currentSlug}/${postId}`);
   };
 
   const isLoggedIn = !!localStorage.getItem('access');
 
-  // 7. 글쓰기
+  // 글쓰기 (카테고리 slug로 전달)
   const handleWriteClick = () => {
-    navigate(`/community/write?category=${encodeURIComponent(currentCategory)}`);
+    navigate(`/community/write?category=${encodeURIComponent(currentSlug)}`);
   };
 
   return (
@@ -70,9 +85,9 @@ function BoardListPage() {
       <div className="category-tabs">
         {customTabs.map(cat => (
           <button
-            key={cat.id}
-            className={currentCategory === String(cat.id) ? 'active' : ''}
-            onClick={() => handleCategoryClick(cat.id)}
+            key={cat.slug}
+            className={currentSlug === cat.slug ? 'active' : ''}
+            onClick={() => handleCategoryClick(cat.slug)}
           >
             {cat.name}
           </button>
