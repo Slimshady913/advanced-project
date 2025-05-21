@@ -32,9 +32,9 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
         responses={200: BoardPostSerializer(many=True)}
     )
     def get(self, request, *args, **kwargs):
-        category_name = self.request.query_params.get('category')
-        if category_name:
-            self.queryset = self.queryset.filter(category__name=category_name)
+        category_slug = self.request.query_params.get('category')
+        if category_slug and category_slug != 'hot':
+            self.queryset = self.queryset.filter(category__slug=category_slug)
         return super().get(request, *args, **kwargs)
 
     def perform_create(self, serializer):

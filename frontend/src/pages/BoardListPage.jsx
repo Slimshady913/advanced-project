@@ -10,27 +10,26 @@ function BoardListPage() {
   const [categories, setCategories] = useState([]);
   const [posts, setPosts] = useState([]);
 
-  // "인기" "핫딜" 가상 탭
+  // "인기" "핫딜" 가상 탭 + 실제 카테고리(slug 필드 필요!)
   const customTabs = [
-    { id: 'hot', name: '인기', slug: 'hot' },
-    { id: 'sale', name: '핫딜', slug: 'sale' },
-    // 실제 카테고리도 slug 필드 필요! (ex: { id: 1, name: '자유', slug: 'free' })
-    ...categories,
+    { slug: 'hot', name: '인기' },
+    ...categories.map(cat => ({ slug: cat.slug, name: cat.name, id: cat.id })),
+    { slug: 'sale', name: '핫딜' }, // "핫딜"은 슬러그/DB 모두 포함돼 있으면 중복 안 되게 주의
   ];
 
-  // URL에 없으면 hot으로 기본값 (최초 진입)
+  // URL에 없으면 hot으로 기본값
   const currentSlug =
     categorySlug ||
     (customTabs.length > 0 ? customTabs[0].slug : 'hot');
 
-  // 카테고리 목록 불러오기 (slug 필드 포함되어야 함!)
+  // 카테고리 목록 불러오기 (slug 필드 포함되어야 함)
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
-      setCategories(res.data); // res.data: [{id, name, slug}, ...]
+      setCategories(res.data); // [{id, name, slug}, ...]
     });
   }, []);
 
-  // 게시글 목록 불러오기 (slug에 따라 동작)
+  // 게시글 목록 불러오기
   useEffect(() => {
     if (!currentSlug) return;
     const fetchPosts = async () => {
@@ -38,17 +37,15 @@ function BoardListPage() {
         let url = `/board/posts/`;
         if (currentSlug === 'hot') {
           url += '?ordering=like_count';
-        } else if (currentSlug === 'sale') {
-          // 실제 "핫딜" 카테고리의 id 찾아서 적용
-          const saleCat = categories.find(cat => cat.slug === 'sale');
-          if (saleCat) {
-            url += `?category=${saleCat.id}`;
-          }
         } else {
-          // 실제 카테고리 (자유, 국내 드라마 등)
+          // slug에 맞는 카테고리 객체를 찾음
           const selectedCat = categories.find(cat => cat.slug === currentSlug);
           if (selectedCat) {
             url += `?category=${selectedCat.id}`;
+          } else if (currentSlug === 'sale') {
+            // "핫딜"이 실제 카테고리에 없을 경우 방어 코드
+            const saleCat = categories.find(cat => cat.slug === 'sale');
+            if (saleCat) url += `?category=${saleCat.id}`;
           }
         }
         const res = await axios.get(url);
@@ -74,7 +71,7 @@ function BoardListPage() {
 
   const isLoggedIn = !!localStorage.getItem('access');
 
-  // 글쓰기 (카테고리 slug로 전달)
+  // 글쓰기
   const handleWriteClick = () => {
     navigate(`/community/write?category=${encodeURIComponent(currentSlug)}`);
   };
