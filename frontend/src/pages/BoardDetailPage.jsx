@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import './BoardDetailPage.css';
+import { formatDate } from '../utils/formatDate';
 
 function BoardDetailPage() {
   const { id } = useParams();
@@ -114,7 +115,7 @@ function BoardDetailPage() {
       {post && (
         <>
           <h2>{post.title}</h2>
-          <p className="meta">작성자: {post.user} | {post.created_at.slice(0, 10)}</p>
+          <p className="meta">작성자: {post.user} | {formatDate(post.created_at)}</p>
           <p className="content">{post.content}</p>
 
           {username === post.user && (
@@ -139,7 +140,7 @@ function BoardDetailPage() {
             {comments.map((comment) => (
               <div key={comment.id} className="comment-item">
                 <p>{comment.user}: {comment.content}</p>
-                <p className="comment-meta">{comment.created_at.slice(0, 10)}</p>
+                <p className="comment-meta">{formatDate(comment.created_at)}</p>
                 <div className="comment-actions">
                   <button onClick={() => handleCommentLike(comment.id, true)}>👍 {comment.like_count ?? 0}</button>
                   {comment.user === username && (
