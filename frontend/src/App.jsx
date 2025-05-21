@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import Header from './components/Header.jsx';
 import AuthPage from './pages/AuthPage.jsx';
@@ -14,7 +14,7 @@ import BoardListPage from './pages/BoardListPage.jsx';
 import BoardWritePage from './pages/BoardWritePage.jsx';
 import BoardDetailPage from './pages/BoardDetailPage.jsx';
 import BoardEditPage from './pages/BoardEditPage.jsx';
-import { Navigate } from 'react-router-dom';
+
 /**
  * App: 루트 컴포넌트
  * - 로그인 상태 체크 및 헤더 렌더링
