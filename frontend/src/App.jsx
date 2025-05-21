@@ -14,7 +14,7 @@ import BoardListPage from './pages/BoardListPage.jsx';
 import BoardWritePage from './pages/BoardWritePage.jsx';
 import BoardDetailPage from './pages/BoardDetailPage.jsx';
 import BoardEditPage from './pages/BoardEditPage.jsx';
-
+import { Navigate } from 'react-router-dom';
 /**
  * App: 루트 컴포넌트
  * - 로그인 상태 체크 및 헤더 렌더링
@@ -127,7 +127,8 @@ function App() {
             }
           />
           {/* 🗣️ 커뮤니티 게시판 */}
-          <Route path="/community" element={<BoardListPage />} />
+          <Route path="/community" element={<Navigate to="/community/인기" replace />} />
+          <Route path="/community/:category" element={<BoardListPage />} />
           <Route
             path="/community/write"
             element={
@@ -136,7 +137,6 @@ function App() {
               </PrivateRoute>
             }
           />
-          <Route path="/community/:id" element={<BoardDetailPage />} />
           <Route
             path="/community/edit/:id"
             element={
@@ -145,6 +145,8 @@ function App() {
               </PrivateRoute>
             }
           />
+          {/* 상세 페이지 라우팅 예시 (추가/선택) */}
+          <Route path="/community/:category/:id" element={<BoardDetailPage />} />
         </Routes>
       )}
     </Router>
