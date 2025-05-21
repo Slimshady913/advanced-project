@@ -36,7 +36,6 @@ class Command(BaseCommand):
             obj, _ = BoardCategory.objects.get_or_create(
                 name=name, defaults={'slug': slug}
             )
-            # 만약 기존에 있고 slug 미입력시 slug 입력
             if not obj.slug:
                 obj.slug = slug
                 obj.save()
@@ -62,19 +61,21 @@ class Command(BaseCommand):
                     post=post,
                     user=random.choice(user_objects)
                 )
-                # 댓글 좋아요/비추천(랜덤 0~3개, 랜덤 is_like)
-                for k in range(random.randint(0, 3)):
-                    BoardCommentLike.objects.get_or_create(
+                # 댓글 좋아요/비추천 - user 중복 없이 랜덤 샘플
+                like_users = random.sample(user_objects, k=random.randint(0, len(user_objects)))
+                for like_user in like_users:
+                    BoardCommentLike.objects.create(
                         comment=comment,
-                        user=random.choice(user_objects),
+                        user=like_user,
                         is_like=random.choice([True, False])
                     )
 
-            # 게시글 좋아요/비추천 랜덤 0~3개, is_like True/False 골고루
-            for k in range(random.randint(0, 3)):
-                BoardPostLike.objects.get_or_create(
+            # 게시글 좋아요/비추천 - user 중복 없이 랜덤 샘플
+            like_users = random.sample(user_objects, k=random.randint(0, len(user_objects)))
+            for like_user in like_users:
+                BoardPostLike.objects.create(
                     post=post,
-                    user=random.choice(user_objects),
+                    user=like_user,
                     is_like=random.choice([True, False])
                 )
 
