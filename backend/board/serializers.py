@@ -28,7 +28,7 @@ class BoardPostSerializer(serializers.ModelSerializer):
 class BoardCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardCategory
-        fields = ['id', 'name', 'description']
+        fields = ['id', 'name', 'slug', 'description']  # slug 포함
 
 # 댓글 시리얼라이저
 class BoardCommentSerializer(serializers.ModelSerializer):

@@ -7,6 +7,7 @@ User = get_user_model()
 # ✅ 게시판 카테고리 모델 (ex. 자유게시판, 영화 정보, 국내 드라마 등)
 class BoardCategory(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="카테고리명")
+    slug = models.SlugField(max_length=50, unique=True, verbose_name="슬러그", default='')  # <-- 추가!
     description = models.TextField(blank=True, verbose_name="설명")
 
     def __str__(self):
