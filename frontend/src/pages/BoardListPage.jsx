@@ -3,16 +3,14 @@ import axios from '../api/axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './BoardListPage.css';
 
-// 카테고리 목록 (핫딜 추가, 인기 포함)
-const categories = [
-  { label: '인기 게시판', value: '인기' },
-  { label: '자유', value: '자유' },
-  { label: '국내 드라마', value: '국내 드라마' },
-  { label: '해외 드라마', value: '해외 드라마' },
-  { label: '국내 영화', value: '국내 영화' },
-  { label: '해외 영화', value: '해외 영화' },
-  { label: '핫딜', value: '핫딜' },
-];
+const [categories, setCategories] = useState([]);
+
+useEffect(() => {
+  // 카테고리 목록 불러오기
+  axios.get('/board/categories/').then(res => {
+    setCategories(res.data);
+  });
+}, []);
 
 function BoardListPage() {
   const { category } = useParams();
@@ -44,8 +42,8 @@ function BoardListPage() {
   };
 
   // 카테고리 버튼 클릭시 URL 이동
-  const handleCategoryClick = (cat) => {
-    navigate(`/community/${cat}`);
+  const handleCategoryClick = (catId) => {
+    navigate(`/community/${catId}`);
   };
 
   // 게시글 클릭시 상세 페이지로 이동
@@ -66,11 +64,11 @@ function BoardListPage() {
       <div className="category-tabs">
         {categories.map((cat) => (
           <button
-            key={cat.value}
-            className={currentCategory === cat.value ? 'active' : ''}
-            onClick={() => handleCategoryClick(cat.value)}
+            key={cat.id}
+            className={currentCategory === String(cat.id) ? 'active' : ''}
+            onClick={() => handleCategoryClick(cat.id)}
           >
-            {cat.label}
+            {cat.name}
           </button>
         ))}
       </div>
