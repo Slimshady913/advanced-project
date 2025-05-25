@@ -1,104 +1,43 @@
 .detailContainer {
   width: 100%;
   max-width: 860px;
-  margin: 38px auto 32px auto;
-  padding: 42px 0 60px 0;
-  background: rgba(28, 32, 37, 0.99);
-  border-radius: 18px;
-  box-shadow: 0 8px 36px 0 rgba(0,0,0,0.22);
+  margin: 0 auto 40px auto;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
   color: #d2ecfc;
   font-family: 'Helvetica Neue', 'Roboto', Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
-@media (max-width: 900px) {
-  .detailContainer { padding: 15px 0; }
-}
-@media (max-width: 600px) {
-  .detailContainer { padding: 8px 0; border-radius: 0; }
-}
 
-/* ======= 게시글 헤더 ======= */
-.postHeader {
-  border-bottom: 1.7px solid #242e36;
-  margin-bottom: 32px;
-  padding-bottom: 14px;
-  padding-left: 42px;
-  padding-right: 42px;
-  background: none;
-}
-@media (max-width: 900px) {
-  .postHeader { padding-left: 4vw; padding-right: 4vw; }
-}
-@media (max-width: 600px) {
-  .postHeader { padding-left: 2vw; padding-right: 2vw; }
-}
-
-.postMeta {
-  display: flex;
-  gap: 16px;
-  font-size: 0.97rem;
-  color: #92a4b2;
-  margin-bottom: 10px;
-}
-.category {
+/* ======= 게시글 본문 ======= */
+.content {
+  margin: 16px 42px 0 42px;
+  font-size: 1.08rem;
+  line-height: 1.9;
+  color: #eaf6ff;
+  word-break: break-all;
   background: #222b38;
-  color: #00AEEF;
-  padding: 3px 13px;
-  border-radius: 16px;
-  font-weight: bold;
-  font-size: 1.02rem;
-  letter-spacing: 0.02em;
-}
-.date, .views, .comments {
-  background: #202530;
-  color: #b2c7e2;
-  padding: 2.5px 9px;
-  border-radius: 7px;
-  font-size: 0.98em;
-}
-
-.postTitle {
-  font-size: 1.19rem;
-  font-weight: 800;
-  margin: 10px 0 14px 0;
-  color: #fff;
-  letter-spacing: -0.9px;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.09);
+  border-radius: 13px;
+  padding: 32px 20px;
+  box-shadow: 0 2px 8px rgba(0,30,90,0.06);
+  min-height: 84px;
 }
 @media (max-width: 900px) {
-  .postTitle { font-size: 1.08rem; }
+  .content { font-size: 1.01rem; margin-left: 4vw; margin-right: 4vw; }
 }
 @media (max-width: 600px) {
-  .postTitle { font-size: 0.99rem; }
-}
-
-.postAuthor {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  color: #7ca2c8;
-  margin-bottom: 2px;
-}
-.avatar {
-  font-size: 1.05rem;
-  background: #222b38;
-  color: #00AEEF;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
+  .content { font-size: 0.93rem; margin-left: 2vw; margin-right: 2vw; padding: 13px 7px; }
 }
 
 /* 첨부파일 */
 .postAttachment {
-  margin-bottom: 20px;
-  padding: 7px 0 5px 42px;
+  margin-top: 13px;
+  margin-bottom: 24px;
+  margin-left: 42px;
 }
 .postAttachment a {
   background: #1c293b;
@@ -115,40 +54,18 @@
   color: #fff;
 }
 @media (max-width: 900px) {
-  .postAttachment { padding-left: 4vw; }
+  .postAttachment { margin-left: 4vw; }
 }
 @media (max-width: 600px) {
-  .postAttachment { padding-left: 2vw; }
-}
-
-/* ======= 본문 ======= */
-.content {
-  margin: 34px 0 40px 0;
-  font-size: 1.07rem;
-  line-height: 1.85;
-  color: #eaf6ff;
-  word-break: break-all;
-  background: #222b38;
-  border-radius: 12px;
-  padding: 26px 20px;
-  box-shadow: 0 2px 8px rgba(0,30,90,0.06);
-  margin-left: 42px;
-  margin-right: 42px;
-}
-@media (max-width: 900px) {
-  .content { font-size: 1.01rem; margin-left: 4vw; margin-right: 4vw; }
-}
-@media (max-width: 600px) {
-  .content { font-size: 0.93rem; margin-left: 2vw; margin-right: 2vw; padding: 13px 7px; }
+  .postAttachment { margin-left: 2vw; }
 }
 
 /* ======= 추천/비추천 버튼 ======= */
 .postLikeActions {
   display: flex;
   gap: 17px;
-  margin-bottom: 28px;
+  margin: 30px 42px 8px 0;
   justify-content: flex-end;
-  margin-right: 42px;
 }
 .likeBtn, .dislikeBtn {
   font-size: 1.08rem;
@@ -213,7 +130,7 @@
 .commentTitle {
   color: #bcd3e3;
   font-size: 1.07rem;
-  margin-top: 36px;
+  margin-top: 38px;
   margin-bottom: 13px;
   letter-spacing: -0.03em;
   padding-left: 42px;

@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import styles from './BoardDetailPage.module.css';
-import './BoardListPage.css'; // 전역 카테고리/카드 스타일 재활용
+import './BoardListPage.css';
 import { formatDate } from '../utils/formatDate';
 import { FaThumbsUp, FaThumbsDown, FaComment, FaEye, FaImage } from 'react-icons/fa';
 
 function BoardDetailPage() {
   const { id } = useParams();
-  const location = useLocation();
   const navigate = useNavigate();
 
-  // 카테고리, 상세, 댓글, 같은 카테고리 최신글 상태
   const [categories, setCategories] = useState([]);
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
@@ -23,36 +21,39 @@ function BoardDetailPage() {
   const token = localStorage.getItem('access');
   const username = localStorage.getItem('username');
 
-  // 카테고리 목록 불러오기
+  // 카테고리 목록
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
       const data = Array.isArray(res.data) ? res.data
-                : (Array.isArray(res.data.results) ? res.data.results : []);
+        : (Array.isArray(res.data.results) ? res.data.results : []);
       setCategories(data);
     });
   }, []);
 
-  // 상세/댓글 불러오기
+  // 상세/댓글
   useEffect(() => {
     fetchPost();
     fetchComments();
-    // eslint-disable-next-line
   }, [id]);
 
-  // 같은 카테고리 최신글 불러오기
+  // 같은 카테고리 최신글
   useEffect(() => {
-    if (post && post.category_slug) {
-      fetchRelatedPosts(post.category_slug);
+    if (post) {
+      const slug =
+        post.category_slug || post.category || post.category_name || (categories[0] && categories[0].slug) || 'free';
+      fetchRelatedPosts(slug);
     }
     // eslint-disable-next-line
-  }, [post]);
+  }, [post, categories]);
 
   const fetchPost = async () => {
     try {
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : { headers: {} };
       const res = await axios.get(`/board/posts/${id}/`, config);
       setPost(res.data);
-    } catch (err) { setPost(null); }
+    } catch (err) {
+      setPost(null);
+    }
   };
 
   const fetchComments = async () => {
@@ -64,42 +65,42 @@ function BoardDetailPage() {
     }
   };
 
+  // 최신글 10개 불러오기 (자기자신 제외)
   const fetchRelatedPosts = async (categorySlug) => {
+    if (!categorySlug) return setRelatedPosts([]);
     try {
-      // 10개 최신글, 자기자신 제외
       const res = await axios.get(`/board/posts/?category=${categorySlug}&page=1&page_size=11`);
-      if (res.data && res.data.results) {
-        setRelatedPosts(res.data.results.filter(p => p.id !== Number(id)).slice(0, 10));
-      }
+      const arr = res.data?.results ?? res.data ?? [];
+      setRelatedPosts(arr.filter(p => p.id !== Number(id)).slice(0, 10));
     } catch (err) {
       setRelatedPosts([]);
     }
   };
 
-  // 카테고리 탭 클릭 시 이동
-  const handleCategoryClick = slug => {
-    navigate(`/community/${slug}`);
-  };
-
-  // 상세 하단 게시글 카드 클릭
-  const handleRelatedPostClick = postId => {
-    navigate(`/community/${post?.category_slug || post?.category || 'free'}/${postId}`);
-  };
-
-  // 추천 상위 3개 댓글
-  const topCommentIds = comments
-    .slice().sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0))
-    .slice(0, 3).map(c => c.id);
-
-  // 카테고리 탭 목록 생성
+  // 카테고리 탭
   const saleCategory = categories.find(cat => cat.slug === 'sale');
   const customTabs = [
     { slug: 'hot', name: '인기' },
     ...categories.map(cat => ({ slug: cat.slug, name: cat.name, id: cat.id })),
     ...(saleCategory ? [] : [{ slug: 'sale', name: '핫딜' }]),
   ];
-  // 현재 게시글의 카테고리
-  const categorySlug = post?.category_slug || post?.category || 'free';
+
+  // 탭 클릭
+  const handleCategoryClick = slug => {
+    navigate(`/community/${slug}`);
+  };
+
+  // 상세 하단 게시글 카드 클릭
+  const handleRelatedPostClick = postId => {
+    if (!post) return;
+    const slug = post.category_slug || post.category || 'free';
+    navigate(`/community/${slug}/${postId}`);
+  };
+
+  // 댓글 상위 3개
+  const topCommentIds = comments
+    .slice().sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0))
+    .slice(0, 3).map(c => c.id);
 
   // 추천/비추천
   const handlePostLike = async (isLike) => {
@@ -109,7 +110,7 @@ function BoardDetailPage() {
       await axios.post(`/board/posts/${id}/like/`, { is_like: isLike },
         { headers: { Authorization: `Bearer ${token}` } });
       await fetchPost();
-    } catch (err) { /* 에러처리 */ }
+    } catch (err) { }
     setLikeLoading(false);
   };
 
@@ -124,7 +125,7 @@ function BoardDetailPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setNewComment(''); setError(''); fetchComments();
-    } catch (err) { /* 에러처리 */ }
+    } catch (err) { }
   };
   const handleCommentDelete = async (commentId) => {
     try {
@@ -132,7 +133,7 @@ function BoardDetailPage() {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchComments();
-    } catch (err) { /* 에러처리 */ }
+    } catch (err) { }
   };
   const handleCommentLike = async (commentId, isLike) => {
     try {
@@ -142,7 +143,7 @@ function BoardDetailPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchComments();
-    } catch (err) { /* 에러처리 */ }
+    } catch (err) { }
   };
   const handlePostDelete = async () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
@@ -151,9 +152,73 @@ function BoardDetailPage() {
           headers: { Authorization: `Bearer ${token}` }
         });
         navigate('/community');
-      } catch (err) { /* 에러처리 */ }
+      } catch (err) { }
     }
   };
+
+  // 타이틀 줄(카테고리/제목/작성자/날짜/통계)
+  function TitleBar() {
+    if (!post) return null;
+    return (
+      <div style={{
+        background: '#232c38',
+        borderRadius: 12,
+        padding: '18px 42px 16px 42px',
+        marginBottom: 19,
+        display: 'flex',
+        flexDirection: 'column',
+        boxShadow: '0 2px 10px rgba(0,30,90,0.07)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+          <span style={{
+            background: '#2981d4',
+            color: '#fff',
+            fontWeight: 800,
+            fontSize: '1.02rem',
+            padding: '4px 17px',
+            borderRadius: 12,
+            marginRight: 14,
+            letterSpacing: '-0.5px',
+            display: 'inline-block'
+          }}>
+            {post.category_name || post.category}
+          </span>
+          <span style={{
+            fontWeight: 800,
+            fontSize: '1.17rem',
+            color: '#e5f0ff',
+            marginRight: 11,
+            lineHeight: 1.3
+          }}>{post.title}</span>
+          <span style={{
+            marginLeft: 'auto',
+            color: '#7ca2c8',
+            fontSize: '0.97rem',
+            fontWeight: 500
+          }}>{formatDate(post.created_at)}</span>
+        </div>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 20,
+          marginTop: 1,
+          flexWrap: 'wrap'
+        }}>
+          <span style={{
+            fontWeight: 700,
+            color: '#90c7fa',
+            fontSize: '1.01rem'
+          }}>{post.user?.username || post.user}</span>
+          <span style={{ color: '#b6bfd2', fontWeight: 500, display: 'flex', gap: 12, fontSize: '1.06rem' }}>
+            <span><FaThumbsUp className="icon like" /> {post.like_count}</span>
+            <span><FaThumbsDown className="icon dislike" /> {post.dislike_count}</span>
+            <span><FaComment className="icon comment" /> {comments.length}</span>
+            <span><FaEye className="icon view" /> {post.views || post.view_count || 0}</span>
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="board-root-layout">
@@ -168,75 +233,26 @@ function BoardDetailPage() {
             </div>
           </div>
         </aside>
-        {/* 본문 */}
         <main className="board-center">
-          <div className="board-container pro" style={{marginTop:38}}>
+          <div className="board-container pro" style={{ marginTop: 38 }}>
             {/* 카테고리 탭 */}
             <div className="category-tabs pro">
               {customTabs.map(cat => (
                 <button
                   key={cat.slug}
-                  className={categorySlug === cat.slug ? 'active' : ''}
+                  className={post && (post.category_slug || post.category) === cat.slug ? 'active' : ''}
                   onClick={() => handleCategoryClick(cat.slug)}
                 >
                   {cat.name}
                 </button>
               ))}
             </div>
+            {/* 타이틀바 */}
+            <TitleBar />
             {post && (
               <>
-                {/* 게시글 카드 스타일 */}
-                <div
-                  className="post-card pro"
-                  style={{
-                    background: 'none',
-                    cursor: 'default',
-                    borderRadius: 14,
-                    marginTop: '10px',
-                    marginBottom: '22px'
-                  }}
-                >
-                  <div className="post-thumb">
-                    {post.thumbnail_url ? (
-                      <img
-                        src={post.thumbnail_url}
-                        alt="썸네일"
-                        className="post-thumb-img"
-                        onError={e => { e.target.style.display = 'none'; }}
-                      />
-                    ) : (
-                      <div className="post-thumb-icon"><FaImage /></div>
-                    )}
-                  </div>
-                  <div className="post-title-row">
-                    <span className="post-category">[{post.category_name || post.category}]</span>
-                    <h3 className="post-title" style={{ whiteSpace: 'normal', fontWeight: 900, fontSize: '1.17rem' }}>
-                      {post.title}
-                    </h3>
-                  </div>
-                  <div className="post-meta-row">
-                    <span className="post-user">{post.user?.username || post.user}</span>
-                    <span className="post-date">{formatDate(post.created_at)}</span>
-                  </div>
-                  <div className="post-stats-row">
-                    <span className="stat">
-                      <FaThumbsUp className="icon like" /> {post.like_count}
-                    </span>
-                    <span className="stat">
-                      <FaThumbsDown className="icon dislike" /> {post.dislike_count}
-                    </span>
-                    <span className="stat">
-                      <FaComment className="icon comment" /> {comments.length}
-                    </span>
-                    <span className="stat">
-                      <FaEye className="icon view" /> {post.views || post.view_count || 0}
-                    </span>
-                  </div>
-                </div>
-
-                {/* 본문 내용 */}
+                {/* 본문 */}
                 <div className={styles.content}>{post.content}</div>
-
                 {/* 첨부파일 */}
                 {post.attachment && (
                   <div className={styles.postAttachment}>
@@ -245,7 +261,6 @@ function BoardDetailPage() {
                     </a>
                   </div>
                 )}
-
                 {/* 추천/비추천 */}
                 <div className={styles.postLikeActions}>
                   <button
@@ -263,13 +278,13 @@ function BoardDetailPage() {
                     비추천
                   </button>
                 </div>
+                {/* 수정/삭제 */}
                 {username === (post.user?.username || post.user) && token && (
                   <div className={styles.postActions}>
                     <button onClick={() => navigate(`/community/edit/${post.id}`)}>수정</button>
                     <button onClick={handlePostDelete}>삭제</button>
                   </div>
                 )}
-
                 {/* 댓글 */}
                 <h3 className={styles.commentTitle}>댓글 {comments.length}</h3>
                 {token ? (
@@ -314,12 +329,12 @@ function BoardDetailPage() {
                     );
                   })}
                 </div>
-                {/* ↓↓↓ 컨테이너 하단: 같은 카테고리의 게시글 미리보기(최대 10개, 카드디자인) ↓↓↓ */}
-                <div style={{marginTop: 48}}>
-                  <div style={{fontWeight:900, fontSize:'1.13rem', color:'#53a7ff', marginBottom:18, paddingLeft:42}}>
-                    {post.category_name || post.category} 게시판의 최신글
+                {/* 최신글 미리보기(10개) */}
+                <div style={{ marginTop: 48 }}>
+                  <div style={{ fontWeight: 900, fontSize: '1.13rem', color: '#53a7ff', marginBottom: 18, paddingLeft: 42 }}>
+                    {(post.category_name || post.category) + ' 게시판의 최신글'}
                   </div>
-                  <div className="post-list pro" style={{marginBottom: 8}}>
+                  <div className="post-list pro" style={{ marginBottom: 8 }}>
                     {relatedPosts.length === 0
                       ? <p className="no-post">관련 게시글이 없습니다.</p>
                       : relatedPosts.map(rp => (
@@ -327,7 +342,7 @@ function BoardDetailPage() {
                           key={rp.id}
                           className="post-card pro"
                           onClick={() => handleRelatedPostClick(rp.id)}
-                          style={{ cursor:'pointer', borderRadius:12, background: 'none'}}
+                          style={{ cursor: 'pointer', borderRadius: 12, background: 'none' }}
                         >
                           <div className="post-thumb">
                             {rp.thumbnail_url ? (
