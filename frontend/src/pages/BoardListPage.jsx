@@ -64,77 +64,98 @@ function BoardListPage() {
   };
 
   return (
-    <div className="board-container pro">
-      <h1 className="board-title pro">커뮤니티</h1>
-      <div className="category-tabs pro">
-        {customTabs.map(cat => (
-          <button
-            key={cat.slug}
-            className={currentSlug === cat.slug ? 'active' : ''}
-            onClick={() => handleCategoryClick(cat.slug)}
-          >
-            {cat.name}
-          </button>
-        ))}
-      </div>
-      {isLoggedIn && (
-        <button className="write-button pro" onClick={handleWriteClick}>
-          글쓰기
-        </button>
-      )}
-      <div className="post-list pro">
-        {posts.length === 0 ? (
-          <p className="no-post">게시글이 없습니다.</p>
-        ) : (
-          posts.map(post => (
-            <div
-              key={post.id}
-              className="post-card pro"
-              onClick={() => handlePostClick(post.id)}
-            >
-              {/* 썸네일/아이콘 미리보기 영역 */}
-              <div className="post-thumb">
-                {post.thumbnail_url ? (
-                  <img
-                    src={post.thumbnail_url}
-                    alt="썸네일"
-                    className="post-thumb-img"
-                    onError={e => { e.target.style.display = 'none'; }}
-                  />
-                ) : (
-                  <div className="post-thumb-icon">
-                    <FaImage />
-                  </div>
-                )}
-              </div>
+    <div className="board-root-layout">
+      {/* 왼쪽 광고 영역 */}
+      <aside className="ad-left">
+        <div className="ad-banner">
+          {/* 예시: 이미지 광고도 가능 */}
+          {/* <img src="/ads/left-banner.png" alt="광고" style={{width: '100%'}} /> */}
+          광고 영역
+        </div>
+      </aside>
 
-              {/* 제목/카테고리/기존 정보 */}
-              <div className="post-title-row">
-                <span className="post-category">[{post.category_name}]</span>
-                <h3 className="post-title">{post.title}</h3>
-              </div>
-              <div className="post-meta-row">
-                <span className="post-user">{post.user?.username || post.user}</span>
-                <span className="post-date">{formatDate(post.created_at)}</span>
-              </div>
-              <div className="post-stats-row">
-                <span className="stat">
-                  <FaThumbsUp className="icon like" /> {post.like_count}
-                </span>
-                <span className="stat">
-                  <FaThumbsDown className="icon dislike" /> {post.dislike_count}
-                </span>
-                <span className="stat">
-                  <FaComment className="icon comment" /> {post.comment_count}
-                </span>
-                <span className="stat">
-                  <FaEye className="icon view" /> {post.view_count}
-                </span>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      {/* 중앙 본문 */}
+      <main className="board-center">
+        <div className="board-container pro">
+          <h1 className="board-title pro">커뮤니티</h1>
+          <div className="category-tabs pro">
+            {customTabs.map(cat => (
+              <button
+                key={cat.slug}
+                className={currentSlug === cat.slug ? 'active' : ''}
+                onClick={() => handleCategoryClick(cat.slug)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+          {isLoggedIn && (
+            <button className="write-button pro" onClick={handleWriteClick}>
+              글쓰기
+            </button>
+          )}
+          <div className="post-list pro">
+            {posts.length === 0 ? (
+              <p className="no-post">게시글이 없습니다.</p>
+            ) : (
+              posts.map(post => (
+                <div
+                  key={post.id}
+                  className="post-card pro"
+                  onClick={() => handlePostClick(post.id)}
+                >
+                  {/* 썸네일/아이콘 미리보기 영역 */}
+                  <div className="post-thumb">
+                    {post.thumbnail_url ? (
+                      <img
+                        src={post.thumbnail_url}
+                        alt="썸네일"
+                        className="post-thumb-img"
+                        onError={e => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="post-thumb-icon">
+                        <FaImage />
+                      </div>
+                    )}
+                  </div>
+                  {/* 제목/카테고리/기존 정보 */}
+                  <div className="post-title-row">
+                    <span className="post-category">[{post.category_name}]</span>
+                    <h3 className="post-title">{post.title}</h3>
+                  </div>
+                  <div className="post-meta-row">
+                    <span className="post-user">{post.user?.username || post.user}</span>
+                    <span className="post-date">{formatDate(post.created_at)}</span>
+                  </div>
+                  <div className="post-stats-row">
+                    <span className="stat">
+                      <FaThumbsUp className="icon like" /> {post.like_count}
+                    </span>
+                    <span className="stat">
+                      <FaThumbsDown className="icon dislike" /> {post.dislike_count}
+                    </span>
+                    <span className="stat">
+                      <FaComment className="icon comment" /> {post.comment_count}
+                    </span>
+                    <span className="stat">
+                      <FaEye className="icon view" /> {post.view_count}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* 오른쪽 광고 영역 */}
+      <aside className="ad-right">
+        <div className="ad-banner">
+          {/* <img src="/ads/right-banner.png" alt="광고" style={{width: '100%'}} /> */}
+          광고 영역
+        </div>
+      </aside>
     </div>
   );
 }

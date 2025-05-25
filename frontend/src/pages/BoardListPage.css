@@ -9,15 +9,56 @@ body {
   min-height: 100vh;
   background: #181a1b;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.ad-left, .ad-right {
+  width: 180px;
+  min-width: 120px;
+  max-width: 220px;
+  display: flex;
+  justify-content: center;
+  align-items: center;    /* 세로 중앙 정렬 */
+  height: 100%;
+  margin: 0 0px;
+}
+
+.ad-banner {
+  width: 140px;
+  height: 380px;
+  max-height: 90vh;
+  min-height: 160px;
+  background: linear-gradient(120deg, #232a36 72%, #2e4172 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(30,40,80,0.17), 0 1px 5px rgba(0,0,0,0.18);
+  display: flex;
   align-items: center;
+  justify-content: center;
+  color: #bee6ff;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 1.1px;
+  text-align: center;
+  margin: 0 10px;
+  user-select: none;
+  opacity: 0.95;
 }
 
 .board-center {
+  flex: 1;
+  min-width: 0;
   display: flex;
   justify-content: center;
-  width: 100%;
-  min-height: 100vh;
+}
+
+@media (max-width: 1350px) {
+  .ad-left, .ad-right { width: 80px; min-width: 60px; }
+  .ad-banner { width: 60px; height: 200px; font-size: 0.89rem; }
+}
+@media (max-width: 1200px) {
+  .ad-left, .ad-right { display: none; }
 }
 
 /* 게시판 메인 컨테이너(가운데 정렬) */
@@ -33,7 +74,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  /* 가운데 정렬 보장 */
 }
 
 @media (max-width: 1300px) {
@@ -43,7 +83,6 @@ body {
   .board-container.pro { padding: 6vw 0 10vw 0; border-radius: 0; }
 }
 
-/* 아래 부분은 이전 스타일과 동일하게 사용해도 됩니다. */
 .board-title.pro {
   font-size: 2.2rem;
   font-weight: 900;
@@ -54,6 +93,7 @@ body {
   padding-left: 42px;
   line-height: 1.12;
 }
+
 .category-tabs.pro {
   display: flex;
   gap: 10px;
