@@ -28,7 +28,16 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
         manual_parameters=[
             openapi.Parameter(
                 'category', openapi.IN_QUERY, description="카테고리 필터링 (예: '영화', '드라마', 'hot')", type=openapi.TYPE_STRING
-            )
+            ),
+            openapi.Parameter(
+                'search_type', openapi.IN_QUERY, description="검색 타입 (title, title_content, user)", type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'search', openapi.IN_QUERY, description="검색어", type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'page', openapi.IN_QUERY, description="페이지 번호", type=openapi.TYPE_INTEGER
+            ),
         ],
         responses={200: BoardPostSerializer(many=True)}
     )
@@ -37,6 +46,7 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
         min_like_count = 10  # 인기 기준 추천수 (원하는 값으로 조정)
         queryset = self.get_queryset()
 
+        # 카테고리 필터
         if category_slug:
             if category_slug == 'hot':
                 # 인기글: 추천수 N개 이상 필터 + 추천순 정렬
@@ -47,6 +57,20 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
                 ).order_by('-like_count', '-created_at')
             else:
                 queryset = queryset.filter(category__slug=category_slug)
+
+        # 🔥 검색 파라미터 처리
+        search_type = self.request.query_params.get("search_type")
+        search = self.request.query_params.get("search")
+        if search_type and search:
+            if search_type == "title":
+                queryset = queryset.filter(title__icontains=search)
+            elif search_type == "title_content":
+                queryset = queryset.filter(
+                    Q(title__icontains=search) | Q(content__icontains=search)
+                )
+            elif search_type == "user":
+                queryset = queryset.filter(user__username__icontains=search)
+
         self.queryset = queryset
         return super().get(request, *args, **kwargs)
 

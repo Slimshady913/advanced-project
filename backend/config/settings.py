@@ -144,6 +144,9 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
     ),
+    # 🔥 [추가] 페이지네이션 설정 (기본값: 1페이지에 20개)
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,  # 1페이지에 보여줄 게시글 개수(원하는 숫자로 변경 가능)
 }
 
 SWAGGER_SETTINGS = {
