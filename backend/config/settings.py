@@ -147,8 +147,11 @@ REST_FRAMEWORK = {
     # 🔥 [추가] 페이지네이션 설정 (기본값: 1페이지에 20개)
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,  # 1페이지에 보여줄 게시글 개수(원하는 숫자로 변경 가능)
+    
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',  # GET/HEAD/OPTIONS는 모두 허용, POST/PUT/DELETE만 인증 필요
+    ],
 }
-
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
         'Bearer': {

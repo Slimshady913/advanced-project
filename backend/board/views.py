@@ -82,7 +82,8 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
 class BoardPostDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BoardPost.objects.all()
     serializer_class = BoardPostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    #permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [permissions.AllowAny]  # ✅ 임시로 완전히 공개!
 
     @swagger_auto_schema(operation_summary="게시글 상세 조회")
     def get(self, request, *args, **kwargs):
