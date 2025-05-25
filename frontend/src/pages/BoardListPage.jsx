@@ -3,6 +3,7 @@ import axios from '../api/axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './BoardListPage.css';
 import { formatDate } from '../utils/formatDate';
+import { FaThumbsUp, FaThumbsDown, FaComment, FaEye } from 'react-icons/fa';
 
 function BoardListPage() {
   const { category: categorySlug } = useParams();
@@ -10,18 +11,14 @@ function BoardListPage() {
   const [categories, setCategories] = useState([]);
   const [posts, setPosts] = useState([]);
 
-  // 가상 탭(인기, 핫딜)과 실제 카테고리(slug 기준, 중복 제거)
-  // - "hot"은 가상 인기 탭
-  // - "sale"은 실제 카테고리에 있으면 중복 없이 탭 합침
+  // 실제 카테고리 중 핫딜이 있는지 확인
   const saleCategory = categories.find(cat => cat.slug === 'sale');
   const customTabs = [
     { slug: 'hot', name: '인기' },
     ...categories.map(cat => ({ slug: cat.slug, name: cat.name, id: cat.id })),
-    // 실제 카테고리에 "sale"이 없다면 핫딜 가상 탭 추가
     ...(saleCategory ? [] : [{ slug: 'sale', name: '핫딜' }]),
   ];
 
-  // URL에 없으면 hot으로 기본값
   const currentSlug =
     categorySlug ||
     (customTabs.length > 0 ? customTabs[0].slug : 'hot');
@@ -29,7 +26,7 @@ function BoardListPage() {
   // 카테고리 목록 불러오기
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
-      setCategories(res.data); // [{id, name, slug}, ...]
+      setCategories(res.data);
     });
   }, []);
 
@@ -55,27 +52,24 @@ function BoardListPage() {
     // eslint-disable-next-line
   }, [currentSlug, categories]);
 
-  // 카테고리 버튼 클릭
   const handleCategoryClick = slug => {
     navigate(`/community/${slug}`);
   };
 
-  // 게시글 클릭
   const handlePostClick = postId => {
     navigate(`/community/${currentSlug}/${postId}`);
   };
 
   const isLoggedIn = !!localStorage.getItem('access');
 
-  // 글쓰기
   const handleWriteClick = () => {
     navigate(`/community/write?category=${encodeURIComponent(currentSlug)}`);
   };
 
   return (
-    <div className="board-container">
-      <h1 className="board-title">커뮤니티</h1>
-      <div className="category-tabs">
+    <div className="board-container pro">
+      <h1 className="board-title pro">커뮤니티</h1>
+      <div className="category-tabs pro">
         {customTabs.map(cat => (
           <button
             key={cat.slug}
@@ -87,23 +81,42 @@ function BoardListPage() {
         ))}
       </div>
       {isLoggedIn && (
-        <button className="write-button" onClick={handleWriteClick}>
+        <button className="write-button pro" onClick={handleWriteClick}>
           글쓰기
         </button>
       )}
-      <div className="post-list">
+      <div className="post-list pro">
         {posts.length === 0 ? (
-          <p>게시글이 없습니다.</p>
+          <p className="no-post">게시글이 없습니다.</p>
         ) : (
           posts.map(post => (
             <div
               key={post.id}
-              className="post-card"
+              className="post-card pro"
               onClick={() => handlePostClick(post.id)}
             >
-              <h3>{post.title}</h3>
-              <p>작성자: {post.user?.username || post.user}</p>
-              <p>{formatDate(post.created_at)}</p>
+              <div className="post-title-row">
+                <span className="post-category">[{post.category_name}]</span>
+                <h3 className="post-title">{post.title}</h3>
+              </div>
+              <div className="post-meta-row">
+                <span className="post-user">{post.user?.username || post.user}</span>
+                <span className="post-date">{formatDate(post.created_at)}</span>
+              </div>
+              <div className="post-stats-row">
+                <span className="stat">
+                  <FaThumbsUp className="icon like" /> {post.like_count}
+                </span>
+                <span className="stat">
+                  <FaThumbsDown className="icon dislike" /> {post.dislike_count}
+                </span>
+                <span className="stat">
+                  <FaComment className="icon comment" /> {post.comment_count}
+                </span>
+                <span className="stat">
+                  <FaEye className="icon view" /> {post.view_count}
+                </span>
+              </div>
             </div>
           ))
         )}
