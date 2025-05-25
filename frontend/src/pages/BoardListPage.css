@@ -20,7 +20,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  max-width: 1480px;   /* PC: 본문+광고+여백 */
+  max-width: 1480px;
   margin: 0 auto;
   padding: 0 12px;
   box-sizing: border-box;
@@ -38,7 +38,6 @@ body {
   margin-top: 32px;
   margin-left: 18px;
   margin-right: 18px;
-  /* 광고가 너무 끝에 붙지 않게 */
   transition: width 0.2s, margin 0.2s;
 }
 
@@ -94,7 +93,7 @@ body {
   opacity: 1;
 }
 
-/* ----- 반응형 광고 미디어쿼리 ----- */
+/* 반응형 광고 미디어쿼리 */
 @media (max-width: 1550px) {
   .board-center-wrap { max-width: 1240px; }
   .ad-left, .ad-right { width: 110px; margin-left: 7px; margin-right: 7px; }
@@ -106,6 +105,7 @@ body {
   .board-center-wrap { max-width: 100vw; }
 }
 
+/* 중앙 본문 */
 .board-center {
   flex: 1 1 0;
   min-width: 0;
@@ -114,7 +114,7 @@ body {
   align-items: stretch;
 }
 
-/* 게시판 메인 컨테이너(가운데 정렬) */
+/* 게시판 메인 컨테이너 */
 .board-container.pro {
   width: 100%;
   max-width: 1100px;
@@ -128,7 +128,6 @@ body {
   flex-direction: column;
   align-items: stretch;
 }
-
 @media (max-width: 1300px) {
   .board-container.pro { max-width: 98vw; }
 }
@@ -136,7 +135,7 @@ body {
   .board-container.pro { padding: 6vw 0 10vw 0; border-radius: 0; }
 }
 
-/* 이하 게시판, 글, 카테고리 스타일은 동일 */
+/* 타이틀 */
 .board-title.pro {
   font-size: 2.2rem;
   font-weight: 900;
@@ -147,6 +146,8 @@ body {
   padding-left: 42px;
   line-height: 1.12;
 }
+
+/* 카테고리 탭 */
 .category-tabs.pro {
   display: flex;
   gap: 10px;
@@ -178,6 +179,8 @@ body {
   background: #294869;
   color: #f0f6fb;
 }
+
+/* 글쓰기 버튼 */
 .write-button.pro {
   display: block;
   margin: 0 42px 23px auto;
@@ -196,6 +199,8 @@ body {
   background: linear-gradient(90deg, #0094cc, #0053c4);
   transform: translateY(-1.5px) scale(1.03);
 }
+
+/* ---- 게시글 목록 ---- */
 .post-list.pro {
   display: flex;
   flex-direction: column;
@@ -247,6 +252,8 @@ body {
   .write-button.pro { margin-right: 2vw; }
   .post-card.pro { padding-left: 2vw; padding-right: 2vw; }
 }
+
+/* 썸네일 */
 .post-thumb {
   width: 56px;
   height: 42px;
@@ -356,7 +363,95 @@ body {
 .no-post {
   color: #bbb;
   text-align: center;
-  padding: 68px 0;
+  padding: 68px 0 28px 0;
   font-size: 1.19rem;
   font-weight: 700;
+}
+
+/* ---- 검색바 ---- */
+.board-search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+  padding-left: 42px;
+  align-items: center;
+}
+.board-search-bar select,
+.board-search-bar input {
+  padding: 6px 12px;
+  font-size: 1rem;
+  border: 1px solid #263048;
+  border-radius: 8px;
+  background: #222b38;
+  color: #d2ecfc;
+  outline: none;
+  min-width: 75px;
+  max-width: 180px;
+  transition: border 0.14s;
+}
+.board-search-bar select:focus,
+.board-search-bar input:focus {
+  border: 1.5px solid #00aeef;
+}
+.board-search-bar input {
+  min-width: 140px;
+  width: 230px;
+  max-width: 340px;
+}
+.board-search-bar .search-btn {
+  background: linear-gradient(90deg, #00aeef 75%, #0056b8 100%);
+  color: #fff;
+  font-weight: 800;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 17px;
+  font-size: 1.08rem;
+  margin-left: 5px;
+  cursor: pointer;
+  transition: background 0.11s, transform 0.11s;
+  display: flex;
+  align-items: center;
+}
+.board-search-bar .search-btn:hover {
+  background: linear-gradient(90deg, #006cff 80%, #1c368c 100%);
+  transform: translateY(-1.5px) scale(1.04);
+}
+@media (max-width: 900px) {
+  .board-search-bar { padding-left: 4vw; }
+}
+@media (max-width: 600px) {
+  .board-search-bar { padding-left: 2vw; flex-wrap: wrap; gap: 6px; }
+}
+
+/* ---- 페이지네이션 ---- */
+.pagination-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  margin: 30px 0 2px 0;
+  user-select: none;
+}
+.pagination-bar button {
+  padding: 6px 12px;
+  border: none;
+  background: #242e36;
+  color: #b2d9fa;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1.09rem;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, transform 0.10s;
+}
+.pagination-bar button.active,
+.pagination-bar button:focus {
+  background: linear-gradient(90deg, #00aeef 68%, #0056b8 100%);
+  color: #fff;
+  font-weight: 900;
+  transform: scale(1.08);
+}
+.pagination-bar button:disabled {
+  background: #1a232b;
+  color: #7e8e9b;
+  cursor: not-allowed;
 }

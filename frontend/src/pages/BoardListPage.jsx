@@ -119,20 +119,6 @@ function BoardListPage() {
     navigate(`/community/${categorySlug || 'hot'}?${params.toString()}`);
   };
 
-  // ----- 통합검색 -----
-  const [allSearchType, setAllSearchType] = useState('title');
-  const [allSearchInput, setAllSearchInput] = useState('');
-  const handleAllSearch = (e) => {
-    e && e.preventDefault();
-    const params = new URLSearchParams();
-    if (allSearchInput) {
-      params.set('search_type', allSearchType);
-      params.set('search', allSearchInput);
-    }
-    params.set('page', '1');
-    navigate(`/community/hot?${params.toString()}`);
-  };
-
   return (
     <div className="board-root-layout">
       <div className="board-center-wrap">
@@ -238,47 +224,45 @@ function BoardListPage() {
                 ))
               )}
             </div>
-            {/* 페이지네이션 */}
-            {totalPages > 1 && (
-              <nav className="pagination-bar">
+            {/* 페이지네이션: 게시글 없을 때도 항상 표시 */}
+            <nav className="pagination-bar" style={{marginTop: totalPages > 1 || count === 0 ? '30px' : '0'}}>
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={page === 1}
+              >
+                &lt;&lt;
+              </button>
+              <button
+                onClick={() => handlePageChange(Math.max(1, page - 1))}
+                disabled={page === 1}
+              >
+                &lt;
+              </button>
+              {pageArr.map(p => (
                 <button
-                  onClick={() => handlePageChange(1)}
-                  disabled={page === 1}
+                  key={p}
+                  className={page === p ? 'active' : ''}
+                  onClick={() => handlePageChange(p)}
                 >
-                  &lt;&lt;
+                  {p}
                 </button>
-                <button
-                  onClick={() => handlePageChange(Math.max(1, page - 1))}
-                  disabled={page === 1}
-                >
-                  &lt;
-                </button>
-                {pageArr.map(p => (
-                  <button
-                    key={p}
-                    className={page === p ? 'active' : ''}
-                    onClick={() => handlePageChange(p)}
-                  >
-                    {p}
-                  </button>
-                ))}
-                <button
-                  onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
-                  disabled={page === totalPages}
-                >
-                  &gt;
-                </button>
-                <button
-                  onClick={() => handlePageChange(totalPages)}
-                  disabled={page === totalPages}
-                >
-                  &gt;&gt;
-                </button>
-              </nav>
-            )}
+              ))}
+              <button
+                onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+              >
+                &gt;
+              </button>
+              <button
+                onClick={() => handlePageChange(totalPages)}
+                disabled={page === totalPages}
+              >
+                &gt;&gt;
+              </button>
+            </nav>
           </div>
         </main>
-        {/* 오른쪽 광고 + 통합검색 */}
+        {/* 오른쪽 광고 (통합검색 삭제됨) */}
         <aside className="ad-right">
           <div className="ad-fixed">
             <div className="ad-banner">광고A</div>
@@ -286,24 +270,6 @@ function BoardListPage() {
             <div className="ad-banner short">
               <img src="/ads/ad_test_right.png" alt="광고" style={{ width: '100%', borderRadius: 8 }} />
             </div>
-            {/* ----- 통합검색 ----- */}
-            <form className="board-search-bar all-search-bar" onSubmit={handleAllSearch}>
-              <div style={{ fontWeight: 900, color: '#aef', marginBottom: 8 }}>통합검색</div>
-              <select value={allSearchType} onChange={e => setAllSearchType(e.target.value)}>
-                <option value="title">제목</option>
-                <option value="title_content">제목+내용</option>
-                <option value="user">작성자</option>
-              </select>
-              <input
-                type="text"
-                value={allSearchInput}
-                onChange={e => setAllSearchInput(e.target.value)}
-                placeholder="전체 게시판 검색"
-              />
-              <button type="submit" className="search-btn">
-                <FaSearch />
-              </button>
-            </form>
           </div>
         </aside>
       </div>
