@@ -82,7 +82,13 @@ function BoardDetailPage() {
     try {
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       const res = await axios.get(`/board/posts/${id}/comments/`, config);
-      setComments(Array.isArray(res.data) ? res.data : []);
+      if (Array.isArray(res.data.results)) {
+        setComments(res.data.results); // pagination 구조 대응
+      } else if (Array.isArray(res.data)) {
+        setComments(res.data);
+      } else {
+        setComments([]);
+      }
     } catch (err) {
       setComments([]);
     }
