@@ -10,6 +10,7 @@ function BoardDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  // --- 상태
   const [categories, setCategories] = useState([]);
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
@@ -21,7 +22,7 @@ function BoardDetailPage() {
   const token = localStorage.getItem('access');
   const username = localStorage.getItem('username');
 
-  // 카테고리 목록
+  // 카테고리 목록 로딩
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
       const data = Array.isArray(res.data) ? res.data
@@ -30,25 +31,36 @@ function BoardDetailPage() {
     });
   }, []);
 
-  // 상세/댓글
+  // 게시글 상세/댓글 로딩
   useEffect(() => {
     fetchPost();
     fetchComments();
   }, [id]);
 
-  // 같은 카테고리 최신글
+  // 같은 카테고리 최신글(10개) 불러오기
   useEffect(() => {
-    if (post) {
-      const slug =
-        post.category_slug || post.category || post.category_name || (categories[0] && categories[0].slug) || 'free';
-      fetchRelatedPosts(slug);
+    if (!post) return;
+    // BoardListPage에서와 동일하게 slug 사용
+    let categorySlug = post.category_slug || post.category || post.category_name || 'free';
+    fetchRelatedPosts(categorySlug);
+  }, [post]);
+
+  // BoardListPage와 동일한 관련글 불러오기
+  const fetchRelatedPosts = async (categorySlug) => {
+    let url = `/board/posts/?category=${categorySlug}&page=1&page_size=10`;
+    try {
+      const res = await axios.get(url);
+      // results가 있으면 results, 없으면 전체 배열에서 자기자신 제외
+      let list = Array.isArray(res.data?.results) ? res.data.results : Array.isArray(res.data) ? res.data : [];
+      setRelatedPosts(list.filter(p => p.id !== Number(id)));
+    } catch (err) {
+      setRelatedPosts([]);
     }
-    // eslint-disable-next-line
-  }, [post, categories]);
+  };
 
   const fetchPost = async () => {
     try {
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : { headers: {} };
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
       const res = await axios.get(`/board/posts/${id}/`, config);
       setPost(res.data);
     } catch (err) {
@@ -65,36 +77,23 @@ function BoardDetailPage() {
     }
   };
 
-  // 최신글 10개 불러오기 (자기자신 제외)
-  const fetchRelatedPosts = async (categorySlug) => {
-    if (!categorySlug) return setRelatedPosts([]);
-    try {
-      const res = await axios.get(`/board/posts/?category=${categorySlug}&page=1&page_size=11`);
-      const arr = res.data?.results ?? res.data ?? [];
-      setRelatedPosts(arr.filter(p => p.id !== Number(id)).slice(0, 10));
-    } catch (err) {
-      setRelatedPosts([]);
-    }
-  };
-
-  // 카테고리 탭
+  // 카테고리 탭 (BoardListPage와 동일)
   const saleCategory = categories.find(cat => cat.slug === 'sale');
   const customTabs = [
     { slug: 'hot', name: '인기' },
     ...categories.map(cat => ({ slug: cat.slug, name: cat.name, id: cat.id })),
     ...(saleCategory ? [] : [{ slug: 'sale', name: '핫딜' }]),
   ];
+  const categorySlug = post?.category_slug || post?.category || 'free';
 
   // 탭 클릭
   const handleCategoryClick = slug => {
     navigate(`/community/${slug}`);
   };
 
-  // 상세 하단 게시글 카드 클릭
+  // 관련글 카드 클릭
   const handleRelatedPostClick = postId => {
-    if (!post) return;
-    const slug = post.category_slug || post.category || 'free';
-    navigate(`/community/${slug}/${postId}`);
+    navigate(`/community/${categorySlug}/${postId}`);
   };
 
   // 댓글 상위 3개
@@ -114,7 +113,7 @@ function BoardDetailPage() {
     setLikeLoading(false);
   };
 
-  // 댓글
+  // 댓글 관련
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) { setError('댓글을 입력하세요.'); return; }
@@ -156,64 +155,70 @@ function BoardDetailPage() {
     }
   };
 
-  // 타이틀 줄(카테고리/제목/작성자/날짜/통계)
+  // 타이틀바 UI - BoardListPage 카드와 통일
   function TitleBar() {
     if (!post) return null;
     return (
-      <div style={{
-        background: '#232c38',
-        borderRadius: 12,
-        padding: '18px 42px 16px 42px',
-        marginBottom: 19,
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0 2px 10px rgba(0,30,90,0.07)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-          <span style={{
-            background: '#2981d4',
-            color: '#fff',
-            fontWeight: 800,
-            fontSize: '1.02rem',
-            padding: '4px 17px',
-            borderRadius: 12,
-            marginRight: 14,
-            letterSpacing: '-0.5px',
-            display: 'inline-block'
+      <div
+        className="post-card pro"
+        style={{
+          background: '#222b38',
+          borderRadius: 14,
+          margin: '16px 0 18px 0',
+          cursor: 'default',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.10)'
+        }}
+      >
+        <div className="post-thumb">
+          {post.thumbnail_url ? (
+            <img
+              src={post.thumbnail_url}
+              alt="썸네일"
+              className="post-thumb-img"
+              onError={e => { e.target.style.display = 'none'; }}
+            />
+          ) : (
+            <div className="post-thumb-icon"><FaImage /></div>
+          )}
+        </div>
+        <div className="post-title-row" style={{alignItems:'center'}}>
+          <span className="post-category" style={{
+            fontWeight:900,
+            fontSize:'1.05rem',
+            padding:'5px 13px',
+            background:'#2881e2',
+            color:'#fff',
+            borderRadius:'8px',
+            marginRight:10
           }}>
             {post.category_name || post.category}
           </span>
-          <span style={{
-            fontWeight: 800,
-            fontSize: '1.17rem',
-            color: '#e5f0ff',
-            marginRight: 11,
-            lineHeight: 1.3
-          }}>{post.title}</span>
-          <span style={{
-            marginLeft: 'auto',
-            color: '#7ca2c8',
-            fontSize: '0.97rem',
-            fontWeight: 500
-          }}>{formatDate(post.created_at)}</span>
+          <h3 className="post-title" style={{
+            fontWeight:900,
+            fontSize:'1.19rem',
+            color:'#fff',
+            marginRight:12,
+            marginBottom:0,
+            whiteSpace:'normal',
+            letterSpacing:'-0.5px'
+          }}>{post.title}</h3>
         </div>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 20,
-          marginTop: 1,
-          flexWrap: 'wrap'
-        }}>
-          <span style={{
-            fontWeight: 700,
-            color: '#90c7fa',
-            fontSize: '1.01rem'
-          }}>{post.user?.username || post.user}</span>
-          <span style={{ color: '#b6bfd2', fontWeight: 500, display: 'flex', gap: 12, fontSize: '1.06rem' }}>
-            <span><FaThumbsUp className="icon like" /> {post.like_count}</span>
-            <span><FaThumbsDown className="icon dislike" /> {post.dislike_count}</span>
-            <span><FaComment className="icon comment" /> {comments.length}</span>
-            <span><FaEye className="icon view" /> {post.views || post.view_count || 0}</span>
+        <div className="post-meta-row" style={{flexDirection:'row', gap:12, marginLeft:2, alignItems:'center', marginBottom:6}}>
+          <span className="post-user" style={{fontWeight:600, color:'#7cc6ff'}}>{post.user?.username || post.user}</span>
+          <span className="post-date">{formatDate(post.created_at)}</span>
+        </div>
+        <div className="post-stats-row" style={{gap:13, marginLeft:2}}>
+          <span className="stat">
+            <FaThumbsUp className="icon like" /> {post.like_count}
+          </span>
+          <span className="stat">
+            <FaThumbsDown className="icon dislike" /> {post.dislike_count}
+          </span>
+          <span className="stat">
+            <FaComment className="icon comment" /> {comments.length}
+          </span>
+          <span className="stat">
+            <FaEye className="icon view" /> {post.views || post.view_count || 0}
           </span>
         </div>
       </div>
@@ -234,25 +239,27 @@ function BoardDetailPage() {
           </div>
         </aside>
         <main className="board-center">
-          <div className="board-container pro" style={{ marginTop: 38 }}>
+          <div className="board-container pro" style={{marginTop:38}}>
             {/* 카테고리 탭 */}
             <div className="category-tabs pro">
               {customTabs.map(cat => (
                 <button
                   key={cat.slug}
-                  className={post && (post.category_slug || post.category) === cat.slug ? 'active' : ''}
+                  className={categorySlug === cat.slug ? 'active' : ''}
                   onClick={() => handleCategoryClick(cat.slug)}
                 >
                   {cat.name}
                 </button>
               ))}
             </div>
-            {/* 타이틀바 */}
+            {/* 타이틀 */}
             <TitleBar />
             {post && (
               <>
                 {/* 본문 */}
-                <div className={styles.content}>{post.content}</div>
+                <div className={styles.content} style={{marginTop:6, marginBottom:24}}>
+                  {post.content}
+                </div>
                 {/* 첨부파일 */}
                 {post.attachment && (
                   <div className={styles.postAttachment}>
@@ -329,9 +336,12 @@ function BoardDetailPage() {
                     );
                   })}
                 </div>
-                {/* 최신글 미리보기(10개) */}
+                {/* 최신글 미리보기 */}
                 <div style={{ marginTop: 48 }}>
-                  <div style={{ fontWeight: 900, fontSize: '1.13rem', color: '#53a7ff', marginBottom: 18, paddingLeft: 42 }}>
+                  <div style={{
+                    fontWeight: 900, fontSize: '1.13rem', color: '#53a7ff',
+                    marginBottom: 18, paddingLeft: 42
+                  }}>
                     {(post.category_name || post.category) + ' 게시판의 최신글'}
                   </div>
                   <div className="post-list pro" style={{ marginBottom: 8 }}>

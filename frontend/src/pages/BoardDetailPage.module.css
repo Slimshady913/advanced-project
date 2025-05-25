@@ -1,3 +1,4 @@
+/* BoardDetailPage.module.css */
 .detailContainer {
   width: 100%;
   max-width: 860px;
@@ -13,9 +14,9 @@
   align-items: stretch;
 }
 
-/* ======= 게시글 본문 ======= */
+/* ======= 본문 영역 ======= */
 .content {
-  margin: 16px 42px 0 42px;
+  margin: 0 42px 0 42px;
   font-size: 1.08rem;
   line-height: 1.9;
   color: #eaf6ff;
@@ -33,7 +34,7 @@
   .content { font-size: 0.93rem; margin-left: 2vw; margin-right: 2vw; padding: 13px 7px; }
 }
 
-/* 첨부파일 */
+/* ======= 첨부파일 ======= */
 .postAttachment {
   margin-top: 13px;
   margin-bottom: 24px;
