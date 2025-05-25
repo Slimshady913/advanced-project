@@ -11,60 +11,113 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: stretch;
+  align-items: flex-start;
 }
 
-.ad-left, .ad-right {
-  width: 180px;
-  min-width: 120px;
-  max-width: 220px;
+/* 광고+본문 한 덩어리 중앙 정렬 */
+.board-center-wrap {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;    /* 세로 중앙 정렬 */
-  height: 100%;
-  margin: 0 0px;
+  align-items: flex-start;
+  max-width: 1480px;   /* PC: 본문+광고+여백 */
+  margin: 0 auto;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+/* 광고 영역 (좌/우) */
+.ad-left, .ad-right {
+  width: 190px;
+  min-width: 110px;
+  max-width: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 32px;
+  margin-left: 18px;
+  margin-right: 18px;
+  /* 광고가 너무 끝에 붙지 않게 */
+  transition: width 0.2s, margin 0.2s;
+}
+
+.ad-fixed {
+  position: sticky;
+  top: 36px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
 }
 
 .ad-banner {
-  width: 140px;
+  width: 145px;
   height: 380px;
+  max-width: 100%;
   max-height: 90vh;
-  min-height: 160px;
-  background: linear-gradient(120deg, #232a36 72%, #2e4172 100%);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(30,40,80,0.17), 0 1px 5px rgba(0,0,0,0.18);
+  min-height: 120px;
+  background: linear-gradient(120deg, #232a36 80%, #2e4172 100%);
+  border-radius: 15px;
+  box-shadow: 0 4px 24px rgba(30,40,80,0.13), 0 1px 5px rgba(0,0,0,0.10);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #bee6ff;
   font-weight: 900;
-  font-size: 1.1rem;
+  font-size: 1.12rem;
   letter-spacing: 1.1px;
   text-align: center;
-  margin: 0 10px;
+  margin: 0 auto;
   user-select: none;
   opacity: 0.95;
+  overflow: hidden;
+  transition: width 0.2s, height 0.2s, font-size 0.2s;
+}
+.ad-banner img {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 8px;
+}
+.ad-banner.short {
+  height: 120px;
+  min-height: 64px;
+  font-size: 1rem;
+  border-radius: 10px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.ad-banner:hover {
+  box-shadow: 0 8px 32px rgba(0,174,239,0.13), 0 1.5px 12px rgba(0,0,0,0.13);
+  opacity: 1;
+}
+
+/* ----- 반응형 광고 미디어쿼리 ----- */
+@media (max-width: 1550px) {
+  .board-center-wrap { max-width: 1240px; }
+  .ad-left, .ad-right { width: 110px; margin-left: 7px; margin-right: 7px; }
+  .ad-banner { width: 75px; height: 180px; font-size: 0.92rem; }
+  .ad-banner.short { height: 60px; font-size: 0.89rem; }
+}
+@media (max-width: 1200px) {
+  .ad-left, .ad-right { display: none !important; }
+  .board-center-wrap { max-width: 100vw; }
 }
 
 .board-center {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
   display: flex;
   justify-content: center;
-}
-
-@media (max-width: 1350px) {
-  .ad-left, .ad-right { width: 80px; min-width: 60px; }
-  .ad-banner { width: 60px; height: 200px; font-size: 0.89rem; }
-}
-@media (max-width: 1200px) {
-  .ad-left, .ad-right { display: none; }
+  align-items: stretch;
 }
 
 /* 게시판 메인 컨테이너(가운데 정렬) */
 .board-container.pro {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1100px;
   min-width: 340px;
   margin: 38px auto 0 auto;
   padding: 38px 0 60px 0;
@@ -83,6 +136,7 @@ body {
   .board-container.pro { padding: 6vw 0 10vw 0; border-radius: 0; }
 }
 
+/* 이하 게시판, 글, 카테고리 스타일은 동일 */
 .board-title.pro {
   font-size: 2.2rem;
   font-weight: 900;
@@ -93,7 +147,6 @@ body {
   padding-left: 42px;
   line-height: 1.12;
 }
-
 .category-tabs.pro {
   display: flex;
   gap: 10px;

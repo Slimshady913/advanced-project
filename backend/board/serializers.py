@@ -11,11 +11,13 @@ class BoardPostSerializer(serializers.ModelSerializer):
     dislike_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
     view_count = serializers.IntegerField(read_only=True) 
+    thumbnail_url = serializers.SerializerMethodField()
 
     class Meta:
         model = BoardPost
         fields = ['id', 'category','category_name', 'title', 'content', 'user',
-                   'created_at', 'dislike_count', 'comment_count', 'view_count', 'like_count', 'my_like']
+                   'created_at', 'dislike_count', 'comment_count', 'view_count', 'like_count', 'my_like'
+                   , 'thumbnail_url']
 
     def get_like_count(self, obj):
         # 추천(True)만 카운트
@@ -34,6 +36,23 @@ class BoardPostSerializer(serializers.ModelSerializer):
 
     def get_comment_count(self, obj):
         return obj.comments.count()
+    
+    def get_thumbnail_url(self, obj):
+        # 1. 첨부 이미지 모델이 있으면 그 중 첫 번째 반환 (예시)
+        first_image = getattr(obj, 'images', None)
+        if first_image and hasattr(first_image, 'first'):
+            image_obj = first_image.first()
+            if image_obj and hasattr(image_obj, 'image') and image_obj.image:
+                return image_obj.image.url
+
+        # 2. 본문(content)에 <img src=...>가 있다면 추출 (간단 예시)
+        import re
+        match = re.search(r'<img[^>]+src="([^">]+)"', obj.content or '')
+        if match:
+            return match.group(1)
+
+        # 3. 없다면 None
+        return None
     
 class BoardCategorySerializer(serializers.ModelSerializer):
     class Meta:
