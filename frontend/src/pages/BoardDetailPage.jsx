@@ -24,7 +24,6 @@ function BoardDetailPage() {
 
   const fetchPost = async () => {
     try {
-      // 토큰이 있으면 Authorization 헤더 추가, 없으면 명시적으로 빈 헤더 설정
       const config = token
         ? { headers: { Authorization: `Bearer ${token}` } }
         : { headers: {} };
@@ -38,10 +37,9 @@ function BoardDetailPage() {
   const fetchComments = async () => {
     try {
       const res = await axios.get(`/board/posts/${id}/comments/`);
-      // 배열이 아니면 빈 배열로 강제 변환 (방어코드)
       setComments(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      setComments([]); // 실패시에도 빈 배열
+      setComments([]);
       console.error('댓글 목록 불러오기 실패', err);
     }
   };
@@ -57,7 +55,7 @@ function BoardDetailPage() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      await fetchPost(); // 추천수, 상태 즉시 반영
+      await fetchPost();
     } catch (err) {
       alert('추천/비추천 처리 중 오류가 발생했습니다.');
     }
@@ -70,7 +68,6 @@ function BoardDetailPage() {
       setError('댓글을 입력하세요.');
       return;
     }
-
     try {
       await axios.post(
         `/board/posts/${id}/comments/`,
@@ -133,61 +130,61 @@ function BoardDetailPage() {
     }
   };
 
+  // 추천 상위 3개의 댓글을 주요댓글로 지정
+  const topCommentIds = comments
+    .slice()
+    .sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0))
+    .slice(0, 3)
+    .map((c) => c.id);
+
   return (
     <div className="detail-container">
       {post && (
         <>
-          <h2>{post.title}</h2>
-          <p className="meta">
-            작성자: {post.user} | {formatDate(post.created_at)}
-          </p>
-          <p className="content">{post.content}</p>
-
-          {/* 좋아요/비추천 버튼 */}
-          <div className="post-like-actions" style={{ margin: '10px 0 20px 0' }}>
+          <div className="post-header">
+            <div className="post-meta">
+              <span className="category">{post.category || '카테고리'}</span>
+              <span className="date">{formatDate(post.created_at)}</span>
+              <span className="views">조회 {post.views || post.view_count || 0}</span>
+              <span className="comments">댓글 {comments.length}</span>
+            </div>
+            <h1 className="post-title">{post.title}</h1>
+            <div className="post-author">
+              <span className="avatar">{post.user?.[0] || '👤'}</span>
+              <span className="author-name">{post.user}</span>
+            </div>
+          </div>
+          {post.attachment && (
+            <div className="post-attachment">
+              <a href={post.attachment} download>
+                {post.attachment.split('/').pop()}
+              </a>
+            </div>
+          )}
+          <div className="content">{post.content}</div>
+          <div className="post-like-actions">
             <button
               className={`like-btn${post.my_like === true ? ' active' : ''}`}
               onClick={() => handlePostLike(true)}
               disabled={likeLoading || !token}
-              style={{
-                marginRight: '10px',
-                background: post.my_like === true ? '#00aeef' : '#e0e0e0',
-                color: post.my_like === true ? '#fff' : '#222',
-                borderRadius: '8px',
-                fontWeight: 'bold',
-                padding: '7px 14px',
-                border: 'none',
-                cursor: token ? 'pointer' : 'not-allowed'
-              }}
             >
-              👍 추천 {post.like_count}
+              추천 {post.like_count}
             </button>
             <button
               className={`dislike-btn${post.my_like === false ? ' active' : ''}`}
               onClick={() => handlePostLike(false)}
               disabled={likeLoading || !token}
-              style={{
-                background: post.my_like === false ? '#d30000' : '#e0e0e0',
-                color: post.my_like === false ? '#fff' : '#222',
-                borderRadius: '8px',
-                fontWeight: 'bold',
-                padding: '7px 14px',
-                border: 'none',
-                cursor: token ? 'pointer' : 'not-allowed'
-              }}
             >
-              👎 비추천
+              비추천
             </button>
           </div>
-
           {username === post.user && token && (
             <div className="post-actions">
               <button onClick={() => navigate(`/community/edit/${post.id}`)}>수정</button>
               <button onClick={handlePostDelete}>삭제</button>
             </div>
           )}
-
-          <h3>댓글</h3>
+          <h3>댓글 {comments.length}</h3>
           {token ? (
             <form onSubmit={handleCommentSubmit} className="comment-form">
               <textarea
@@ -198,30 +195,37 @@ function BoardDetailPage() {
               <button type="submit">댓글 작성</button>
             </form>
           ) : (
-            <p style={{ color: '#aaa', margin: '1rem 0 2rem 0' }}>댓글 작성은 로그인 후 이용하실 수 있습니다.</p>
+            <p className="login-message">댓글 작성은 로그인 후 이용하실 수 있습니다.</p>
           )}
           {error && <p className="error-message">{error}</p>}
-
           <div className="comment-list">
-            {(Array.isArray(comments) ? comments : []).map((comment) => (
-              <div key={comment.id} className="comment-item">
-                <p>
-                  {comment.user}: {comment.content}
-                </p>
-                <p className="comment-meta">{formatDate(comment.created_at)}</p>
-                <div className="comment-actions">
-                  <button
-                    onClick={() => handleCommentLike(comment.id, true)}
-                    disabled={!token}
-                  >
-                    👍 {comment.like_count ?? 0}
-                  </button>
-                  {comment.user === username && token && (
-                    <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
-                  )}
+            {comments.map((comment) => {
+              const isTop = topCommentIds.includes(comment.id);
+              return (
+                <div
+                  key={comment.id}
+                  className={`comment-item${isTop ? ' best' : ''}`}
+                >
+                  <div className="comment-head">
+                    {isTop && <span className="best-badge">BEST</span>}
+                    <span className="comment-user">{comment.user}</span>
+                    <span className="comment-date">{formatDate(comment.created_at)}</span>
+                  </div>
+                  <div className="comment-body">{comment.content}</div>
+                  <div className="comment-actions">
+                    <button
+                      onClick={() => handleCommentLike(comment.id, true)}
+                      disabled={!token}
+                    >
+                      👍 {comment.like_count ?? 0}
+                    </button>
+                    {comment.user === username && token && (
+                      <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </>
       )}
