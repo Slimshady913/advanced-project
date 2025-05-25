@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
-import './BoardDetailPage.css';
+import styles from './BoardDetailPage.module.css'; // ✅ 반드시 이렇게 import!
 import { formatDate } from '../utils/formatDate';
 
 function BoardDetailPage() {
@@ -138,40 +138,40 @@ function BoardDetailPage() {
     .map((c) => c.id);
 
   return (
-    <div className="detail-container">
+    <div className={styles.detailContainer}>
       {post && (
         <>
-          <div className="post-header">
-            <div className="post-meta">
-              <span className="category">{post.category || '카테고리'}</span>
-              <span className="date">{formatDate(post.created_at)}</span>
-              <span className="views">조회 {post.views || post.view_count || 0}</span>
-              <span className="comments">댓글 {comments.length}</span>
+          <div className={styles.postHeader}>
+            <div className={styles.postMeta}>
+              <span className={styles.category}>{post.category || '카테고리'}</span>
+              <span className={styles.date}>{formatDate(post.created_at)}</span>
+              <span className={styles.views}>조회 {post.views || post.view_count || 0}</span>
+              <span className={styles.comments}>댓글 {comments.length}</span>
             </div>
-            <h1 className="post-title">{post.title}</h1>
-            <div className="post-author">
-              <span className="avatar">{post.user?.[0] || '👤'}</span>
-              <span className="author-name">{post.user}</span>
+            <h1 className={styles.postTitle}>{post.title}</h1>
+            <div className={styles.postAuthor}>
+              <span className={styles.avatar}>{post.user?.[0] || '👤'}</span>
+              <span className={styles.authorName}>{post.user}</span>
             </div>
           </div>
           {post.attachment && (
-            <div className="post-attachment">
+            <div className={styles.postAttachment}>
               <a href={post.attachment} download>
                 {post.attachment.split('/').pop()}
               </a>
             </div>
           )}
-          <div className="content">{post.content}</div>
-          <div className="post-like-actions">
+          <div className={styles.content}>{post.content}</div>
+          <div className={styles.postLikeActions}>
             <button
-              className={`like-btn${post.my_like === true ? ' active' : ''}`}
+              className={`${styles.likeBtn}${post.my_like === true ? ` ${styles.active}` : ''}`}
               onClick={() => handlePostLike(true)}
               disabled={likeLoading || !token}
             >
               추천 {post.like_count}
             </button>
             <button
-              className={`dislike-btn${post.my_like === false ? ' active' : ''}`}
+              className={`${styles.dislikeBtn}${post.my_like === false ? ` ${styles.active}` : ''}`}
               onClick={() => handlePostLike(false)}
               disabled={likeLoading || !token}
             >
@@ -179,14 +179,14 @@ function BoardDetailPage() {
             </button>
           </div>
           {username === post.user && token && (
-            <div className="post-actions">
+            <div className={styles.postActions}>
               <button onClick={() => navigate(`/community/edit/${post.id}`)}>수정</button>
               <button onClick={handlePostDelete}>삭제</button>
             </div>
           )}
-          <h3>댓글 {comments.length}</h3>
+          <h3 className={styles.commentTitle}>댓글 {comments.length}</h3>
           {token ? (
-            <form onSubmit={handleCommentSubmit} className="comment-form">
+            <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
@@ -195,24 +195,24 @@ function BoardDetailPage() {
               <button type="submit">댓글 작성</button>
             </form>
           ) : (
-            <p className="login-message">댓글 작성은 로그인 후 이용하실 수 있습니다.</p>
+            <p className={styles.loginMessage}>댓글 작성은 로그인 후 이용하실 수 있습니다.</p>
           )}
-          {error && <p className="error-message">{error}</p>}
-          <div className="comment-list">
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          <div className={styles.commentList}>
             {comments.map((comment) => {
               const isTop = topCommentIds.includes(comment.id);
               return (
                 <div
                   key={comment.id}
-                  className={`comment-item${isTop ? ' best' : ''}`}
+                  className={`${styles.commentItem}${isTop ? ` ${styles.best}` : ''}`}
                 >
-                  <div className="comment-head">
-                    {isTop && <span className="best-badge">BEST</span>}
-                    <span className="comment-user">{comment.user}</span>
-                    <span className="comment-date">{formatDate(comment.created_at)}</span>
+                  <div className={styles.commentHead}>
+                    {isTop && <span className={styles.bestBadge}>BEST</span>}
+                    <span className={styles.commentUser}>{comment.user}</span>
+                    <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
                   </div>
-                  <div className="comment-body">{comment.content}</div>
-                  <div className="comment-actions">
+                  <div className={styles.commentBody}>{comment.content}</div>
+                  <div className={styles.commentActions}>
                     <button
                       onClick={() => handleCommentLike(comment.id, true)}
                       disabled={!token}
