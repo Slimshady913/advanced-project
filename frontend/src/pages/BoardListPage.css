@@ -92,6 +92,7 @@
   transition: background 0.11s;
   cursor: pointer;
   gap: 0;
+  position: relative;
 }
 .post-card.pro:hover {
   background: #1e2431;
@@ -113,6 +114,48 @@
     padding-left: 4vw;
     padding-right: 4vw;
     min-height: 54px;
+  }
+}
+
+.post-thumb {
+  width: 56px;
+  height: 42px;
+  min-width: 56px;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #232c38;
+  border-radius: 6px;
+  margin-right: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+}
+.post-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 5px;
+}
+.post-thumb-icon {
+  color: #b2c1db;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 700px) {
+  .post-thumb {
+    width: 40px;
+    height: 30px;
+    min-width: 40px;
+    min-height: 30px;
+    border-radius: 5px;
+    margin-right: 7px;
+  }
+  .post-thumb-icon {
+    font-size: 1.36rem;
   }
 }
 

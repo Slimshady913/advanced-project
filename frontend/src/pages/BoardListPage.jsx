@@ -3,7 +3,7 @@ import axios from '../api/axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './BoardListPage.css';
 import { formatDate } from '../utils/formatDate';
-import { FaThumbsUp, FaThumbsDown, FaComment, FaEye } from 'react-icons/fa';
+import { FaThumbsUp, FaThumbsDown, FaComment, FaEye, FaImage } from 'react-icons/fa';
 
 function BoardListPage() {
   const { category: categorySlug } = useParams();
@@ -11,7 +11,6 @@ function BoardListPage() {
   const [categories, setCategories] = useState([]);
   const [posts, setPosts] = useState([]);
 
-  // 실제 카테고리 중 핫딜이 있는지 확인
   const saleCategory = categories.find(cat => cat.slug === 'sale');
   const customTabs = [
     { slug: 'hot', name: '인기' },
@@ -23,14 +22,12 @@ function BoardListPage() {
     categorySlug ||
     (customTabs.length > 0 ? customTabs[0].slug : 'hot');
 
-  // 카테고리 목록 불러오기
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
       setCategories(res.data);
     });
   }, []);
 
-  // 게시글 목록 불러오기
   useEffect(() => {
     if (!currentSlug) return;
     const fetchPosts = async () => {
@@ -95,6 +92,23 @@ function BoardListPage() {
               className="post-card pro"
               onClick={() => handlePostClick(post.id)}
             >
+              {/* 썸네일/아이콘 미리보기 영역 */}
+              <div className="post-thumb">
+                {post.thumbnail_url ? (
+                  <img
+                    src={post.thumbnail_url}
+                    alt="썸네일"
+                    className="post-thumb-img"
+                    onError={e => { e.target.style.display = 'none'; }}
+                  />
+                ) : (
+                  <div className="post-thumb-icon">
+                    <FaImage />
+                  </div>
+                )}
+              </div>
+
+              {/* 제목/카테고리/기존 정보 */}
               <div className="post-title-row">
                 <span className="post-category">[{post.category_name}]</span>
                 <h3 className="post-title">{post.title}</h3>
