@@ -10,7 +10,6 @@ function BoardDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // --- 상태
   const [categories, setCategories] = useState([]);
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
@@ -22,7 +21,6 @@ function BoardDetailPage() {
   const token = localStorage.getItem('access');
   const username = localStorage.getItem('username');
 
-  // 카테고리 목록 로딩
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
       const data = Array.isArray(res.data) ? res.data
@@ -31,14 +29,12 @@ function BoardDetailPage() {
     });
   }, []);
 
-  // 게시글 상세/댓글 로딩
   useEffect(() => {
     fetchPost();
     fetchComments();
     // eslint-disable-next-line
   }, [id]);
 
-  // --- 카테고리 slug를 slug로 변환 (중요) ---
   const getCategorySlug = () => {
     if (post?.category_slug) return post.category_slug;
     if (post?.category_name) {
@@ -48,13 +44,11 @@ function BoardDetailPage() {
     if (post?.category) {
       const cat = categories.find(c => c.name === post.category);
       if (cat) return cat.slug;
-      // 혹시 slug가 그대로 저장되어 있으면 반환
       if (categories.some(c => c.slug === post.category)) return post.category;
     }
     return 'free';
   };
 
-  // 같은 카테고리 최신글(10개) 불러오기
   useEffect(() => {
     if (!post || categories.length === 0) return;
     let categorySlug = getCategorySlug();
@@ -62,7 +56,6 @@ function BoardDetailPage() {
     // eslint-disable-next-line
   }, [post, categories]);
 
-  // BoardListPage와 동일한 관련글 불러오기 (최신순)
   const fetchRelatedPosts = async (categorySlug) => {
     let url = `/board/posts/?category=${categorySlug}&ordering=-created_at&page=1&page_size=10`;
     try {
@@ -84,16 +77,17 @@ function BoardDetailPage() {
     }
   };
 
+  // 로그인 여부와 상관없이 댓글을 읽을 수 있도록!
   const fetchComments = async () => {
     try {
-      const res = await axios.get(`/board/posts/${id}/comments/`);
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const res = await axios.get(`/board/posts/${id}/comments/`, config);
       setComments(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       setComments([]);
     }
   };
 
-  // 카테고리 탭 (BoardListPage와 동일)
   const saleCategory = categories.find(cat => cat.slug === 'sale');
   const customTabs = [
     { slug: 'hot', name: '인기' },
@@ -102,22 +96,18 @@ function BoardDetailPage() {
   ];
   const categorySlug = getCategorySlug();
 
-  // 탭 클릭
   const handleCategoryClick = slug => {
     navigate(`/community/${slug}`);
   };
 
-  // 관련글 카드 클릭
   const handleRelatedPostClick = postId => {
     navigate(`/community/${categorySlug}/${postId}`);
   };
 
-  // 댓글 상위 3개
   const topCommentIds = comments
     .slice().sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0))
     .slice(0, 3).map(c => c.id);
 
-  // 추천/비추천
   const handlePostLike = async (isLike) => {
     if (!token) return;
     setLikeLoading(true);
@@ -129,7 +119,6 @@ function BoardDetailPage() {
     setLikeLoading(false);
   };
 
-  // 댓글 관련
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) { setError('댓글을 입력하세요.'); return; }
@@ -171,80 +160,9 @@ function BoardDetailPage() {
     }
   };
 
-  // 타이틀바 UI - BoardListPage 카드와 통일
-  function TitleBar() {
-    if (!post) return null;
-    return (
-      <div
-        className="post-card pro"
-        style={{
-          background: '#222b38',
-          borderRadius: 14,
-          margin: '16px 0 18px 0',
-          cursor: 'default',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.10)'
-        }}
-      >
-        <div className="post-thumb">
-          {post.thumbnail_url ? (
-            <img
-              src={post.thumbnail_url}
-              alt="썸네일"
-              className="post-thumb-img"
-              onError={e => { e.target.style.display = 'none'; }}
-            />
-          ) : (
-            <div className="post-thumb-icon"><FaImage /></div>
-          )}
-        </div>
-        <div className="post-title-row" style={{alignItems:'center'}}>
-          <span className="post-category" style={{
-            fontWeight:900,
-            fontSize:'1.05rem',
-            padding:'5px 13px',
-            background:'#2881e2',
-            color:'#fff',
-            borderRadius:'8px',
-            marginRight:10
-          }}>
-            {post.category_name || post.category}
-          </span>
-          <h3 className="post-title" style={{
-            fontWeight:900,
-            fontSize:'1.19rem',
-            color:'#fff',
-            marginRight:12,
-            marginBottom:0,
-            whiteSpace:'normal',
-            letterSpacing:'-0.5px'
-          }}>{post.title}</h3>
-        </div>
-        <div className="post-meta-row" style={{flexDirection:'row', gap:12, marginLeft:2, alignItems:'center', marginBottom:6}}>
-          <span className="post-user" style={{fontWeight:600, color:'#7cc6ff'}}>{post.user?.username || post.user}</span>
-          <span className="post-date">{formatDate(post.created_at)}</span>
-        </div>
-        <div className="post-stats-row" style={{gap:13, marginLeft:2}}>
-          <span className="stat">
-            <FaThumbsUp className="icon like" /> {post.like_count}
-          </span>
-          <span className="stat">
-            <FaThumbsDown className="icon dislike" /> {post.dislike_count}
-          </span>
-          <span className="stat">
-            <FaComment className="icon comment" /> {comments.length}
-          </span>
-          <span className="stat">
-            <FaEye className="icon view" /> {post.views || post.view_count || 0}
-          </span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="board-root-layout">
       <div className="board-center-wrap">
-        {/* 광고 */}
         <aside className="ad-left">
           <div className="ad-fixed">
             <div className="ad-banner">광고1</div>
@@ -255,9 +173,9 @@ function BoardDetailPage() {
           </div>
         </aside>
         <main className="board-center">
-          <div className="board-container pro" style={{marginTop:38}}>
+          <div className={styles.detailContainer}>
             {/* 카테고리 탭 */}
-            <div className="category-tabs pro">
+            <div className="category-tabs pro" style={{marginTop:28}}>
               {customTabs.map(cat => (
                 <button
                   key={cat.slug}
@@ -268,22 +186,52 @@ function BoardDetailPage() {
                 </button>
               ))}
             </div>
-            {/* 타이틀 */}
-            <TitleBar />
+
+            {/* 상단 정보 */}
             {post && (
               <>
+                <div className={styles.headerRow}>
+                  <span className={styles.categoryTag}>{post.category_name || post.category}</span>
+                  <div className={styles.titleText}>{post.title}</div>
+                  <div className={styles.statsRow}>
+                    <span className={styles.stat}><FaThumbsUp className="icon" />{post.like_count}</span>
+                    <span className={styles.stat}><FaThumbsDown className="icon" />{post.dislike_count}</span>
+                    <span className={styles.stat}><FaComment className="icon" />{post.comment_count}</span>
+                    <span className={styles.stat}><FaEye className="icon" />{post.views || post.view_count || 0}</span>
+                  </div>
+                </div>
+                <div className={styles.writerRow}>
+                  <span className={styles.writerName}>{post.user?.username || post.user}</span>
+                  <span className={styles.writeDate}>{formatDate(post.created_at)}</span>
+                </div>
+
                 {/* 본문 */}
-                <div className={styles.content} style={{marginTop:6, marginBottom:24}}>
+                <div className={styles.content}>
+                  {post.thumbnail_url && (
+                    <div style={{marginBottom: "18px"}}>
+                      <img
+                        src={post.thumbnail_url}
+                        alt="썸네일"
+                        style={{maxWidth: "320px", width: "100%", borderRadius: "11px", display: "block"}}
+                        onError={e => { e.target.style.display = 'none'; }}
+                      />
+                    </div>
+                  )}
                   {post.content}
                 </div>
                 {/* 첨부파일 */}
                 {post.attachment && (
-                  <div className={styles.postAttachment}>
-                    <a href={post.attachment} download>
+                  <div className={styles.attachmentRow}>
+                    <a
+                      href={post.attachment}
+                      download
+                      className={styles.attachmentLink}
+                    >
                       {post.attachment.split('/').pop()}
                     </a>
                   </div>
                 )}
+
                 {/* 추천/비추천 */}
                 <div className={styles.postLikeActions}>
                   <button
@@ -301,6 +249,7 @@ function BoardDetailPage() {
                     비추천
                   </button>
                 </div>
+
                 {/* 수정/삭제 */}
                 {username === (post.user?.username || post.user) && token && (
                   <div className={styles.postActions}>
@@ -308,52 +257,56 @@ function BoardDetailPage() {
                     <button onClick={handlePostDelete}>삭제</button>
                   </div>
                 )}
-                {/* 댓글 */}
-                <h3 className={styles.commentTitle}>댓글 {comments.length}</h3>
-                {token ? (
-                  <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
-                    <textarea
-                      value={newComment}
-                      onChange={e => setNewComment(e.target.value)}
-                      placeholder="댓글을 입력하세요"
-                    ></textarea>
-                    <button type="submit">댓글 작성</button>
-                  </form>
-                ) : (
-                  <p className={styles.loginMessage}>댓글 작성은 로그인 후 이용하실 수 있습니다.</p>
-                )}
-                {error && <p className={styles.errorMessage}>{error}</p>}
-                <div className={styles.commentList}>
-                  {comments.map(comment => {
-                    const isTop = topCommentIds.includes(comment.id);
-                    return (
-                      <div
-                        key={comment.id}
-                        className={`${styles.commentItem}${isTop ? ` ${styles.best}` : ''}`}
-                      >
-                        <div className={styles.commentHead}>
-                          {isTop && <span className={styles.bestBadge}>BEST</span>}
-                          <span className={styles.commentUser}>{comment.user}</span>
-                          <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
+
+                {/* --------- 댓글영역 --------- */}
+                <div className={styles.commentSection}>
+                  <h3 className={styles.commentTitle}>댓글 {comments.length}</h3>
+                  {token ? (
+                    <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
+                      <textarea
+                        value={newComment}
+                        onChange={e => setNewComment(e.target.value)}
+                        placeholder="댓글을 입력하세요"
+                      ></textarea>
+                      <button type="submit">댓글 작성</button>
+                    </form>
+                  ) : (
+                    <p className={styles.loginMessage}>댓글 작성은 로그인 후 이용하실 수 있습니다.</p>
+                  )}
+                  {error && <p className={styles.errorMessage}>{error}</p>}
+                  <div className={styles.commentList}>
+                    {comments.map(comment => {
+                      const isTop = topCommentIds.includes(comment.id);
+                      return (
+                        <div
+                          key={comment.id}
+                          className={`${styles.commentItem}${isTop ? ` ${styles.best}` : ''}`}
+                        >
+                          <div className={styles.commentHead}>
+                            {isTop && <span className={styles.bestBadge}>BEST</span>}
+                            <span className={styles.commentUser}>{comment.user}</span>
+                            <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
+                          </div>
+                          <div className={styles.commentBody}>{comment.content}</div>
+                          <div className={styles.commentActions}>
+                            <button
+                              onClick={() => handleCommentLike(comment.id, true)}
+                              disabled={!token}
+                            >
+                              👍 {comment.like_count ?? 0}
+                            </button>
+                            {comment.user === username && token && (
+                              <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
+                            )}
+                          </div>
                         </div>
-                        <div className={styles.commentBody}>{comment.content}</div>
-                        <div className={styles.commentActions}>
-                          <button
-                            onClick={() => handleCommentLike(comment.id, true)}
-                            disabled={!token}
-                          >
-                            👍 {comment.like_count ?? 0}
-                          </button>
-                          {comment.user === username && token && (
-                            <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
+
                 {/* 최신글 미리보기 */}
-                <div style={{ marginTop: 48 }}>
+                <div style={{ marginTop: 46 }}>
                   <div style={{
                     fontWeight: 900, fontSize: '1.13rem', color: '#53a7ff',
                     marginBottom: 18, paddingLeft: 42
