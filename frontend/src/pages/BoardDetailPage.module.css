@@ -6,7 +6,6 @@
   padding: 0;
   background: none;
   border-radius: 0;
-  box-shadow: none;
   color: #d2ecfc;
   font-family: 'Helvetica Neue', 'Roboto', Arial, sans-serif;
   display: flex;
@@ -16,29 +15,28 @@
 
 /* ======= 본문 영역 ======= */
 .content {
-  margin: 0 42px 0 42px;
+  margin: 0 0 0 0;
   font-size: 1.08rem;
-  line-height: 1.9;
+  line-height: 1.85;
   color: #eaf6ff;
   word-break: break-all;
   background: #222b38;
   border-radius: 13px;
-  padding: 32px 20px;
-  box-shadow: 0 2px 8px rgba(0,30,90,0.06);
+  padding: 32px 32px;
+  box-shadow: 0 2px 8px rgba(0,30,90,0.08);
   min-height: 84px;
 }
 @media (max-width: 900px) {
-  .content { font-size: 1.01rem; margin-left: 4vw; margin-right: 4vw; }
+  .content { font-size: 1.01rem; padding: 18px 4vw; }
 }
 @media (max-width: 600px) {
-  .content { font-size: 0.93rem; margin-left: 2vw; margin-right: 2vw; padding: 13px 7px; }
+  .content { font-size: 0.93rem; padding: 10px 2vw; }
 }
 
 /* ======= 첨부파일 ======= */
 .postAttachment {
-  margin-top: 13px;
-  margin-bottom: 24px;
-  margin-left: 42px;
+  margin: 18px 0 28px 0;
+  padding-left: 34px;
 }
 .postAttachment a {
   background: #1c293b;
@@ -55,18 +53,19 @@
   color: #fff;
 }
 @media (max-width: 900px) {
-  .postAttachment { margin-left: 4vw; }
+  .postAttachment { padding-left: 4vw; }
 }
 @media (max-width: 600px) {
-  .postAttachment { margin-left: 2vw; }
+  .postAttachment { padding-left: 2vw; }
 }
 
 /* ======= 추천/비추천 버튼 ======= */
 .postLikeActions {
   display: flex;
   gap: 17px;
-  margin: 30px 42px 8px 0;
+  margin: 32px 0 10px 0;
   justify-content: flex-end;
+  padding-right: 34px;
 }
 .likeBtn, .dislikeBtn {
   font-size: 1.08rem;
@@ -90,11 +89,11 @@
   color: #fff;
 }
 @media (max-width: 900px) {
-  .postLikeActions { margin-right: 4vw; }
+  .postLikeActions { padding-right: 4vw; }
   .likeBtn, .dislikeBtn { padding: 9px 13px; font-size: 1rem; }
 }
 @media (max-width: 600px) {
-  .postLikeActions { margin-right: 2vw; }
+  .postLikeActions { padding-right: 2vw; }
 }
 
 /* ======= 수정/삭제 버튼 ======= */
@@ -103,7 +102,7 @@
   justify-content: flex-end;
   gap: 11px;
   margin-bottom: 22px;
-  margin-right: 42px;
+  padding-right: 34px;
 }
 .postActions button {
   padding: 8px 22px;
@@ -121,10 +120,10 @@
   color: #fff;
 }
 @media (max-width: 900px) {
-  .postActions { margin-right: 4vw; }
+  .postActions { padding-right: 4vw; }
 }
 @media (max-width: 600px) {
-  .postActions { margin-right: 2vw; }
+  .postActions { padding-right: 2vw; }
 }
 
 /* ======= 댓글 ======= */
@@ -134,7 +133,7 @@
   margin-top: 38px;
   margin-bottom: 13px;
   letter-spacing: -0.03em;
-  padding-left: 42px;
+  padding-left: 34px;
 }
 @media (max-width: 900px) {
   .commentTitle { padding-left: 4vw; }
@@ -145,8 +144,8 @@
 
 .commentForm {
   margin-bottom: 15px;
-  padding-left: 42px;
-  padding-right: 42px;
+  padding-left: 34px;
+  padding-right: 34px;
 }
 .commentForm textarea {
   width: 100%;
@@ -190,7 +189,7 @@
 
 .loginMessage {
   color: #bcd3e3;
-  margin: 1.3rem 0 2.2rem 42px;
+  margin: 1.3rem 0 2.2rem 34px;
 }
 @media (max-width: 900px) {
   .loginMessage { margin-left: 4vw; }
@@ -202,7 +201,7 @@
 .errorMessage {
   color: #fc6d6d;
   font-weight: 800;
-  margin: 14px 0 0 42px;
+  margin: 14px 0 0 34px;
 }
 @media (max-width: 900px) {
   .errorMessage { margin-left: 4vw; }
@@ -213,8 +212,8 @@
 
 .commentList {
   margin-top: 13px;
-  padding-left: 42px;
-  padding-right: 42px;
+  padding-left: 34px;
+  padding-right: 34px;
 }
 @media (max-width: 900px) {
   .commentList { padding-left: 4vw; padding-right: 4vw; }

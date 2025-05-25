@@ -35,22 +35,38 @@ function BoardDetailPage() {
   useEffect(() => {
     fetchPost();
     fetchComments();
+    // eslint-disable-next-line
   }, [id]);
+
+  // --- 카테고리 slug를 slug로 변환 (중요) ---
+  const getCategorySlug = () => {
+    if (post?.category_slug) return post.category_slug;
+    if (post?.category_name) {
+      const cat = categories.find(c => c.name === post.category_name);
+      if (cat) return cat.slug;
+    }
+    if (post?.category) {
+      const cat = categories.find(c => c.name === post.category);
+      if (cat) return cat.slug;
+      // 혹시 slug가 그대로 저장되어 있으면 반환
+      if (categories.some(c => c.slug === post.category)) return post.category;
+    }
+    return 'free';
+  };
 
   // 같은 카테고리 최신글(10개) 불러오기
   useEffect(() => {
-    if (!post) return;
-    // BoardListPage에서와 동일하게 slug 사용
-    let categorySlug = post.category_slug || post.category || post.category_name || 'free';
+    if (!post || categories.length === 0) return;
+    let categorySlug = getCategorySlug();
     fetchRelatedPosts(categorySlug);
-  }, [post]);
+    // eslint-disable-next-line
+  }, [post, categories]);
 
-  // BoardListPage와 동일한 관련글 불러오기
+  // BoardListPage와 동일한 관련글 불러오기 (최신순)
   const fetchRelatedPosts = async (categorySlug) => {
-    let url = `/board/posts/?category=${categorySlug}&page=1&page_size=10`;
+    let url = `/board/posts/?category=${categorySlug}&ordering=-created_at&page=1&page_size=10`;
     try {
       const res = await axios.get(url);
-      // results가 있으면 results, 없으면 전체 배열에서 자기자신 제외
       let list = Array.isArray(res.data?.results) ? res.data.results : Array.isArray(res.data) ? res.data : [];
       setRelatedPosts(list.filter(p => p.id !== Number(id)));
     } catch (err) {
@@ -84,7 +100,7 @@ function BoardDetailPage() {
     ...categories.map(cat => ({ slug: cat.slug, name: cat.name, id: cat.id })),
     ...(saleCategory ? [] : [{ slug: 'sale', name: '핫딜' }]),
   ];
-  const categorySlug = post?.category_slug || post?.category || 'free';
+  const categorySlug = getCategorySlug();
 
   // 탭 클릭
   const handleCategoryClick = slug => {
