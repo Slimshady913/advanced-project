@@ -1,22 +1,38 @@
-body {
-  background: #181a1b;
-}
-
 .detailContainer {
+  width: 100%;
   max-width: 860px;
-  margin: 40px auto 32px auto;
-  padding: 42px 28px 44px 28px;
+  margin: 38px auto 32px auto;
+  padding: 42px 0 60px 0;
   background: rgba(28, 32, 37, 0.99);
   border-radius: 18px;
   box-shadow: 0 8px 36px 0 rgba(0,0,0,0.22);
   color: #d2ecfc;
   font-family: 'Helvetica Neue', 'Roboto', Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 900px) {
+  .detailContainer { padding: 15px 0; }
+}
+@media (max-width: 600px) {
+  .detailContainer { padding: 8px 0; border-radius: 0; }
 }
 
+/* ======= 게시글 헤더 ======= */
 .postHeader {
   border-bottom: 1.7px solid #242e36;
   margin-bottom: 32px;
   padding-bottom: 14px;
+  padding-left: 42px;
+  padding-right: 42px;
+  background: none;
+}
+@media (max-width: 900px) {
+  .postHeader { padding-left: 4vw; padding-right: 4vw; }
+}
+@media (max-width: 600px) {
+  .postHeader { padding-left: 2vw; padding-right: 2vw; }
 }
 
 .postMeta {
@@ -35,9 +51,7 @@ body {
   font-size: 1.02rem;
   letter-spacing: 0.02em;
 }
-.date,
-.views,
-.comments {
+.date, .views, .comments {
   background: #202530;
   color: #b2c7e2;
   padding: 2.5px 9px;
@@ -52,6 +66,12 @@ body {
   color: #fff;
   letter-spacing: -0.9px;
   text-shadow: 0 2px 8px rgba(0,0,0,0.09);
+}
+@media (max-width: 900px) {
+  .postTitle { font-size: 1.08rem; }
+}
+@media (max-width: 600px) {
+  .postTitle { font-size: 0.99rem; }
 }
 
 .postAuthor {
@@ -75,9 +95,10 @@ body {
   font-weight: bold;
 }
 
+/* 첨부파일 */
 .postAttachment {
   margin-bottom: 20px;
-  padding: 7px 0 5px 0;
+  padding: 7px 0 5px 42px;
 }
 .postAttachment a {
   background: #1c293b;
@@ -93,7 +114,14 @@ body {
   background: #00AEEF;
   color: #fff;
 }
+@media (max-width: 900px) {
+  .postAttachment { padding-left: 4vw; }
+}
+@media (max-width: 600px) {
+  .postAttachment { padding-left: 2vw; }
+}
 
+/* ======= 본문 ======= */
 .content {
   margin: 34px 0 40px 0;
   font-size: 1.07rem;
@@ -104,16 +132,25 @@ body {
   border-radius: 12px;
   padding: 26px 20px;
   box-shadow: 0 2px 8px rgba(0,30,90,0.06);
+  margin-left: 42px;
+  margin-right: 42px;
+}
+@media (max-width: 900px) {
+  .content { font-size: 1.01rem; margin-left: 4vw; margin-right: 4vw; }
+}
+@media (max-width: 600px) {
+  .content { font-size: 0.93rem; margin-left: 2vw; margin-right: 2vw; padding: 13px 7px; }
 }
 
+/* ======= 추천/비추천 버튼 ======= */
 .postLikeActions {
   display: flex;
   gap: 17px;
   margin-bottom: 28px;
   justify-content: flex-end;
+  margin-right: 42px;
 }
-.likeBtn,
-.dislikeBtn {
+.likeBtn, .dislikeBtn {
   font-size: 1.08rem;
   font-weight: 800;
   border-radius: 10px;
@@ -126,23 +163,29 @@ body {
   transition: background 0.14s, color 0.13s;
   letter-spacing: 0.02em;
 }
-.likeBtn.active,
-.likeBtn:hover {
+.likeBtn.active, .likeBtn:hover {
   background: linear-gradient(90deg, #00AEEF 80%, #007cd6 100%);
   color: #fff;
 }
-.dislikeBtn.active,
-.dislikeBtn:hover {
+.dislikeBtn.active, .dislikeBtn:hover {
   background: linear-gradient(90deg, #fc6d6d 80%, #d82323 100%);
   color: #fff;
 }
+@media (max-width: 900px) {
+  .postLikeActions { margin-right: 4vw; }
+  .likeBtn, .dislikeBtn { padding: 9px 13px; font-size: 1rem; }
+}
+@media (max-width: 600px) {
+  .postLikeActions { margin-right: 2vw; }
+}
 
-
+/* ======= 수정/삭제 버튼 ======= */
 .postActions {
   display: flex;
   justify-content: flex-end;
   gap: 11px;
   margin-bottom: 22px;
+  margin-right: 42px;
 }
 .postActions button {
   padding: 8px 22px;
@@ -159,17 +202,33 @@ body {
   background: linear-gradient(90deg, #0094cc, #0053c4);
   color: #fff;
 }
+@media (max-width: 900px) {
+  .postActions { margin-right: 4vw; }
+}
+@media (max-width: 600px) {
+  .postActions { margin-right: 2vw; }
+}
 
+/* ======= 댓글 ======= */
 .commentTitle {
   color: #bcd3e3;
   font-size: 1.07rem;
   margin-top: 36px;
   margin-bottom: 13px;
   letter-spacing: -0.03em;
+  padding-left: 42px;
+}
+@media (max-width: 900px) {
+  .commentTitle { padding-left: 4vw; }
+}
+@media (max-width: 600px) {
+  .commentTitle { padding-left: 2vw; }
 }
 
 .commentForm {
   margin-bottom: 15px;
+  padding-left: 42px;
+  padding-right: 42px;
 }
 .commentForm textarea {
   width: 100%;
@@ -204,20 +263,46 @@ body {
   background: linear-gradient(90deg, #0094cc, #0053c4);
   transform: translateY(-1.5px) scale(1.03);
 }
+@media (max-width: 900px) {
+  .commentForm { padding-left: 4vw; padding-right: 4vw; }
+}
+@media (max-width: 600px) {
+  .commentForm { padding-left: 2vw; padding-right: 2vw; }
+}
 
 .loginMessage {
   color: #bcd3e3;
-  margin: 1.3rem 0 2.2rem 0;
+  margin: 1.3rem 0 2.2rem 42px;
+}
+@media (max-width: 900px) {
+  .loginMessage { margin-left: 4vw; }
+}
+@media (max-width: 600px) {
+  .loginMessage { margin-left: 2vw; }
 }
 
 .errorMessage {
   color: #fc6d6d;
   font-weight: 800;
-  margin: 14px 0;
+  margin: 14px 0 0 42px;
+}
+@media (max-width: 900px) {
+  .errorMessage { margin-left: 4vw; }
+}
+@media (max-width: 600px) {
+  .errorMessage { margin-left: 2vw; }
 }
 
 .commentList {
   margin-top: 13px;
+  padding-left: 42px;
+  padding-right: 42px;
+}
+@media (max-width: 900px) {
+  .commentList { padding-left: 4vw; padding-right: 4vw; }
+}
+@media (max-width: 600px) {
+  .commentList { padding-left: 2vw; padding-right: 2vw; }
 }
 
 .commentItem {
@@ -287,17 +372,4 @@ body {
 .commentActions button:hover {
   background: #222b38;
   color: #49c6ff;
-}
-
-@media (max-width: 900px) {
-  .detailContainer { padding: 15px 4vw; }
-  .postTitle { font-size: 1.08rem; }
-  .content { font-size: 1.01rem; }
-  .likeBtn, .dislikeBtn { padding: 9px 13px; font-size: 1rem; }
-}
-
-@media (max-width: 600px) {
-  .detailContainer { padding: 8px 0; }
-  .postTitle { font-size: 0.99rem; }
-  .content { font-size: 0.93rem; }
 }
