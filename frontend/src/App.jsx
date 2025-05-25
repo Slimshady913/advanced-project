@@ -28,7 +28,7 @@ function App() {
 
   // 🔐 JWT 토큰 기반 사용자 인증 상태 초기화
   const initializeAuth = async () => {
-    const token = localStorage.getItem('access'); // 'accessToken' -> 'access'로 수정
+    const token = localStorage.getItem('access');
     if (token) {
       try {
         const decoded = jwtDecode(token);
@@ -68,7 +68,7 @@ function App() {
           userEmail={userEmail}
           username={username}
           onLogout={() => {
-            localStorage.removeItem('access'); // 'accessToken' → 'access'로 통일
+            localStorage.removeItem('access');
             localStorage.removeItem('refresh');
             setIsLoggedIn(false);
             setUserEmail('');
@@ -127,7 +127,7 @@ function App() {
             }
           />
           {/* 🗣️ 커뮤니티 게시판 */}
-          <Route path="/community" element={<Navigate to="/community/인기" replace />} />
+          <Route path="/community" element={<Navigate to="/community/hot" replace />} />
           <Route path="/community/:category" element={<BoardListPage />} />
           <Route
             path="/community/write"

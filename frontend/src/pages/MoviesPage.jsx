@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const MoviesPage = ({ isLoggedIn }) => {
   const [movies, setMovies] = useState([]);
-  const [ottList, setOttList] = useState([]);
+  const [ottList, setOttList] = useState([]); // 반드시 배열로!
   const [subscribedOtts, setSubscribedOtts] = useState([]);
   const [selectedOtts, setSelectedOtts] = useState([]);
   const [showOttDropdown, setShowOttDropdown] = useState(false);
@@ -30,8 +30,13 @@ const MoviesPage = ({ isLoggedIn }) => {
   // OTT 목록 불러오기
   useEffect(() => {
     axios.get('/ott/')
-      .then(res => setOttList(res.data))
-      .catch(() => {});
+      .then(res => {
+        // 방어: 항상 배열 보장
+        const data = Array.isArray(res.data) ? res.data
+          : (Array.isArray(res.data.results) ? res.data.results : []);
+        setOttList(data);
+      })
+      .catch(() => setOttList([]));
   }, []);
 
   // 구독중인 OTT 정보 가져오기
@@ -39,7 +44,6 @@ const MoviesPage = ({ isLoggedIn }) => {
     if (isLoggedIn) {
       axios.get('/users/profile/')
         .then(res => {
-          // API에 따라 다를 수 있으니 아래를 맞게 수정
           if (res.data && res.data.subscribed_ott) {
             setSubscribedOtts(res.data.subscribed_ott.map(o => o.id));
           } else {
@@ -61,20 +65,22 @@ const MoviesPage = ({ isLoggedIn }) => {
 
     axios.get(url)
       .then(res => {
-        setMovies(res.data);
+        // 결과가 배열 또는 {results:[]} 구조 모두 대응
+        setMovies(Array.isArray(res.data) ? res.data : (res.data.results || []));
         setError('');
       })
       .catch(() => setError('영화 목록을 불러오는 데 실패했습니다.'));
   }, [search, selectedOtts, ordering]);
 
+  // ottList가 항상 배열로!
+  const ottArr = Array.isArray(ottList) ? ottList : [];
+  const subscribedOttObjs = ottArr.filter(ott => subscribedOtts.includes(ott.id));
+  const otherOttObjs = ottArr.filter(ott => !subscribedOtts.includes(ott.id));
+
   // 드롭다운 버튼용 텍스트
   const ottButtonText = selectedOtts.length === 0
     ? 'OTT 전체'
-    : ottList.filter(ott => selectedOtts.includes(ott.id)).map(ott => ott.name).join(', ');
-
-  // 구독/전체 OTT 그룹 구분
-  const subscribedOttObjs = ottList.filter(ott => subscribedOtts.includes(ott.id));
-  const otherOttObjs = ottList.filter(ott => !subscribedOtts.includes(ott.id));
+    : ottArr.filter(ott => selectedOtts.includes(ott.id)).map(ott => ott.name).join(', ');
 
   return (
     <div className="movies-page">
@@ -94,7 +100,7 @@ const MoviesPage = ({ isLoggedIn }) => {
           검색
         </button>
 
-        {/* ▼ OTT 필터 드롭다운 ▼ */}
+        {/* OTT 필터 드롭다운 */}
         <div className="ott-dropdown-wrapper" ref={ottDropdownRef}>
           <button
             className="ott-dropdown-btn"
@@ -113,7 +119,7 @@ const MoviesPage = ({ isLoggedIn }) => {
                 />
                 전체
               </label>
-              {/* ---- 구독중인 OTT 그룹 ---- */}
+              {/* 구독중인 OTT 그룹 */}
               {isLoggedIn && subscribedOttObjs.length > 0 && (
                 <div className="ott-dropdown-group">
                   <div className="dropdown-group-title">구독중인 OTT</div>
@@ -136,7 +142,7 @@ const MoviesPage = ({ isLoggedIn }) => {
                   ))}
                 </div>
               )}
-              {/* ---- 나머지 OTT 그룹 ---- */}
+              {/* 기타 OTT 그룹 */}
               {otherOttObjs.length > 0 && (
                 <div className="ott-dropdown-group">
                   {isLoggedIn && subscribedOttObjs.length > 0 && (
@@ -183,14 +189,14 @@ const MoviesPage = ({ isLoggedIn }) => {
           <option value="title">제목순</option>
         </select>
       </div>
-      {/* ⚠️ 에러 메시지 */}
+      {/* 에러 메시지 */}
       {error && (
         <p style={{ color: '#e50914', textAlign: 'center', marginBottom: '1rem' }}>
           {error}
         </p>
       )}
 
-      {/* 🎬 영화 카드 그리드 */}
+      {/* 영화 카드 그리드 */}
       <div className="movies-grid">
         {movies.map(movie => (
           <div
@@ -215,7 +221,7 @@ const MoviesPage = ({ isLoggedIn }) => {
                 {movie.ott_services
                   .slice(0, 4)
                   .map(ottId => {
-                    const service = ottList.find(o => o.id === ottId);
+                    const service = ottArr.find(o => o.id === ottId);
                     return service ? (
                       <img
                         key={service.id}
@@ -229,7 +235,7 @@ const MoviesPage = ({ isLoggedIn }) => {
                   <span className="ott-more" title={
                     movie.ott_services
                       .slice(4)
-                      .map(ottId => ottList.find(o => o.id === ottId)?.name)
+                      .map(ottId => ottArr.find(o => o.id === ottId)?.name)
                       .filter(Boolean)
                       .join(', ')
                   }>

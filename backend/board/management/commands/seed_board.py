@@ -1,82 +1,62 @@
 from django.core.management.base import BaseCommand
-from board.models import (
-    BoardPost, BoardComment, BoardPostLike, BoardCommentLike, BoardCategory
-)
-from users.models import User
-from django.utils import timezone
+from board.models import BoardCategory, BoardPost
+from django.contrib.auth import get_user_model
 import random
+from datetime import timedelta
+from django.utils import timezone
 
 class Command(BaseCommand):
-    help = '커뮤니티 게시판 더미 데이터를 생성합니다.'
+    help = "100개의 게시글 더미 데이터를 생성합니다."
 
     def handle(self, *args, **kwargs):
-        print("👤 사용자 생성")
-        user_data = [
-            ('user1', 'user1@example.com'),
-            ('user2', 'user2@example.com'),
-            ('user3', 'user3@example.com'),
+        User = get_user_model()
+        usernames = ["user1", "user2", "user3"]
+        users = []
+        for username in usernames:
+            user = User.objects.filter(username=username).first()
+            if not user:
+                user = User.objects.create_user(username=username, email=f"{username}@example.com", password="dummy1234")
+            users.append(user)
+
+        categories = list(BoardCategory.objects.all())
+        if not categories:
+            category_names = ["자유", "국내 드라마", "해외 드라마", "국내 영화", "해외 영화", "핫딜"]
+            for name in category_names:
+                slug = name.replace(" ", "_")
+                categories.append(BoardCategory.objects.create(name=name, slug=slug))
+            self.stdout.write(f"카테고리 {len(categories)}개 생성됨")
+
+        dummy_titles = [
+            "더미 게시글", "테스트용 제목", "임의의 글", "영화 추천", "드라마 감상", "정보 공유", "이벤트", "후기"
         ]
-        user_objects = []
-        for username, email in user_data:
-            user, _ = User.objects.get_or_create(username=username, email=email)
-            user.set_password('pass1234'); user.save()
-            user_objects.append(user)
-
-        # ✅ 카테고리 생성 (slug 필드 포함)
-        category_data = [
-            ('자유', 'free'),
-            ('국내 드라마', 'drama_kr'),
-            ('해외 드라마', 'drama_intl'),
-            ('국내 영화', 'movie_kr'),
-            ('해외 영화', 'movie_intl'),
-            ('핫딜', 'sale'),
+        dummy_contents = [
+            "이것은 더미 데이터입니다.",
+            "게시글 내용 예시입니다. 랜덤 생성.",
+            "오늘 본 영화 너무 재밌었어요!",
+            "정보 나눔 게시글.",
+            "이 게시글은 자동 생성되었습니다.",
+            "파이썬으로 더미 데이터 생성 중."
         ]
-        category_objects = {}
-        for name, slug in category_data:
-            obj, _ = BoardCategory.objects.get_or_create(
-                name=name, defaults={'slug': slug}
+
+        created_count = 0
+        for i in range(100):
+            title = f"{random.choice(dummy_titles)} {i+1}"
+            content = f"{random.choice(dummy_contents)} (No.{i+1})"
+            user = random.choice(users)
+            category = random.choice(categories)
+            days_ago = random.randint(0, 30)
+            hours_ago = random.randint(0, 23)
+            created_at = timezone.now() - timedelta(days=days_ago, hours=hours_ago)
+
+            post, created = BoardPost.objects.get_or_create(
+                title=title,
+                defaults={
+                    "category": category,
+                    "user": user,
+                    "content": content,
+                    "created_at": created_at,
+                }
             )
-            if not obj.slug:
-                obj.slug = slug
-                obj.save()
-            category_objects[name] = obj
+            created_count += 1
 
-        print("📝 게시글 생성")
-        # 다양한 카테고리와 유저 조합으로 30개 게시글 생성
-        for i in range(1, 31):
-            cat_name = random.choice([d[0] for d in category_data])
-            post = BoardPost.objects.create(
-                title=f"[{cat_name}] 더미 게시글 {i}",
-                content=f"이것은 더미 게시글입니다. 번호: {i}\n자동 생성 {random.randint(100,999)}",
-                category=category_objects[cat_name],
-                user=random.choice(user_objects),
-                created_at=timezone.now() - timezone.timedelta(days=random.randint(0, 20))
-            )
-            print(f"  - {post.title}")
-
-            # 게시글마다 1~5개의 댓글 생성
-            for j in range(random.randint(1, 5)):
-                comment = BoardComment.objects.create(
-                    content=f"{post.title}의 댓글 {j+1}",
-                    post=post,
-                    user=random.choice(user_objects)
-                )
-                # 댓글 좋아요/비추천 - user 중복 없이 랜덤 샘플
-                like_users = random.sample(user_objects, k=random.randint(0, len(user_objects)))
-                for like_user in like_users:
-                    BoardCommentLike.objects.create(
-                        comment=comment,
-                        user=like_user,
-                        is_like=random.choice([True, False])
-                    )
-
-            # 게시글 좋아요/비추천 - user 중복 없이 랜덤 샘플
-            like_users = random.sample(user_objects, k=random.randint(0, len(user_objects)))
-            for like_user in like_users:
-                BoardPostLike.objects.create(
-                    post=post,
-                    user=like_user,
-                    is_like=random.choice([True, False])
-                )
-
-        print("✅ 더미 데이터 생성 완료 (게시글 30개, 유저 3명, 댓글/추천/비추천 랜덤)")
+        self.stdout.write(self.style.SUCCESS(f"{created_count}개의 게시글 더미 데이터가 생성되었습니다."))
