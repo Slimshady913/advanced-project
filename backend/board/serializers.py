@@ -8,10 +8,14 @@ class BoardPostSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     like_count = serializers.SerializerMethodField()
     my_like = serializers.SerializerMethodField()
+    dislike_count = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
+    view_count = serializers.IntegerField(read_only=True) 
 
     class Meta:
         model = BoardPost
-        fields = ['id', 'category','category_name', 'title', 'content', 'user', 'created_at', 'like_count', 'my_like']
+        fields = ['id', 'category','category_name', 'title', 'content', 'user',
+                   'created_at', 'dislike_count', 'comment_count', 'view_count', 'like_count', 'my_like']
 
     def get_like_count(self, obj):
         # 추천(True)만 카운트
@@ -24,6 +28,12 @@ class BoardPostSerializer(serializers.ModelSerializer):
             # True=추천, False=비추천, None=아직 없음
             return like.is_like if like else None
         return None
+    
+    def get_dislike_count(self, obj):
+        return obj.likes.filter(is_like=False).count()
+
+    def get_comment_count(self, obj):
+        return obj.comments.count()
     
 class BoardCategorySerializer(serializers.ModelSerializer):
     class Meta:

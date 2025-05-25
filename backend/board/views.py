@@ -71,6 +71,13 @@ class BoardPostDetailView(generics.RetrieveUpdateDestroyAPIView):
     @swagger_auto_schema(operation_summary="게시글 삭제")
     def delete(self, request, *args, **kwargs):
         return super().delete(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.view_count = (instance.view_count or 0) + 1
+        instance.save(update_fields=['view_count'])
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 # ✅ 댓글 목록 조회 + 작성
