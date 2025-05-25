@@ -1,112 +1,193 @@
 .board-container.pro {
-  max-width: 900px;
+  max-width: 980px;
   margin: 40px auto 0 auto;
-  padding: 32px;
-  background: rgba(24, 27, 32, 0.95);
+  padding: 36px 32px 48px 32px;
+  background: rgba(26, 30, 36, 0.97);
   border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 28px 0 rgba(0,0,0,0.19);
 }
 
 .board-title.pro {
-  font-size: 2.4rem;
+  font-size: 2.5rem;
   font-weight: 800;
-  margin-bottom: 22px;
+  margin-bottom: 26px;
   color: #fff;
-  letter-spacing: -1px;
-  text-align: center;
+  letter-spacing: -1.5px;
+  text-align: left;
+  line-height: 1.25;
 }
 
 .category-tabs.pro {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 26px;
-  justify-content: center;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
 }
-
+.category-tabs.pro::-webkit-scrollbar {
+  height: 4px;
+}
+.category-tabs.pro::-webkit-scrollbar-thumb {
+  background: #2a3e4e;
+  border-radius: 10px;
+}
 .category-tabs.pro button {
-  padding: 8px 20px;
-  background: #202834;
+  padding: 8px 24px;
+  background: #222b38;
   color: #cfd8e3;
   border: none;
-  border-radius: 10px;
+  border-radius: 18px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 1.06rem;
-  transition: background 0.18s, color 0.18s;
+  font-size: 1.05rem;
+  transition: background 0.17s, color 0.17s, transform 0.12s;
+  white-space: nowrap;
 }
 .category-tabs.pro button.active {
-  background: linear-gradient(90deg, #00AEEF, #0062F5);
+  background: linear-gradient(90deg, #00AEEF 70%, #0056b8 100%);
   color: #fff;
   font-weight: bold;
   box-shadow: 0 2px 10px rgba(0,174,239,0.14);
+  transform: scale(1.07);
+}
+.category-tabs.pro button:hover:not(.active) {
+  background: #29384b;
+  color: #e1e9f3;
 }
 
 .write-button.pro {
   display: block;
-  margin: 0 0 22px auto;
+  margin: 0 0 26px auto;
   background: linear-gradient(90deg, #00AEEF, #0062F5);
   color: #fff;
   border: none;
-  padding: 10px 22px;
-  border-radius: 10px;
+  padding: 10px 28px;
+  border-radius: 14px;
   font-weight: 700;
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1.12rem;
   box-shadow: 0 2px 8px rgba(0,174,239,0.10);
-  transition: background 0.18s;
+  transition: background 0.17s, transform 0.13s;
 }
 .write-button.pro:hover {
   background: linear-gradient(90deg, #0094cc, #0053c4);
+  transform: translateY(-2px) scale(1.04);
 }
 
 .post-list.pro {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+}
+@media (max-width: 900px) {
+  .post-list.pro {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .board-container.pro {
+    padding: 18px 5vw 28px 5vw;
+    border-radius: 12px;
+  }
+  .board-title.pro {
+    font-size: 2rem;
+    margin-bottom: 18px;
+  }
+}
+@media (max-width: 600px) {
+  .board-container.pro {
+    max-width: 100vw;
+    padding: 8vw 2vw 8vw 2vw;
+    min-width: 0;
+    border-radius: 0;
+  }
+  .board-title.pro {
+    font-size: 1.37rem;
+    margin-bottom: 12px;
+  }
+  .write-button.pro {
+    padding: 7px 10vw;
+    font-size: 1.01rem;
+    border-radius: 9px;
+  }
+  .category-tabs.pro {
+    gap: 4px;
+    margin-bottom: 13px;
+  }
 }
 
+/* 카드 디자인 */
 .post-card.pro {
-  background: linear-gradient(120deg, #222933 60%, #20242d 100%);
-  border-radius: 15px;
-  padding: 24px 30px 18px 30px;
+  background: linear-gradient(120deg, #232c3a 75%, #22242d 100%);
+  border-radius: 16px;
+  padding: 26px 30px 18px 26px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.18);
   cursor: pointer;
-  transition: box-shadow 0.16s, transform 0.15s;
-  border: 1.5px solid rgba(0, 174, 239, 0.09);
+  transition: box-shadow 0.16s, transform 0.16s, border 0.12s;
+  border: 1.7px solid rgba(0, 174, 239, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 .post-card.pro:hover {
-  box-shadow: 0 6px 22px rgba(0,174,239,0.15);
-  transform: translateY(-3px) scale(1.013);
+  box-shadow: 0 10px 30px rgba(0,174,239,0.14);
+  border: 2px solid #00AEEF33;
+  transform: translateY(-2px) scale(1.013);
+  background: linear-gradient(115deg, #27394a 80%, #22262d 100%);
+}
+@media (max-width: 600px) {
+  .post-card.pro {
+    padding: 16px 8vw 13px 8vw;
+    border-radius: 10px;
+    font-size: 0.98rem;
+  }
 }
 
 .post-title-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 7px;
+  min-width: 0;
 }
 .post-category {
-  font-size: 1.04rem;
+  font-size: 1.03rem;
   color: #00AEEF;
   font-weight: 700;
   letter-spacing: -0.5px;
+  flex-shrink: 0;
 }
 .post-title {
-  font-size: 1.22rem;
+  font-size: 1.21rem;
   font-weight: 700;
   color: #fff;
   margin: 0;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
   word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+@media (max-width: 600px) {
+  .post-title-row .post-title {
+    font-size: 1.05rem;
+  }
+  .post-category {
+    font-size: 0.97rem;
+  }
 }
 
 .post-meta-row {
   display: flex;
-  gap: 16px;
-  font-size: 0.97rem;
-  color: #a4b4c9;
-  margin-bottom: 14px;
+  gap: 18px;
+  font-size: 0.99rem;
+  color: #99aac7;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 .post-user {
   font-weight: 600;
@@ -117,24 +198,35 @@
 
 .post-stats-row {
   display: flex;
-  gap: 18px;
+  gap: 16px;
   margin-top: 2px;
+  flex-wrap: wrap;
 }
 .stat {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 1.03rem;
+  gap: 6px;
+  font-size: 1.05rem;
   color: #a4b4c9;
+  background: #22324b55;
+  border-radius: 8px;
+  padding: 3px 10px 2px 8px;
+  font-weight: 600;
+  transition: background 0.16s, color 0.16s;
 }
-.icon.like { color: #04D68E; }
-.icon.dislike { color: #F16B6B; }
-.icon.comment { color: #41B3FA; }
-.icon.view { color: #FAF36B; }
+.icon.like { color: #03cd7a; font-size: 1.13em; }
+.icon.dislike { color: #f46b6b; font-size: 1.13em;}
+.icon.comment { color: #45c9ff; font-size: 1.13em;}
+.icon.view { color: #ffe066; font-size: 1.13em;}
+.stat:hover .icon.like { color: #24ffae;}
+.stat:hover .icon.dislike { color: #ff7d7d;}
+.stat:hover .icon.comment { color: #6bd1ff;}
+.stat:hover .icon.view { color: #fff26d;}
+.stat:hover { background: #234269; color: #f7fafd; }
 
 .no-post {
   color: #bbb;
   text-align: center;
-  padding: 40px 0;
-  font-size: 1.25rem;
+  padding: 60px 0;
+  font-size: 1.18rem;
 }
