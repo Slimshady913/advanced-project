@@ -10,11 +10,15 @@ function BoardListPage() {
   const [categories, setCategories] = useState([]);
   const [posts, setPosts] = useState([]);
 
-  // "인기" "핫딜" 가상 탭 + 실제 카테고리(slug 필드 필요!)
+  // 가상 탭(인기, 핫딜)과 실제 카테고리(slug 기준, 중복 제거)
+  // - "hot"은 가상 인기 탭
+  // - "sale"은 실제 카테고리에 있으면 중복 없이 탭 합침
+  const saleCategory = categories.find(cat => cat.slug === 'sale');
   const customTabs = [
     { slug: 'hot', name: '인기' },
     ...categories.map(cat => ({ slug: cat.slug, name: cat.name, id: cat.id })),
-    { slug: 'sale', name: '핫딜' }, // "핫딜"은 슬러그/DB 모두 포함돼 있으면 중복 안 되게 주의
+    // 실제 카테고리에 "sale"이 없다면 핫딜 가상 탭 추가
+    ...(saleCategory ? [] : [{ slug: 'sale', name: '핫딜' }]),
   ];
 
   // URL에 없으면 hot으로 기본값
@@ -22,7 +26,7 @@ function BoardListPage() {
     categorySlug ||
     (customTabs.length > 0 ? customTabs[0].slug : 'hot');
 
-  // 카테고리 목록 불러오기 (slug 필드 포함되어야 함)
+  // 카테고리 목록 불러오기
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
       setCategories(res.data); // [{id, name, slug}, ...]
@@ -38,15 +42,7 @@ function BoardListPage() {
         if (currentSlug === 'hot') {
           url += '?ordering=like_count';
         } else {
-          // slug에 맞는 카테고리 객체를 찾음
-          const selectedCat = categories.find(cat => cat.slug === currentSlug);
-          if (selectedCat) {
-            url += `?category=${selectedCat.id}`;
-          } else if (currentSlug === 'sale') {
-            // "핫딜"이 실제 카테고리에 없을 경우 방어 코드
-            const saleCat = categories.find(cat => cat.slug === 'sale');
-            if (saleCat) url += `?category=${saleCat.id}`;
-          }
+          url += `?category=${currentSlug}`;
         }
         const res = await axios.get(url);
         setPosts(res.data);
