@@ -95,8 +95,11 @@ const MovieDetailPage = () => {
   useEffect(() => {
     axios
       .get('/ott/')
-      .then((res) => setOttList(res.data))
-      .catch((err) => console.error('OTT 목록 불러오기 실패:', err));
+      .then((res) => {
+        // 배열인지 체크해서 배열만 set, 아니면 빈 배열로 방어
+        setOttList(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(() => setOttList([]));
   }, []);
 
   useEffect(() => {
@@ -143,7 +146,7 @@ const MovieDetailPage = () => {
     setReviewsLoading(true);
     try {
       const response = await axios.get(`/reviews/?movie=${id}&ordering=${ordering}`);
-      setReviews(response.data);
+      setReviews(Array.isArray(response.data) ? response.data : (Array.isArray(response.data.results) ? response.data.results : []));
     } catch {
       setReviews([]);
     }
@@ -295,7 +298,7 @@ const MovieDetailPage = () => {
 
   // Top 리뷰/전체 리뷰
   const getTopReviews = () => {
-    if (!reviews) return [];
+    if (!Array.isArray(reviews)) return [];
     return [...reviews]
       .map(r => ({ ...r, voteDiff: (r.like_count || 0) - (r.dislike_count || 0) }))
       .filter(r => r.voteDiff >= 10)
@@ -551,7 +554,9 @@ const MovieDetailPage = () => {
 
   // ott id → 객체 변환
   const movieOttList = (movie.ott_services || [])
-    .map((id) => ottList.find((ott) => ott.id === id))
+    .map((id) =>
+      (Array.isArray(ottList) ? ottList : []).find((ott) => ott.id === id)
+    )
     .filter(Boolean);
 
   return (
