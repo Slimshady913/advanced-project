@@ -14,6 +14,7 @@ from drf_yasg import openapi
 from rest_framework import generics
 from .models import BoardCategory
 from .serializers import BoardCategorySerializer
+from django.db.models import Count, Q
 
 # ✅ 게시글 목록 조회 + 작성
 class BoardPostListCreateView(generics.ListCreateAPIView):
@@ -26,15 +27,27 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
         operation_description="전체 커뮤니티 게시글 목록을 최신순으로 반환합니다. 카테고리별로 게시글을 필터링할 수 있습니다.",
         manual_parameters=[
             openapi.Parameter(
-                'category', openapi.IN_QUERY, description="카테고리 필터링 (예: '영화', '드라마')", type=openapi.TYPE_STRING
+                'category', openapi.IN_QUERY, description="카테고리 필터링 (예: '영화', '드라마', 'hot')", type=openapi.TYPE_STRING
             )
         ],
         responses={200: BoardPostSerializer(many=True)}
     )
     def get(self, request, *args, **kwargs):
         category_slug = self.request.query_params.get('category')
-        if category_slug and category_slug != 'hot':
-            self.queryset = self.queryset.filter(category__slug=category_slug)
+        min_like_count = 10  # 인기 기준 추천수 (원하는 값으로 조정)
+        queryset = self.get_queryset()
+
+        if category_slug:
+            if category_slug == 'hot':
+                # 인기글: 추천수 N개 이상 필터 + 추천순 정렬
+                queryset = queryset.annotate(
+                    like_count=Count('likes', filter=Q(likes__is_like=True))
+                ).filter(
+                    like_count__gte=min_like_count
+                ).order_by('-like_count', '-created_at')
+            else:
+                queryset = queryset.filter(category__slug=category_slug)
+        self.queryset = queryset
         return super().get(request, *args, **kwargs)
 
     def perform_create(self, serializer):
