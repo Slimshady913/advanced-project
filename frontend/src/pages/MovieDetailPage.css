@@ -65,8 +65,33 @@
 
 .ott-list {
   display: flex;
-  gap: 20px;
+  flex-direction: column;  /* 한줄에 한개씩 */
+  gap: 18px;
+  align-items: flex-start; /* 왼쪽정렬 */
+}
+
+.ott-row {
+  display: flex;
   align-items: center;
+  gap: 16px;
+  margin-bottom: 2px;
+}
+
+.ott-name {
+  font-size: 1.17rem;
+  font-weight: 600;
+  color: #eaf6ff;
+  letter-spacing: 0.02em;
+  margin-left: 3px;
+  /* OTT 로고와 명확히 구분되도록 */
+  text-shadow: 0 2px 8px #2228, 0 1px 3px #0058;
+}
+.ott-link.ott-row:hover .ott-name {
+  color: #61dafb;
+  text-decoration: underline;
+}
+.ott-link-disabled .ott-name {
+  color: #8995a6;
 }
 
 .ott-link {

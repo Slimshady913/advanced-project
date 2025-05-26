@@ -587,14 +587,16 @@ const MovieDetailPage = () => {
                   href={ott.link_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ott-link"
+                  className="ott-link ott-row"
                   title={ott.name}
                 >
                   <img src={ott.logo_url} alt={ott.name} className="ott-logo" />
+                  <span className="ott-name">{ott.name}</span>
                 </a>
               ) : (
-                <span key={ott.id} className="ott-link-disabled" title="링크 없음">
+                <span key={ott.id} className="ott-link-disabled ott-row" title="링크 없음">
                   <img src={ott.logo_url} alt={ott.name} className="ott-logo" style={{ opacity: 0.5 }} />
+                  <span className="ott-name">{ott.name}</span>
                 </span>
               )
             )}
