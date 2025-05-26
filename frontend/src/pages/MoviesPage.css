@@ -9,7 +9,7 @@
   --gap-sm: 0.75rem;
   --gap-md: 1.5rem;
   --radius-base: 6px;
-  --radius-card: 8px;
+  --radius-card: 10px;
   --dropdown-shadow: 0 8px 30px rgba(0,0,0,0.18);
 }
 
@@ -25,7 +25,7 @@ html, body {
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 4px; }
 
-.movies-page { width: 100%; padding: 1rem 2rem; }
+.movies-page { width: 100%; padding: 1rem 2vw; }
 .movies-page h2 { font-size: 2rem; font-weight: 700; margin-bottom: var(--gap-md); text-align: center; }
 
 /* ───── 필터 바 ───── */
@@ -37,9 +37,8 @@ html, body {
   justify-content: center;
   align-items: center;
   gap: var(--gap-sm);
-  z-index: 10; /* 드롭다운 팝오버와 겹침 방지 */
+  z-index: 10;
 }
-
 .filter-bar input[type="text"],
 .filter-bar select,
 .filter-bar .search-button {
@@ -64,9 +63,8 @@ html, body {
 /* ───── OTT 드롭다운(팝오버) ───── */
 .ott-dropdown-wrapper {
   position: relative;
-  z-index: 20; /* 팝오버가 카드 위에 보이도록 */
+  z-index: 20;
 }
-
 .ott-dropdown-btn {
   display: flex; align-items: center;
   background: #232323;
@@ -102,8 +100,6 @@ html, body {
   0% { opacity: 0; transform: translateY(-8px);}
   100% { opacity: 1; transform: none;}
 }
-
-/* 드롭다운 체크박스 및 전체/초기화 */
 .ott-dropdown-list label.ott-checkbox {
   display: flex; align-items: center;
   padding: 4px 2px 4px 2px;
@@ -151,25 +147,36 @@ html, body {
 .movies-grid {
   max-width: 1200px; margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: var(--gap-md); justify-items: center;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2rem;
+  justify-items: center;
+  padding-bottom: 30px;
+}
+
+@media (max-width: 1024px) {
+  .movies-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+@media (max-width: 700px) {
+  .movies-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 1.3rem; }
 }
 @media (max-width: 480px) {
-  .movies-grid { grid-template-columns: repeat(2, 1fr) !important; }
-}
-@media (max-width: 1024px) {
-  .movies-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .movies-page { padding: 1rem 0.4rem; }
+  .movies-grid { grid-template-columns: 1fr 1fr !important; gap: 0.8rem; }
 }
 
 .movie-card {
-  position: relative; width: 100%; max-width: 180px;
+  width: 100%;
+  max-width: 230px;
   background-color: var(--bg-card); border-radius: var(--radius-card);
   overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.5);
   transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  display: flex; flex-direction: column; justify-content: flex-start;
+  min-width: 0;
+  min-height: 320px;
 }
 .movie-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-6px) scale(1.03);
   box-shadow: 0 8px 16px rgba(0,0,0,0.7);
 }
 
@@ -183,28 +190,29 @@ html, body {
 }
 
 .movie-info {
-  padding: 0.75rem;
-  display: flex; flex-direction: column; gap: 0.25rem;
+  padding: 0.85rem 0.75rem 0.8rem 0.75rem;
+  display: flex; flex-direction: column; gap: 0.28rem;
   min-height: 4.5rem;
 }
 .movie-info h3 {
-  font-size: 1.05rem; font-weight: 800; color: var(--text-light);
+  font-size: 1.09rem; font-weight: 800; color: var(--text-light);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .movie-info p.meta {
-  font-size: 0.85rem; color: var(--text-muted); margin: 0;
+  font-size: 0.88rem; color: var(--text-muted); margin: 0;
 }
 .movie-info .rating {
-  font-size: 0.98rem; color: var(--accent);
+  font-size: 1.02rem; color: var(--accent);
   font-weight: 700; margin: 0;
-  display: flex; align-items: center; gap: 0.5em;
+  display: flex; align-items: center; gap: 0.45em;
 }
 .movie-info .rating-count {
-  color: #bbb; font-size: 0.90em; margin-left: 0.05em; font-weight: 400;
+  color: #bbb; font-size: 0.92em; margin-left: 0.05em; font-weight: 400;
 }
 
 .ott-logos {
-  display: flex; align-items: center; gap: 7px; margin-top: 0.4rem;
+  display: flex; align-items: center; gap: 7px; margin-top: 0.32rem;
+  flex-wrap: wrap;
 }
 .ott-logos img {
   width: 24px; height: 24px; border-radius: 4px; flex-shrink: 0;
@@ -220,10 +228,13 @@ html, body {
 }
 .ott-more:hover { background: var(--accent); color: #fff; }
 
-@media (max-width: 768px) {
-  .filter-bar { flex-direction: column; gap: 1rem; }
-  .filter-bar input,
-  .filter-bar select,
-  .filter-bar .search-button { width: 100%; }
-  .movie-card { max-width: 45%; }
+/* 모바일(700px 이하)에서 카드의 높이, 폰트 조금 키움 */
+@media (max-width: 700px) {
+  .movie-card { max-width: 97vw; min-height: 240px; }
+  .movie-info h3 { font-size: 1.07rem; }
+  .movie-info { padding: 0.75rem 0.5rem 0.7rem 0.5rem; }
+}
+@media (max-width: 420px) {
+  .movies-grid { gap: 0.5rem !important; }
+  .movie-card { max-width: 99vw; }
 }
