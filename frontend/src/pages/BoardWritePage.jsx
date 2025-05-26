@@ -18,20 +18,21 @@ function BoardWritePage() {
   const categorySlugFromQuery = params.get('category'); // 예: "movie_kr"
 
   useEffect(() => {
-    // 카테고리 목록 불러오기
     axios.get('/board/categories/').then(res => {
-      setCategories(res.data);
+      const categoriesArr =
+        Array.isArray(res.data) ? res.data
+          : Array.isArray(res.data.results) ? res.data.results
+            : [];
+      setCategories(categoriesArr);
 
-      // 카테고리 쿼리스트링(slug)와 일치하는 id 찾기
       if (categorySlugFromQuery) {
-        const matched = res.data.find(cat => cat.slug === categorySlugFromQuery);
+        const matched = categoriesArr.find(cat => cat.slug === categorySlugFromQuery);
         if (matched) {
-          setCategory(matched.id); // id로 set
+          setCategory(matched.id);
           return;
         }
       }
-      // 없으면 첫 번째 카테고리
-      if (res.data.length > 0) setCategory(res.data[0].id);
+      if (categoriesArr.length > 0) setCategory(categoriesArr[0].id);
     });
     // eslint-disable-next-line
   }, []);
