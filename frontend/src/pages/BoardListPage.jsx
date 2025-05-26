@@ -118,6 +118,9 @@ function BoardListPage() {
     navigate(`/community/${categorySlug || 'hot'}?${params.toString()}`);
   };
 
+  // "hot"이거나 카테고리 선택 안 된 경우 글쓰기 숨김
+  const isWriteButtonVisible = !!categorySlug && categorySlug !== 'hot';
+
   return (
     <div className="board-root-layout">
       <div className="board-center-wrap">
@@ -165,18 +168,20 @@ function BoardListPage() {
                   <FaSearch />
                 </button>
               </form>
-              <button
-                className="write-button pro"
-                onClick={() => {
-                  if (!isLoggedIn) {
-                    navigate('/auth');
-                  } else {
-                    handleWriteClick();
-                  }
-                }}
-              >
-                글쓰기
-              </button>
+              {isWriteButtonVisible && (
+                <button
+                  className="write-button pro"
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      navigate('/auth');
+                    } else {
+                      handleWriteClick();
+                    }
+                  }}
+                >
+                  글쓰기
+                </button>
+              )}
             </div>
             {/* 게시글 목록 */}
             <div className="post-list pro">
