@@ -166,11 +166,18 @@ function BoardListPage() {
               </button>
             </form>
             {/* 글쓰기 버튼 */}
-            {isLoggedIn && (
-              <button className="write-button pro" onClick={handleWriteClick}>
-                글쓰기
-              </button>
-            )}
+            <button
+              className="write-button pro"
+              onClick={() => {
+                if (!isLoggedIn) {
+                  navigate('/auth');
+                } else {
+                  handleWriteClick();
+                }
+              }}
+            >
+              글쓰기
+            </button>
             {/* 게시글 목록 */}
             <div className="post-list pro">
               {loading ? (
