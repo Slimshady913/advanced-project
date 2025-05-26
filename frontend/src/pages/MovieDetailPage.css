@@ -23,7 +23,7 @@
   border-radius: 12px;
   flex-shrink: 0;
   background: #181818;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
 }
 
 .movie-text-info {
@@ -53,6 +53,7 @@
   border-radius: 1rem;
   text-align: left;
   box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+  padding-top: 20px;  /* 제목과 아이콘 간의 간격 추가 */
 }
 
 .ott-section h3 {
@@ -61,57 +62,115 @@
   color: #61dafb;
   font-weight: 700;
   letter-spacing: 0.01em;
+  padding-bottom: 15px; /* 제목 아래 간격을 추가 */
 }
 
+/* (1) 그리드 레이아웃으로 2~4열까지 자동 줄바꿈! */
 .ott-list {
-  display: flex;
-  flex-direction: column;  /* 한줄에 한개씩 */
-  gap: 18px;
-  align-items: flex-start; /* 왼쪽정렬 */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+  gap: 24px 44px;      /* 행, 열 간격 */
+  align-items: center;
+  padding-bottom: 6px;
+  padding-right: 15px;  /* 텍스트가 짤리지 않도록 컨테이너 오른쪽 여백 추가 */
 }
 
+/* (2) OTT 1개 행 (로고+이름) */
 .ott-row {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 2px;
+  min-width: 0;
+  max-width: 280px;    /* 긴 텍스트를 위한 넓이 조정 */
+  padding: 7px 0;
+  justify-content: flex-start; /* 텍스트 정렬 */
 }
 
+/* (3) OTT 로고 이미지 */
+.ott-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 0.7rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+  transition: box-shadow 0.16s, transform 0.14s, background 0.17s;
+}
+
+/* (4) hover시 박스 그림자 강조 & 살짝 커짐 */
+.ott-link {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.7rem;
+  padding: 2px 7px 2px 2px;
+  transition: box-shadow 0.16s, transform 0.14s, background 0.17s;
+  position: relative;
+  overflow: visible;
+}
+.ott-link:hover, .ott-link:focus {
+  background: #282d34;
+  box-shadow: 0 4px 18px #222a40bb;
+  transform: translateY(-2px) scale(1.07);
+  z-index: 2;
+}
+.ott-link:hover .ott-logo,
+.ott-link:focus .ott-logo {
+  box-shadow: 0 4px 20px #0e274999, 0 2px 8px #1114;
+  background: #fff;
+  transform: scale(1.06);
+}
+
+/* (5) OTT 이름(2단어도 OK) */
 .ott-name {
-  font-size: 1.17rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: #eaf6ff;
   letter-spacing: 0.02em;
-  margin-left: 3px;
-  /* OTT 로고와 명확히 구분되도록 */
+  margin-left: 5px;  /* 아이콘과 텍스트 간의 간격 늘리기 */
   text-shadow: 0 2px 8px #2228, 0 1px 3px #0058;
+  white-space: pre-line;      /* 줄바꿈 허용 */
+  word-break: keep-all;
+  line-height: 1.13;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
 }
-.ott-link.ott-row:hover .ott-name {
-  color: #61dafb;
-  text-decoration: underline;
+
+/* Coupang Play/Apple TV+ 등 두 단어는 강제 줄바꿈 */
+.ott-name {
+  max-width: 150px; /* 긴 이름을 위한 최대 너비 설정 */
+  overflow-wrap: anywhere;
+}
+
+/* (7) OTT 비활성화(링크X) */
+.ott-link-disabled {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.7rem;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.ott-link-disabled img {
+  opacity: 0.45;
 }
 .ott-link-disabled .ott-name {
   color: #8995a6;
 }
 
-.ott-link {
-  display: inline-block;
-  transition: transform 0.16s cubic-bezier(.7,1.5,.8,1.07);
-  border-radius: 0.5rem;
-}
-.ott-link:hover {
-  transform: scale(1.12);
-  box-shadow: 0 4px 12px #222a40bb;
-  background: #282d34;
-}
-
-.ott-logo {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  border-radius: 0.5rem;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+/* (8) 모바일 대응: 2열 */
+@media (max-width: 850px) {
+  .ott-list {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px 16px;
+    justify-items: flex-start;
+  }
+  .ott-row {
+    max-width: 100%;
+  }
+  .ott-logo {
+    width: 38px;
+    height: 38px;
+  }
 }
 
 .no-ott {
@@ -120,14 +179,22 @@
   padding: 0.4rem 0 0.6rem 0;
 }
 
-.ott-link-disabled {
-  display: inline-block;
-  cursor: not-allowed;
-}
-.ott-link-disabled img {
-  opacity: 0.45;
+.ott-link,
+.ott-link:visited,
+.ott-link:active,
+.ott-link:hover,
+.ott-link:focus {
+  text-decoration: none !important;
+  outline: none;
 }
 
+.ott-link .ott-name,
+.ott-link:visited .ott-name,
+.ott-link:active .ott-name,
+.ott-link:hover .ott-name,
+.ott-link:focus .ott-name {
+  text-decoration: none !important;
+}
 /* 리뷰 섹션 */
 .review-section {
   margin-bottom: 2.8rem;
