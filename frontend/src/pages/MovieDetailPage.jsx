@@ -93,11 +93,11 @@ const MovieDetailPage = () => {
   const getCurrentUser = () => localStorage.getItem('username');
 
   useEffect(() => {
-    axios
-      .get('/ott/')
-      .then((res) => {
-        // 배열인지 체크해서 배열만 set, 아니면 빈 배열로 방어
-        setOttList(Array.isArray(res.data) ? res.data : []);
+    axios.get('/ott/')
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data
+          : (Array.isArray(res.data.results) ? res.data.results : []);
+        setOttList(data);
       })
       .catch(() => setOttList([]));
   }, []);
