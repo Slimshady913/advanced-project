@@ -5,27 +5,46 @@
 }
 
 .write-container {
-  max-width: 540px;
-  margin: 40px auto 0 auto;
+  /* 기존보다 넓게 (반응형: 900px까지) */
+  max-width: 1200px;
+  min-width: 340px;
+  margin: 60px auto 0 auto;
   background: rgba(29,32,37,0.98);
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(0,174,239,0.13), 0 1.5px 12px rgba(0,0,0,0.15);
-  padding: 42px 32px 38px 32px;
+  /* 파란 Glow 완전 제거, 그림자만 부드럽게 */
+  box-shadow: 0 6px 36px rgba(0,0,0,0.19), 0 1.5px 12px rgba(0,0,0,0.13);
+  padding: 52px 60px 46px 60px;
+  transition: max-width 0.2s, padding 0.2s;
+}
+
+@media (max-width: 1200px) {
+  .write-container {
+    max-width: 700px;
+    padding: 42px 32px 38px 32px;
+  }
+}
+
+@media (max-width: 700px) {
+  .write-container {
+    max-width: 98vw;
+    padding: 28px 8vw 24px 8vw;
+    border-radius: 0;
+  }
 }
 
 .write-title {
-  font-size: 2rem;
+  font-size: 2.08rem;
   font-weight: 900;
   color: #fff;
   letter-spacing: -1.3px;
-  margin-bottom: 26px;
+  margin-bottom: 28px;
   text-align: center;
 }
 
 .write-form {
   display: flex;
   flex-direction: column;
-  gap: 17px;
+  gap: 18px;
 }
 
 .write-form label {
@@ -38,8 +57,8 @@
 .write-form input,
 .write-form textarea,
 .write-form select {
-  padding: 13px;
-  font-size: 1.09rem;
+  padding: 14px;
+  font-size: 1.11rem;
   border-radius: 8px;
   border: none;
   background-color: #212228;
@@ -129,14 +148,14 @@
 }
 
 .submit-btn {
-  padding: 15px;
+  padding: 16px;
   background: linear-gradient(90deg, #00AEEF, #0062F5);
   color: #fff;
   font-weight: 900;
   border: none;
   border-radius: 9px;
-  font-size: 1.19rem;
-  margin-top: 13px;
+  font-size: 1.23rem;
+  margin-top: 15px;
   cursor: pointer;
   box-shadow: 0 2px 9px rgba(0,174,239,0.09);
   transition: background 0.12s, transform 0.11s;
