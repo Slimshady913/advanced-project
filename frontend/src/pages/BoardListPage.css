@@ -14,7 +14,6 @@ body {
   align-items: flex-start;
 }
 
-/* 광고+본문 한 덩어리 중앙 정렬 */
 .board-center-wrap {
   width: 100%;
   display: flex;
@@ -26,7 +25,6 @@ body {
   box-sizing: border-box;
 }
 
-/* 광고 영역 (좌/우) */
 .ad-left, .ad-right {
   width: 190px;
   min-width: 110px;
@@ -91,7 +89,6 @@ body {
   opacity: 1;
 }
 
-/* 반응형 광고 미디어쿼리 */
 @media (max-width: 1550px) {
   .board-center-wrap { max-width: 1240px; }
   .ad-left, .ad-right { width: 110px; margin-left: 7px; margin-right: 7px; }
@@ -103,7 +100,6 @@ body {
   .board-center-wrap { max-width: 100vw; }
 }
 
-/* 중앙 본문 */
 .board-center {
   flex: 1 1 0;
   min-width: 0;
@@ -112,7 +108,6 @@ body {
   align-items: stretch;
 }
 
-/* 게시판 메인 컨테이너 */
 .board-container.pro {
   width: 100%;
   max-width: 1100px;
@@ -133,7 +128,6 @@ body {
   .board-container.pro { padding: 6vw 0 10vw 0; border-radius: 0; }
 }
 
-/* 타이틀 */
 .board-title.pro {
   font-size: 2.2rem;
   font-weight: 900;
@@ -145,7 +139,6 @@ body {
   line-height: 1.12;
 }
 
-/* 카테고리 탭 */
 .category-tabs.pro {
   display: flex;
   gap: 10px;
@@ -178,7 +171,6 @@ body {
   color: #f0f6fb;
 }
 
-/* ---- 검색+글쓰기 한 줄 배치 ---- */
 .search-write-row {
   display: flex;
   align-items: center;
@@ -194,7 +186,7 @@ body {
   flex: 1 1 0%;
   min-width: 0;
   margin-bottom: 0;
-  padding-left: 0; /* 좌측 패딩 제거 */
+  padding-left: 0;
   align-items: center;
 }
 
@@ -239,7 +231,6 @@ body {
   transform: translateY(-1.5px) scale(1.04);
 }
 
-/* 글쓰기 버튼 */
 .write-button.pro {
   margin: 0;
   white-space: nowrap;
@@ -303,7 +294,6 @@ body {
   .post-card.pro { padding-left: 2vw; padding-right: 2vw; }
 }
 
-/* 게시글 목록 */
 .post-list.pro {
   display: flex;
   flex-direction: column;
@@ -333,7 +323,6 @@ body {
   z-index: 1;
 }
 
-/* 썸네일 왼쪽 */
 .post-thumb {
   width: 56px;
   height: 42px;
@@ -357,13 +346,14 @@ body {
   border-radius: 6px;
 }
 
-/* 내용부(타이틀/메타/통계) 래핑 */
 .post-content-wrap {
   display: flex;
   flex: 1;
   align-items: center;
   min-width: 0;
   gap: 10px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 
 .post-title-row {
@@ -373,6 +363,7 @@ body {
   min-width: 0;
   flex: 2.7;
   overflow: hidden;
+  white-space: nowrap;
 }
 .post-category {
   font-size: 1.03rem;
@@ -398,9 +389,10 @@ body {
   font-size: 0.97rem;
   color: #92a4b2;
   margin-left: 11px;
-  flex: 1.15;
-  min-width: 88px;
+  flex: 1.1;
+  min-width: 90px;
   gap: 2px;
+  white-space: nowrap;
 }
 .post-user { font-weight: 600; }
 .post-date { color: #7c8ba2; font-size: 0.93em; }
@@ -409,19 +401,18 @@ body {
   gap: 10px;
   align-items: center;
   justify-content: flex-end;
-  flex: 1.1;
-  min-width: 100px;
+  flex: 1.2;
+  min-width: 130px;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 .stat {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 1.08rem;
-  color: #b6bfd2;
-  background: none;
-  border-radius: 8px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
+  min-width: 40px;
+  white-space: nowrap;
 }
 .icon.like { color: #02e481; font-size: 1.11em;}
 .icon.dislike { color: #fc6d6d; font-size: 1.11em;}
@@ -439,7 +430,23 @@ body {
   font-weight: 700;
 }
 
-/* 모바일 & 좁은 화면 개선 */
+@media (max-width: 1100px) {
+  .post-content-wrap {
+    gap: 8px;
+  }
+  .post-meta-row,
+  .post-stats-row {
+    min-width: 0;
+    flex: 1 1 100px;
+    font-size: 0.96rem;
+    gap: 3px;
+  }
+  .post-stats-row {
+    gap: 7px;
+    margin-top: 2px;
+  }
+}
+
 @media (max-width: 900px) {
   .post-card.pro {
     padding-left: 4vw;
@@ -458,14 +465,18 @@ body {
   .post-title-row {
     gap: 7px;
   }
+  .post-stats-row {
+    min-width: 110px;
+    gap: 6px;
+    font-size: 0.98em;
+  }
 }
 
-/* 세로로 바꾸는 breakpoint 조정 (기존보다 넓게 적용) */
 @media (max-width: 700px) {
   .post-card.pro {
     flex-direction: row;
     align-items: flex-start;
-    gap: 8px;
+    gap: 7px;
     padding-left: 2vw;
     padding-right: 2vw;
     min-height: 54px;
@@ -475,67 +486,98 @@ body {
     flex-direction: column;
     align-items: flex-start;
     width: 100%;
-    gap: 4px;
+    gap: 3px;
+    flex-wrap: nowrap;
+    overflow-x: visible;
   }
   .post-meta-row {
     flex-direction: row;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
     margin-left: 7px;
     font-size: 0.96rem;
     min-width: 0;
+    white-space: nowrap;
   }
   .post-stats-row {
     flex-direction: row;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-top: 4px;
+    gap: 6px;
     justify-content: flex-start;
     min-width: 0;
+    white-space: nowrap;
+    overflow-x: auto;
   }
   .post-title-row {
     flex-direction: row;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
+    width: 100%;
+    white-space: nowrap;
   }
 }
 
-/* 완전 좁은 화면 (썸네일 오른쪽 배치) */
 @media (max-width: 520px) {
   .post-card.pro {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 5px;
-    font-size: 0.92rem;
-    min-height: 44px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    font-size: 0.95rem;
+    min-height: 68px;
     padding-left: 1vw;
     padding-right: 1vw;
   }
   .post-thumb {
-    order: 2;
+    order: 0;
+    margin-left: 0;
     margin-right: 0;
-    margin-left: 7px;
+    width: 55px;
+    height: 38px;
+    min-width: 55px;
+    min-height: 38px;
+    align-self: flex-start;
+    margin-bottom: 3px;
   }
   .post-content-wrap {
-    flex: 1;
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
+    width: 100%;
     min-width: 0;
-  }
-  .post-meta-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    margin-left: 3px;
-    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: visible;
   }
   .post-title-row {
-    gap: 3px;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
     font-size: 1.01rem;
+    width: 100%;
+    white-space: nowrap;
+  }
+  .post-meta-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    margin-left: 0;
+    font-size: 0.95rem;
+    min-width: 0;
+    width: 100%;
+    margin-bottom: 1px;
+    white-space: nowrap;
+  }
+  .post-stats-row {
+    flex-direction: row;
+    width: 100%;
+    gap: 5px;
+    font-size: 0.97rem;
+    margin-top: 1px;
+    min-width: 0;
+    white-space: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
   }
 }
-/* ---- 페이지네이션 ---- */
+
 .pagination-bar {
   display: flex;
   justify-content: center;
