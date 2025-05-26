@@ -294,6 +294,7 @@ body {
   .post-card.pro { padding-left: 2vw; padding-right: 2vw; }
 }
 
+/* 게시글 카드 레이아웃 */
 .post-list.pro {
   display: flex;
   flex-direction: column;
@@ -335,7 +336,6 @@ body {
   background: #232c38;
   border-radius: 7px;
   margin-right: 15px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
   order: 0;
 }
 .post-thumb-img {
@@ -345,6 +345,15 @@ body {
   display: block;
   border-radius: 6px;
 }
+.post-thumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1.4rem;
+  color: #7daaff;
+}
 
 .post-content-wrap {
   display: flex;
@@ -353,7 +362,8 @@ body {
   min-width: 0;
   gap: 10px;
   flex-wrap: nowrap;
-  overflow-x: auto;
+  overflow-x: visible;
+  order: 1;
 }
 
 .post-title-row {
@@ -405,7 +415,7 @@ body {
   min-width: 130px;
   white-space: nowrap;
   flex-wrap: nowrap;
-  overflow-x: auto;
+  overflow-x: visible;
 }
 .stat {
   display: flex;
@@ -414,14 +424,29 @@ body {
   min-width: 40px;
   white-space: nowrap;
 }
-.icon.like { color: #02e481; font-size: 1.11em;}
-.icon.dislike { color: #fc6d6d; font-size: 1.11em;}
-.icon.comment { color: #49c6ff; font-size: 1.11em;}
-.icon.view { color: #ffe066; font-size: 1.11em;}
-.stat:hover .icon.like { color: #17ffa6;}
-.stat:hover .icon.dislike { color: #ff7d7d;}
-.stat:hover .icon.comment { color: #6bd1ff;}
-.stat:hover .icon.view { color: #fff26d;}
+.icon.like { color: #02e481; }
+.icon.dislike { color: #fc6d6d; }
+.icon.comment { color: #49c6ff; }
+.icon.view { color: #ffe066; }
+.stat:hover .icon.like { color: #17ffa6; }
+.stat:hover .icon.dislike { color: #ff7d7d; }
+.stat:hover .icon.comment { color: #6bd1ff; }
+.stat:hover .icon.view { color: #fff26d; }
+
+/* --- 아이콘 크기, 정렬 완전 통일 --- */
+.stat .icon {
+  font-size: 1.18rem !important;
+  min-width: 1.18em;
+  min-height: 1.18em;
+  width: 1.18em;
+  height: 1.18em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
 .no-post {
   color: #bbb;
   text-align: center;
@@ -430,151 +455,74 @@ body {
   font-weight: 700;
 }
 
-@media (max-width: 1100px) {
-  .post-content-wrap {
-    gap: 8px;
-  }
-  .post-meta-row,
-  .post-stats-row {
-    min-width: 0;
-    flex: 1 1 100px;
-    font-size: 0.96rem;
-    gap: 3px;
-  }
-  .post-stats-row {
-    gap: 7px;
-    margin-top: 2px;
-  }
-}
-
-@media (max-width: 900px) {
-  .post-card.pro {
-    padding-left: 4vw;
-    padding-right: 4vw;
-    min-height: 54px;
-    font-size: 0.97rem;
-  }
-  .post-thumb {
-    width: 38px;
-    height: 28px;
-    min-width: 38px;
-    min-height: 28px;
-    border-radius: 5px;
-    margin-right: 7px;
-  }
-  .post-title-row {
-    gap: 7px;
-  }
-  .post-stats-row {
-    min-width: 110px;
-    gap: 6px;
-    font-size: 0.98em;
-  }
-}
-
+/* ----------- 모바일 썸네일 오른쪽 카드 레이아웃 ----------- */
 @media (max-width: 700px) {
   .post-card.pro {
     flex-direction: row;
-    align-items: flex-start;
-    gap: 7px;
+    align-items: stretch;
+    gap: 10px;
     padding-left: 2vw;
     padding-right: 2vw;
-    min-height: 54px;
-    font-size: 0.96rem;
-  }
-  .post-content-wrap {
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    gap: 3px;
-    flex-wrap: nowrap;
-    overflow-x: visible;
-  }
-  .post-meta-row {
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    margin-left: 7px;
-    font-size: 0.96rem;
-    min-width: 0;
-    white-space: nowrap;
-  }
-  .post-stats-row {
-    flex-direction: row;
-    gap: 6px;
-    justify-content: flex-start;
-    min-width: 0;
-    white-space: nowrap;
-    overflow-x: auto;
-  }
-  .post-title-row {
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-    white-space: nowrap;
-  }
-}
-
-@media (max-width: 520px) {
-  .post-card.pro {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
-    font-size: 0.95rem;
-    min-height: 68px;
-    padding-left: 1vw;
-    padding-right: 1vw;
+    min-height: 88px;
+    font-size: 0.97rem;
   }
   .post-thumb {
-    order: 0;
-    margin-left: 0;
+    width: 88px !important;
+    height: 62px !important;
+    min-width: 88px !important;
+    min-height: 62px !important;
+    margin-left: 10px;
     margin-right: 0;
-    width: 55px;
-    height: 38px;
-    min-width: 55px;
-    min-height: 38px;
-    align-self: flex-start;
-    margin-bottom: 3px;
+    align-self: center;
+    order: 2;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    background: #232c38;
   }
   .post-content-wrap {
+    flex: 1 1 0;
+    min-width: 0;
+    order: 1;
+    display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: flex-start;
     gap: 2px;
-    width: 100%;
-    min-width: 0;
-    flex-wrap: nowrap;
     overflow-x: visible;
   }
   .post-title-row {
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
-    font-size: 1.01rem;
-    width: 100%;
-    white-space: nowrap;
-  }
-  .post-meta-row {
-    flex-direction: row;
-    align-items: center;
+    font-size: 1.07rem;
     gap: 6px;
-    margin-left: 0;
-    font-size: 0.95rem;
-    min-width: 0;
-    width: 100%;
-    margin-bottom: 1px;
-    white-space: nowrap;
+    margin-bottom: 3px;
+    white-space: normal;
   }
+  .post-meta-row,
   .post-stats-row {
-    flex-direction: row;
-    width: 100%;
-    gap: 5px;
-    font-size: 0.97rem;
-    margin-top: 1px;
-    min-width: 0;
-    white-space: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
+    margin-left: 0;
+    font-size: 0.96rem;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+}
+@media (max-width: 520px) {
+  .post-card.pro {
+    min-height: 110px;
+    gap: 7px;
+  }
+  .post-thumb {
+    width: 92px !important;
+    height: 66px !important;
+    min-width: 92px !important;
+    min-height: 66px !important;
+    border-radius: 12px;
+    margin-left: 7px;
+    margin-right: 0;
+  }
+  .post-title-row {
+    font-size: 1.01rem;
+    gap: 4px;
+    margin-bottom: 2px;
+    white-space: normal;
   }
 }
 
