@@ -303,7 +303,7 @@ body {
   .post-card.pro { padding-left: 2vw; padding-right: 2vw; }
 }
 
-/* ---- 게시글 목록 ---- */
+/* 게시글 목록 */
 .post-list.pro {
   display: flex;
   flex-direction: column;
@@ -326,27 +326,14 @@ body {
   gap: 0;
   position: relative;
   width: 100%;
+  box-sizing: border-box;
 }
 .post-card.pro:hover {
   background: #202530;
   z-index: 1;
 }
-@media (max-width: 900px) {
-  .post-card.pro {
-    padding-left: 4vw;
-    padding-right: 4vw;
-    min-height: 54px;
-    font-size: 0.97rem;
-  }
-}
-@media (max-width: 600px) {
-  .post-card.pro {
-    padding-left: 2vw;
-    padding-right: 2vw;
-  }
-}
 
-/* 썸네일 */
+/* 썸네일 왼쪽 */
 .post-thumb {
   width: 56px;
   height: 42px;
@@ -360,6 +347,7 @@ body {
   border-radius: 7px;
   margin-right: 15px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  order: 0;
 }
 .post-thumb-img {
   width: 100%;
@@ -368,26 +356,16 @@ body {
   display: block;
   border-radius: 6px;
 }
-.post-thumb-icon {
-  color: #b2c1db;
-  font-size: 2rem;
+
+/* 내용부(타이틀/메타/통계) 래핑 */
+.post-content-wrap {
   display: flex;
+  flex: 1;
   align-items: center;
-  justify-content: center;
+  min-width: 0;
+  gap: 10px;
 }
-@media (max-width: 700px) {
-  .post-thumb {
-    width: 38px;
-    height: 28px;
-    min-width: 38px;
-    min-height: 28px;
-    border-radius: 5px;
-    margin-right: 7px;
-  }
-  .post-thumb-icon {
-    font-size: 1.25rem;
-  }
-}
+
 .post-title-row {
   display: flex;
   align-items: center;
@@ -461,6 +439,102 @@ body {
   font-weight: 700;
 }
 
+/* 모바일 & 좁은 화면 개선 */
+@media (max-width: 900px) {
+  .post-card.pro {
+    padding-left: 4vw;
+    padding-right: 4vw;
+    min-height: 54px;
+    font-size: 0.97rem;
+  }
+  .post-thumb {
+    width: 38px;
+    height: 28px;
+    min-width: 38px;
+    min-height: 28px;
+    border-radius: 5px;
+    margin-right: 7px;
+  }
+  .post-title-row {
+    gap: 7px;
+  }
+}
+
+/* 세로로 바꾸는 breakpoint 조정 (기존보다 넓게 적용) */
+@media (max-width: 700px) {
+  .post-card.pro {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    min-height: 54px;
+    font-size: 0.96rem;
+  }
+  .post-content-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 4px;
+  }
+  .post-meta-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+    margin-left: 7px;
+    font-size: 0.96rem;
+    min-width: 0;
+  }
+  .post-stats-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 4px;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+  .post-title-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+  }
+}
+
+/* 완전 좁은 화면 (썸네일 오른쪽 배치) */
+@media (max-width: 520px) {
+  .post-card.pro {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 5px;
+    font-size: 0.92rem;
+    min-height: 44px;
+    padding-left: 1vw;
+    padding-right: 1vw;
+  }
+  .post-thumb {
+    order: 2;
+    margin-right: 0;
+    margin-left: 7px;
+  }
+  .post-content-wrap {
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+  }
+  .post-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    margin-left: 3px;
+    min-width: 0;
+  }
+  .post-title-row {
+    gap: 3px;
+    font-size: 1.01rem;
+  }
+}
 /* ---- 페이지네이션 ---- */
 .pagination-bar {
   display: flex;

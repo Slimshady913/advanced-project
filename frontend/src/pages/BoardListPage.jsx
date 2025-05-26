@@ -10,7 +10,7 @@ function BoardListPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ----- 상태 -----
+  // 상태
   const [categories, setCategories] = useState([]);
   const [posts, setPosts] = useState([]);
   const [count, setCount] = useState(0);
@@ -20,7 +20,7 @@ function BoardListPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ----- URL 쿼리 파싱 (새로고침시 page/search 유지) -----
+  // URL 쿼리 파싱 (새로고침시 page/search 유지)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const pageParam = parseInt(params.get('page') || '1', 10);
@@ -30,10 +30,10 @@ function BoardListPage() {
     setSearchType(typeParam);
     setSearchInput(params.get('search') || '');
     setSearch(params.get('search') || '');
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   }, [location.search]);
 
-  // ----- 카테고리 불러오기 -----
+  // 카테고리 불러오기
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
       const data = Array.isArray(res.data) ? res.data
@@ -42,7 +42,7 @@ function BoardListPage() {
     });
   }, []);
 
-  // ----- 게시글 목록 불러오기 -----
+  // 게시글 목록 불러오기
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     let url = `/board/posts/?`;
@@ -66,7 +66,7 @@ function BoardListPage() {
       });
   }, [categorySlug, location.search]);
 
-  // ----- 카테고리/탭 데이터 방어 -----
+  // 카테고리/탭 데이터 방어
   const categoriesArr = Array.isArray(categories) ? categories : [];
   const saleCategory = categoriesArr.find(cat => cat.slug === 'sale');
   const customTabs = [
@@ -75,23 +75,23 @@ function BoardListPage() {
     ...(saleCategory ? [] : [{ slug: 'sale', name: '핫딜' }]),
   ];
 
-  // ----- 카테고리 변경 -----
+  // 카테고리 변경
   const handleCategoryClick = slug => {
     navigate(`/community/${slug}`);
   };
 
-  // ----- 글쓰기 -----
+  // 글쓰기
   const isLoggedIn = !!localStorage.getItem('access');
   const handleWriteClick = () => {
     navigate(`/community/write?category=${encodeURIComponent(categorySlug || 'hot')}`);
   };
 
-  // ----- 게시글 상세 이동 -----
+  // 게시글 상세 이동
   const handlePostClick = postId => {
     navigate(`/community/${categorySlug || 'hot'}/${postId}`);
   };
 
-  // ----- 검색 실행 -----
+  // 검색 실행
   const handleSearch = (e) => {
     e && e.preventDefault();
     const params = new URLSearchParams();
@@ -103,7 +103,7 @@ function BoardListPage() {
     navigate(`/community/${categorySlug || 'hot'}?${params.toString()}`);
   };
 
-  // ----- 페이지네이션 -----
+  // 페이지네이션
   const PAGE_SIZE = 20;
   const totalPages = Math.ceil(count / PAGE_SIZE);
   const pageArr = [];
@@ -191,6 +191,7 @@ function BoardListPage() {
                     className="post-card pro"
                     onClick={() => handlePostClick(post.id)}
                   >
+                    {/* 썸네일 */}
                     <div className="post-thumb">
                       {post.thumbnail_url ? (
                         <img
@@ -205,27 +206,30 @@ function BoardListPage() {
                         </div>
                       )}
                     </div>
-                    <div className="post-title-row">
-                      <span className="post-category">[{post.category_name}]</span>
-                      <h3 className="post-title">{post.title}</h3>
-                    </div>
-                    <div className="post-meta-row">
-                      <span className="post-user">{post.user?.username || post.user}</span>
-                      <span className="post-date">{formatDate(post.created_at)}</span>
-                    </div>
-                    <div className="post-stats-row">
-                      <span className="stat">
-                        <FaThumbsUp className="icon like" /> {post.like_count}
-                      </span>
-                      <span className="stat">
-                        <FaThumbsDown className="icon dislike" /> {post.dislike_count}
-                      </span>
-                      <span className="stat">
-                        <FaComment className="icon comment" /> {post.comment_count}
-                      </span>
-                      <span className="stat">
-                        <FaEye className="icon view" /> {post.view_count}
-                      </span>
+                    {/* 내용 전체 래핑 */}
+                    <div className="post-content-wrap">
+                      <div className="post-title-row">
+                        <span className="post-category">[{post.category_name}]</span>
+                        <h3 className="post-title">{post.title}</h3>
+                      </div>
+                      <div className="post-meta-row">
+                        <span className="post-user">{post.user?.username || post.user}</span>
+                        <span className="post-date">{formatDate(post.created_at)}</span>
+                      </div>
+                      <div className="post-stats-row">
+                        <span className="stat">
+                          <FaThumbsUp className="icon like" /> {post.like_count}
+                        </span>
+                        <span className="stat">
+                          <FaThumbsDown className="icon dislike" /> {post.dislike_count}
+                        </span>
+                        <span className="stat">
+                          <FaComment className="icon comment" /> {post.comment_count}
+                        </span>
+                        <span className="stat">
+                          <FaEye className="icon view" /> {post.view_count}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))
