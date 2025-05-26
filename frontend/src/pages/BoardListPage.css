@@ -416,6 +416,34 @@ body {
   background: linear-gradient(90deg, #006cff 80%, #1c368c 100%);
   transform: translateY(-1.5px) scale(1.04);
 }
+
+/* 검색+글쓰기 한 줄 배치 */
+.search-write-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-left: 42px;
+  padding-right: 42px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 900px) {
+  .search-write-row {
+    padding-left: 4vw;
+    padding-right: 4vw;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+@media (max-width: 600px) {
+  .search-write-row {
+    padding-left: 2vw;
+    padding-right: 2vw;
+  }
+}
+
 @media (max-width: 900px) {
   .board-search-bar { padding-left: 4vw; }
 }

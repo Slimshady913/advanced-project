@@ -36,7 +36,6 @@ function BoardListPage() {
   // ----- 카테고리 불러오기 -----
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
-      // 방어: 배열 형태만 저장
       const data = Array.isArray(res.data) ? res.data
                 : (Array.isArray(res.data.results) ? res.data.results : []);
       setCategories(data);
@@ -105,7 +104,7 @@ function BoardListPage() {
   };
 
   // ----- 페이지네이션 -----
-  const PAGE_SIZE = 20; // settings.py와 맞춰주세요!
+  const PAGE_SIZE = 20;
   const totalPages = Math.ceil(count / PAGE_SIZE);
   const pageArr = [];
   let start = Math.max(1, page - 2);
@@ -148,36 +147,37 @@ function BoardListPage() {
                 </button>
               ))}
             </div>
-            {/* 검색바 */}
-            <form className="board-search-bar" onSubmit={handleSearch}>
-              <select value={searchType} onChange={e => setSearchType(e.target.value)}>
-                <option value="title">제목</option>
-                <option value="title_content">제목+내용</option>
-                <option value="user">작성자</option>
-              </select>
-              <input
-                type="text"
-                value={searchInput}
-                onChange={e => setSearchInput(e.target.value)}
-                placeholder="검색어 입력"
-              />
-              <button type="submit" className="search-btn">
-                <FaSearch />
+            {/* ✅ 검색바 + 글쓰기 한 줄 배치 */}
+            <div className="search-write-row">
+              <form className="board-search-bar" onSubmit={handleSearch}>
+                <select value={searchType} onChange={e => setSearchType(e.target.value)}>
+                  <option value="title">제목</option>
+                  <option value="title_content">제목+내용</option>
+                  <option value="user">작성자</option>
+                </select>
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={e => setSearchInput(e.target.value)}
+                  placeholder="검색어 입력"
+                />
+                <button type="submit" className="search-btn">
+                  <FaSearch />
+                </button>
+              </form>
+              <button
+                className="write-button pro"
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    navigate('/auth');
+                  } else {
+                    handleWriteClick();
+                  }
+                }}
+              >
+                글쓰기
               </button>
-            </form>
-            {/* 글쓰기 버튼 */}
-            <button
-              className="write-button pro"
-              onClick={() => {
-                if (!isLoggedIn) {
-                  navigate('/auth');
-                } else {
-                  handleWriteClick();
-                }
-              }}
-            >
-              글쓰기
-            </button>
+            </div>
             {/* 게시글 목록 */}
             <div className="post-list pro">
               {loading ? (
@@ -269,7 +269,7 @@ function BoardListPage() {
             </nav>
           </div>
         </main>
-        {/* 오른쪽 광고 (통합검색 삭제됨) */}
+        {/* 오른쪽 광고 */}
         <aside className="ad-right">
           <div className="ad-fixed">
             <div className="ad-banner">광고A</div>
