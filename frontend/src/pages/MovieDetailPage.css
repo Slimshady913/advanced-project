@@ -61,6 +61,7 @@
   font-size: 1.15rem;
   color: #61dafb;
   font-weight: 700;
+  padding-left: 10px;
   letter-spacing: 0.01em;
   padding-bottom: 15px; /* 제목 아래 간격을 추가 */
 }
@@ -71,6 +72,8 @@
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
   gap: 24px 44px;      /* 행, 열 간격 */
   align-items: center;
+  padding-left: 10px;
+  padding-top: 10px; 
   padding-bottom: 6px;
   padding-right: 15px;  /* 텍스트가 짤리지 않도록 컨테이너 오른쪽 여백 추가 */
 }
@@ -81,7 +84,7 @@
   align-items: center;
   gap: 16px;
   min-width: 0;
-  max-width: 280px;    /* 긴 텍스트를 위한 넓이 조정 */
+  max-width: 300px;    /* 긴 텍스트를 위한 넓이 조정 */
   padding: 7px 0;
   justify-content: flex-start; /* 텍스트 정렬 */
 }
@@ -134,12 +137,14 @@
   display: flex;
   align-items: center;
   text-decoration: none;
+  max-width: 100%; /* 너비를 화면에 맞게 100%로 설정 */
+  overflow-wrap: break-word; /* 긴 단어가 있을 경우 자동 줄바꿈 */
 }
 
 /* Coupang Play/Apple TV+ 등 두 단어는 강제 줄바꿈 */
 .ott-name {
-  max-width: 150px; /* 긴 이름을 위한 최대 너비 설정 */
-  overflow-wrap: anywhere;
+  max-width: 100%; /* 긴 이름을 위한 최대 너비 설정 */
+  overflow-wrap: break-word; /* 긴 단어가 있을 경우 자동 줄바꿈 */
 }
 
 /* (7) OTT 비활성화(링크X) */
