@@ -201,9 +201,7 @@ function BoardListPage() {
                           onError={e => { e.target.style.display = 'none'; }}
                         />
                       ) : (
-                        <div className="post-thumb-icon">
-                          <FaImage />
-                        </div>
+                        <div className="post-thumb-icon">📄</div>
                       )}
                     </div>
                     {/* 내용 전체 래핑 */}
