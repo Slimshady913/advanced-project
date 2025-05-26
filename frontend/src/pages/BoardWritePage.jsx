@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './BoardWritePage.css';
 import { validatePostInput } from '../utils/validatePost';
 
@@ -11,13 +11,29 @@ function BoardWritePage() {
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // 쿼리스트링에서 category(slug) 읽기
+  const params = new URLSearchParams(location.search);
+  const categorySlugFromQuery = params.get('category'); // 예: "movie_kr"
 
   useEffect(() => {
     // 카테고리 목록 불러오기
     axios.get('/board/categories/').then(res => {
       setCategories(res.data);
-      if (res.data.length > 0) setCategory(res.data[0].id); // 기본값 첫 카테고리
+
+      // 카테고리 쿼리스트링(slug)와 일치하는 id 찾기
+      if (categorySlugFromQuery) {
+        const matched = res.data.find(cat => cat.slug === categorySlugFromQuery);
+        if (matched) {
+          setCategory(matched.id); // id로 set
+          return;
+        }
+      }
+      // 없으면 첫 번째 카테고리
+      if (res.data.length > 0) setCategory(res.data[0].id);
     });
+    // eslint-disable-next-line
   }, []);
 
   const handleSubmit = async (e) => {
