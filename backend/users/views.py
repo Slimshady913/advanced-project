@@ -9,10 +9,11 @@ from ott.models import OTT
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from rest_framework.permissions import AllowAny
 
 # ✅ 회원가입 API 클래스
 class RegisterView(APIView):
+    permission_classes = [AllowAny]
     @swagger_auto_schema(
         operation_summary="회원가입",
         operation_description="email, username, password를 입력하여 회원가입을 진행합니다.",
