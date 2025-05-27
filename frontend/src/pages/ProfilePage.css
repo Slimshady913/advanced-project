@@ -1,117 +1,141 @@
-/* 👤 프로필 페이지 전체 레이아웃 */
+/* 👤 전체 페이지 레이아웃 */
 .profile-page {
   background-color: #141414;
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 2rem 1rem;
+  align-items: flex-start;
+  padding: 80px 20px;
   color: white;
+  font-family: 'Helvetica Neue', 'Roboto', sans-serif;
 }
 
-/* 📦 프로필 컨테이너 (중앙 정렬된 카드) */
+/* 📦 중앙 카드 */
 .profile-container {
   width: 100%;
-  max-width: 800px;
+  max-width: 660px;
+  background: rgba(24, 24, 24, 0.95);
+  border-radius: 16px;
+  padding: 48px 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
 }
 
-/* 🧾 제목 (👤 + 텍스트) */
+/* 🧾 제목 */
 .profile-container h2 {
-  display: flex;
-  align-items: center;
-  font-size: 1.5rem;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  border-left: 4px solid #e50914;
+  padding-left: 12px;
 }
 
-.profile-container h2::before {
-  content: '👤';
-  font-size: 1.5rem;
-}
-
-/* 🏷️ 입력 필드 라벨 */
+/* 📧 이메일 + 입력 라벨 */
 .profile-container label {
   display: block;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
+  margin: 1.4rem 0 0.6rem;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  color: #ccc;
 }
 
-/* ✏️ 텍스트 입력 필드 */
+/* ✏️ 닉네임 입력창 */
 .profile-container input {
-  padding: 0.6rem;
-  font-size: 1rem;
-  border-radius: 6px;
+  padding: 0.85rem 1.1rem;        /* 높이 적절하게 조정 */
+  font-size: 1.05rem;             /* 크기 조정 */
+  font-weight: 500;               /* 일반적 강조 */
+  border-radius: 8px;
   border: none;
   width: 100%;
-  background-color: #fff;
-  color: black;
+  background-color: #f1f1f1;
+  color: #111;
+  box-sizing: border-box;
+  margin-bottom: 0.6rem;
 }
-
-/* 📺 OTT 구독 리스트 그리드 */
+/* 📺 OTT 목록 */
 .ott-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
   margin-top: 1rem;
 }
 
-/* 🎞️ 각 OTT 아이템 카드 */
+/* 🎞️ OTT 항목 */
 .ott-item {
-  background-color: #222;
-  padding: 0.8rem;
-  border-radius: 8px;
+  background-color: #1f1f1f;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  transition: transform 0.2s ease, border 0.2s ease, background-color 0.2s ease;
+  border: 2px solid transparent;
   cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
 .ott-item:hover {
-  background-color: #333;
+  transform: scale(1.03);
+  background-color: #292929;
 }
 
-/* ✅ 체크박스 커스터마이징 */
-.ott-item input {
+/* ✅ 체크박스 */
+.ott-item input[type="checkbox"] {
   transform: scale(1.2);
   accent-color: #e50914;
+  margin-right: 0.4rem;
 }
 
 /* 🖼️ OTT 로고 */
 .ott-item img {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
   object-fit: cover;
+  transition: outline 0.2s ease;
+}
+
+.ott-item input[type="checkbox"]:checked + img {
+  outline: 2px solid #e50914;
+  outline-offset: 3px;
 }
 
 /* 🏷️ OTT 이름 텍스트 */
 .ott-item span {
   font-size: 0.95rem;
   color: white;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100px;
 }
 
 /* 💾 저장 버튼 */
 .save-btn {
-  margin-top: 2rem;
+  margin-top: 2.8rem;
   background-color: #e50914;
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 6px;
+  padding: 0.85rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: bold;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.25s ease, transform 0.2s ease;
+  width: 100%;
 }
 
 .save-btn:hover {
   background-color: #c40812;
+  transform: translateY(-1px);
 }
 
-/* ✅ 저장 완료 메시지 */
+/* ✅ 메시지 */
 .save-message {
-  margin-top: 1rem;
+  margin-top: 1.2rem;
   font-size: 0.95rem;
-  color: #ccc;
+  color: #aaaaaa;
+  text-align: center;
 }
