@@ -4,117 +4,96 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #141414; /* 넷플릭스 다크 배경 */
+  background-color: #141414;
 }
 
 /* 🔳 로그인/회원가입 박스 스타일 */
 .auth-box {
   background-color: rgba(0, 0, 0, 0.75);
   padding: 3rem;
-  border-radius: 8px;
-  width: 320px;
+  border-radius: 12px;
+  width: 380px; /* ✅ 사이즈 키움 */
   text-align: center;
   box-sizing: border-box;
 }
 
-/* 🔤 제목 스타일 (로그인 / 회원가입) */
+/* 🔤 제목 */
 .auth-box h2 {
   color: white;
   margin-bottom: 2rem;
-  letter-spacing: -0.5px;
+  font-size: 1.6rem;
+  font-weight: 700;
 }
 
-/* 🧾 입력 필드 스타일 */
+/* 🧾 입력 필드 */
 .auth-box input {
   width: 100%;
-  padding: 0.75rem;
-  margin: 0.5rem 0;
+  padding: 1rem; /* ✅ 키움 */
+  margin: 0.6rem 0;
   background: #333;
   border: none;
   color: white;
-  font-size: 1rem;
-  border-radius: 4px;
+  font-size: 1.05rem;
+  border-radius: 6px;
   box-sizing: border-box;
-  outline: none;
-  transition: background 0.2s;
 }
 
 .auth-box input:focus {
   background: #444;
 }
 
-/* 🔘 로그인 / 회원가입 버튼 */
+/* 🔘 버튼 (로그인/가입) */
 .auth-box button {
   width: 100%;
-  padding: 0.75rem;
-  background-color: #e50914; /* 넷플릭스 레드 */
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background-color: #e50914;
   color: white;
-  font-weight: bold;
-  font-size: 1rem;
   border: none;
-  margin-top: 1rem;
-  margin-bottom: 0;
-  border-radius: 4px;
+  border-radius: 8px; /* ✅ 둥글게 */
   cursor: pointer;
-  transition: background 0.18s;
+  margin-top: 1rem;
+  margin-bottom: 0.8rem;
+  transition: background 0.2s ease;
 }
 
-.auth-box button:hover,
-.auth-box button:focus {
+.auth-box button:hover {
   background-color: #b0060f;
 }
 
-/* ❗ 에러 메시지 출력 개선 */
+/* ❗ 에러 메시지 */
 .error-message {
-  color: #e50914;         /* 빨간 글씨 */
-  background: none;       /* 배경 없음 */
-  padding: 0.4rem 0.2rem;
-  margin-top: 1rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  animation: fadeIn 0.3s ease-out;
-  width: 100%;
-  text-align: center;     /* ⬅️ 중앙 정렬 */
-  line-height: 1.6;
-  letter-spacing: -0.3px;
+  color: #e50914;
+  font-size: 0.92rem;
+  margin: 0 auto 1rem auto;
+  text-align: center;
   word-break: keep-all;
-  box-sizing: border-box;
-  box-shadow: none;
-}
-
-/* 버튼 아래 에러 메시지 간격 확보 */
-.auth-box button + .error-message {
-  margin-top: 1rem !important;
-}
-
-/* 에러 메시지 애니메이션 */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  line-height: 1.5;
+  width: 100%;
 }
 
 /* 🔁 로그인/회원가입 모드 전환 텍스트 */
 .toggle-text {
-  margin-top: 1.7rem;
+  margin-top: 0.2rem;
   color: #ccc;
-  font-size: 0.97rem;
-  line-height: 1.8;
+  font-size: 0.93rem;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .toggle-text span {
   color: #e50914;
   cursor: pointer;
   font-weight: bold;
-  transition: color 0.2s;
 }
 
-.toggle-text span:hover,
-.toggle-text span:focus {
+.toggle-text span:hover {
   color: #fff;
   text-decoration: underline;
 }
 
-/* 🔄 전체화면 로딩 스피너 (로그인/회원가입 처리 중) */
+/* 🔄 전체화면 로딩 스피너 */
 .fullscreen-loading {
   position: fixed;
   top: 0;
@@ -143,11 +122,29 @@
   100% { opacity: 1; }
 }
 
-/* ✅ 모바일 대응 (320~480px 너비에서 자연스럽게) */
+/* 📱 모바일 대응 */
 @media (max-width: 480px) {
   .auth-box {
-    width: 96vw;
-    min-width: 0;
-    padding: 2rem 1rem;
+    width: 90vw;
+    padding: 2rem 1.3rem;
+  }
+
+  .auth-box h2 {
+    font-size: 1.4rem;
+  }
+
+  .auth-box input {
+    font-size: 0.95rem;
+    padding: 0.9rem;
+  }
+
+  .auth-box button {
+    font-size: 1rem;
+    padding: 0.9rem;
+  }
+
+  .toggle-text,
+  .error-message {
+    font-size: 0.85rem;
   }
 }
