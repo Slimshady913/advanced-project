@@ -9,15 +9,34 @@ import './SubscribePage.css';
  * - 저장 후 메인 페이지로 이동
  */
 const SubscribePage = () => {
-  const [ottList, setOttList] = useState([]);
+  const [ottList, setOttList] = useState([]);          // 항상 배열!
   const [selectedOtts, setSelectedOtts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   // OTT 목록 불러오기
   useEffect(() => {
     axios.get('/ott/')
-      .then(res => setOttList(res.data))
-      .catch(err => console.error('OTT 목록 불러오기 실패:', err));
+      .then(res => {
+        // 배열인지 확인, DRF라면 res.data가 배열이어야 정상!
+        let data = res.data;
+        if (data && Array.isArray(data)) {
+          setOttList(data);
+        } else if (data && Array.isArray(data.results)) {
+          // 혹시 pagination API라면
+          setOttList(data.results);
+        } else {
+          setOttList([]);   // 잘못된 구조
+        }
+        setError('');
+      })
+      .catch(err => {
+        setOttList([]);
+        setError('OTT 목록 불러오기 실패');
+        console.error('OTT 목록 불러오기 실패:', err);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   // 선택된 OTT 토글 (체크박스)
@@ -47,25 +66,37 @@ const SubscribePage = () => {
             <p className="desc">
               구독 중인 OTT가 없다면 선택하지 않고 &lsquo;저장하기&rsquo;를 눌러도 됩니다.
             </p>
-            <div className="ott-list">
-              {ottList.map(ott => (
-                <label key={ott.id} className={`ott-item${selectedOtts.includes(ott.id) ? ' selected' : ''}`}>
-                  <input
-                    type="checkbox"
-                    checked={selectedOtts.includes(ott.id)}
-                    onChange={() => toggleOtt(ott.id)}
-                  />
-                  <img src={ott.logo_url} alt={ott.name} />
-                  <span>{ott.name}</span>
-                </label>
-              ))}
-            </div>
+            {loading ? (
+              <div className="ott-loading">OTT 목록을 불러오는 중...</div>
+            ) : error ? (
+              <div className="ott-error">{error}</div>
+            ) : (
+              <div className="ott-list">
+                {Array.isArray(ottList) && ottList.length > 0 ? (
+                  ottList.map(ott => (
+                    <label
+                      key={ott.id}
+                      className={`ott-item${selectedOtts.includes(ott.id) ? ' selected' : ''}`}>
+                      <input
+                        type="checkbox"
+                        checked={selectedOtts.includes(ott.id)}
+                        onChange={() => toggleOtt(ott.id)}
+                      />
+                      <img src={ott.logo_url} alt={ott.name} />
+                      <span>{ott.name}</span>
+                    </label>
+                  ))
+                ) : (
+                  <div className="ott-empty">등록된 OTT가 없습니다.</div>
+                )}
+              </div>
+            )}
             <button onClick={handleSubmit} className="save-btn">저장하기</button>
           </div>
         </div>
       </div>
-      </div>
-    );
-  };
-  
-  export default SubscribePage;
+    </div>
+  );
+};
+
+export default SubscribePage;
