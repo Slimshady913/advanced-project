@@ -218,8 +218,13 @@
 
 /* 댓글 입력폼 */
 .commentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 19px;
+  position: relative;
 }
+
 .commentForm textarea {
   width: 100%;
   min-height: 74px;
@@ -229,15 +234,17 @@
   background: #212637;
   border: 1.5px solid #263048;
   color: #d2ecfc;
-  margin-bottom: 7px;
   resize: vertical;
   transition: border 0.12s;
+  box-sizing: border-box;
 }
+
 .commentForm textarea:focus {
   border: 1.7px solid #00aeef;
 }
+
 .commentForm button {
-  float: right;
+  align-self: flex-end; /* 오른쪽 정렬 */
   padding: 8px 22px;
   background: linear-gradient(90deg, #00AEEF, #0062f5);
   color: #fff;
@@ -249,6 +256,7 @@
   box-shadow: 0 2px 9px rgba(0,174,239,0.07);
   transition: background 0.14s, transform 0.12s;
 }
+
 .commentForm button:hover {
   background: linear-gradient(90deg, #0094cc, #0053c4);
   transform: translateY(-1.5px) scale(1.03);
