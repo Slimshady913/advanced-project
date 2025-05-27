@@ -31,7 +31,7 @@ class UserManager(BaseUserManager):
 # ✅ 사용자 모델 정의
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)                     # 로그인 ID로 사용할 이메일
-    username = models.CharField(max_length=30)                 # 사용자 이름 또는 닉네임
+    username = models.CharField(max_length=30, unique=True)                # 사용자 이름 또는 닉네임
     is_active = models.BooleanField(default=True)              # 탈퇴 여부
     is_staff = models.BooleanField(default=False)              # 관리자 권한 여부 (admin site 접근)
 

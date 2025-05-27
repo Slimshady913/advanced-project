@@ -24,6 +24,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             },
         }
 
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("이미 사용 중인 사용자명입니다.")
+        return value
+
     def create(self, validated_data):
         """
         유효성 검사를 마친 데이터로 새 사용자를 생성합니다.
