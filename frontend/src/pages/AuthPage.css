@@ -14,12 +14,14 @@
   border-radius: 8px;
   width: 320px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 /* 🔤 제목 스타일 (로그인 / 회원가입) */
 .auth-box h2 {
   color: white;
   margin-bottom: 2rem;
+  letter-spacing: -0.5px;
 }
 
 /* 🧾 입력 필드 스타일 */
@@ -31,6 +33,14 @@
   border: none;
   color: white;
   font-size: 1rem;
+  border-radius: 4px;
+  box-sizing: border-box;
+  outline: none;
+  transition: background 0.2s;
+}
+
+.auth-box input:focus {
+  background: #444;
 }
 
 /* 🔘 로그인 / 회원가입 버튼 */
@@ -43,27 +53,65 @@
   font-size: 1rem;
   border: none;
   margin-top: 1rem;
+  margin-bottom: 0;
+  border-radius: 4px;
   cursor: pointer;
+  transition: background 0.18s;
+}
+
+.auth-box button:hover,
+.auth-box button:focus {
+  background-color: #b0060f;
+}
+
+/* ❗ 에러 메시지 출력 개선 */
+.error-message {
+  color: #e50914;         /* 빨간 글씨 */
+  background: none;       /* 배경 없음 */
+  padding: 0.4rem 0.2rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-out;
+  width: 100%;
+  text-align: center;     /* ⬅️ 중앙 정렬 */
+  line-height: 1.6;
+  letter-spacing: -0.3px;
+  word-break: keep-all;
+  box-sizing: border-box;
+  box-shadow: none;
+}
+
+/* 버튼 아래 에러 메시지 간격 확보 */
+.auth-box button + .error-message {
+  margin-top: 1rem !important;
+}
+
+/* 에러 메시지 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* 🔁 로그인/회원가입 모드 전환 텍스트 */
 .toggle-text {
-  margin-top: 1rem;
+  margin-top: 1.7rem;
   color: #ccc;
-  font-size: 0.9rem;
+  font-size: 0.97rem;
+  line-height: 1.8;
 }
 
 .toggle-text span {
   color: #e50914;
   cursor: pointer;
   font-weight: bold;
+  transition: color 0.2s;
 }
 
-/* ❗ 에러 메시지 출력 */
-.error-message {
-  color: red;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+.toggle-text span:hover,
+.toggle-text span:focus {
+  color: #fff;
+  text-decoration: underline;
 }
 
 /* 🔄 전체화면 로딩 스피너 (로그인/회원가입 처리 중) */
@@ -89,9 +137,17 @@
   animation: blink 1.2s infinite;
 }
 
-/* ✨ 로딩 텍스트 깜빡임 효과 */
 @keyframes blink {
   0%   { opacity: 1; }
   50%  { opacity: 0.4; }
   100% { opacity: 1; }
+}
+
+/* ✅ 모바일 대응 (320~480px 너비에서 자연스럽게) */
+@media (max-width: 480px) {
+  .auth-box {
+    width: 96vw;
+    min-width: 0;
+    padding: 2rem 1rem;
+  }
 }
