@@ -11,9 +11,11 @@ from .models import Movie
 from .serializers import MovieSerializer
 from .filters import MovieFilter
 from django.db.models import Count
+from config.authentication import CookieJWTAuthentication
 
 # ✅ 영화 목록 조회 (정렬 가능)
 class MovieListView(generics.ListAPIView):
+    authentication_classes = [CookieJWTAuthentication] 
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [filters.OrderingFilter]
@@ -47,6 +49,7 @@ class MovieListView(generics.ListAPIView):
 
 # ✅ 영화 등록
 class MovieCreateView(generics.CreateAPIView):
+    authentication_classes = [CookieJWTAuthentication] 
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticated]
 
@@ -85,6 +88,7 @@ class MovieCreateView(generics.CreateAPIView):
 
 # ✅ 영화 상세 조회
 class MovieDetailView(generics.RetrieveAPIView):
+    authentication_classes = [CookieJWTAuthentication] 
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -103,6 +107,7 @@ class MovieDetailView(generics.RetrieveAPIView):
 # ✅ 영화 수정 및 삭제
 class MovieDetailEditDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Movie.objects.all()
+    authentication_classes = [CookieJWTAuthentication] 
     serializer_class = MovieSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -125,6 +130,7 @@ class MovieDetailEditDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 # ✅ 영화 검색 (제목 검색 + OTT 필터)
 class MovieSearchView(ListAPIView):
+    authentication_classes = [CookieJWTAuthentication] 
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter] 

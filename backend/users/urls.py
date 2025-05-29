@@ -1,16 +1,15 @@
 from django.urls import path
-from .views import RegisterView, ProfileView, subscribe_ott, update_profile
+from .views import (
+    RegisterView, ProfileView, subscribe_ott, update_profile,
+    CookieTokenObtainPairView, LogoutView, CookieTokenRefreshView  # ✅ 추가
+)
 
 urlpatterns = [
-    # ✅ 회원가입: POST 요청 (이메일, 사용자명, 비밀번호 입력)
     path('register/', RegisterView.as_view(), name='register'),
-
-    # ✅ 사용자 프로필 조회: GET 요청 (로그인 필수)
+    path('login/', CookieTokenObtainPairView.as_view(), name='login'),  # ✅ 로그인 (쿠키 발급)
+    path('logout/', LogoutView.as_view(), name='logout'),  # ✅ 로그아웃 (쿠키 삭제)
+    path('token/refresh/', CookieTokenRefreshView.as_view(), name='token_refresh'),
     path('profile/', ProfileView.as_view(), name='profile'),
-
-    # ✅ OTT 구독 설정: POST 요청 (로그인 필수, ott_ids 배열 입력)
     path('subscribe/', subscribe_ott, name='subscribe-ott'), 
-
-    # ✅ 사용자 프로필 수정: PUT 요청 (로그인 필수, 이메일, 사용자명 수정)
-     path('update/', update_profile),  # ✅ 추가된 부분 , name='update-profile'),  # 사용자 프로필 수정 API 추가
+    path('update/', update_profile, name='update-profile'),
 ]

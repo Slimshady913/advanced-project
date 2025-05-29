@@ -132,13 +132,17 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True  # 개발 단계에서는 허용
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3002",  # ✅ 프론트엔드 포트에 맞게 설정
+    "http://localhost:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'config.authentication.CookieJWTAuthentication',  # 수정된 위치 기준
     ),
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -171,8 +175,20 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "AUTH_HEADER_TYPES": ("Bearer",),
+
+    "AUTH_COOKIE": "access_token",  # 쿠키 이름
+    "AUTH_COOKIE_REFRESH": "refresh_token",
+    "AUTH_COOKIE_HTTP_ONLY": True,  # XSS 방지용
+    "AUTH_COOKIE_SECURE": False,    # HTTPS만 허용할지 여부 (배포 시 True 권장)
+    "AUTH_COOKIE_PATH": "/",
+    "AUTH_COOKIE_SAMESITE": "Lax",  # 또는 "Strict" / "None"
 }
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3002",
+]
 

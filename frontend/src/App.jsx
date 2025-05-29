@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
 import Header from './components/Header.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import PrivateRoute from './routes/PrivateRoute.jsx';
@@ -15,69 +14,54 @@ import BoardWritePage from './pages/BoardWritePage.jsx';
 import BoardDetailPage from './pages/BoardDetailPage.jsx';
 import BoardEditPage from './pages/BoardEditPage.jsx';
 
-/**
- * App: 루트 컴포넌트
- * - 로그인 상태 체크 및 헤더 렌더링
- * - 라우트 구성: 로그인, 영화 목록/상세, 리뷰, 프로필, 구독 설정
- */
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null); // ✅ 초기 상태를 null로 설정
   const [userEmail, setUserEmail] = useState('');
   const [username, setUsername] = useState(null);
   const [authReady, setAuthReady] = useState(false);
 
-  // 🔐 JWT 토큰 기반 사용자 인증 상태 초기화
+  // ✅ 쿠키 기반 사용자 인증 상태 확인
   const initializeAuth = async () => {
-    const token = localStorage.getItem('access');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setIsLoggedIn(true);
-        setUserEmail(decoded.email);
-        // 토큰에 username이 있으면 즉시 세팅, 없으면 서버에서 fetch
-        if (decoded.username) {
-          setUsername(decoded.username);
-        } else {
-          const res = await axios.get('/users/profile/');
-          setUsername(res.data.username);
-        }
-      } catch {
-        setIsLoggedIn(false);
-        setUserEmail('');
-        setUsername(null);
-      }
-    } else {
-      setIsLoggedIn(false);
+    try {
+      const res = await axios.get('/users/profile/');
+      setIsLoggedIn(true);
+      setUserEmail(res.data.email);
+      setUsername(res.data.username);
+    } catch {
+      setIsLoggedIn(false); // ❗ 인증 실패는 로그인 안 된 정상 상태
       setUserEmail('');
       setUsername(null);
+    } finally {
+      setAuthReady(true);
     }
-    setAuthReady(true);
   };
 
   useEffect(() => {
-    initializeAuth();
-    // 의존성 없이, 앱 최초 마운트시 한 번만 실행
+    initializeAuth(); // 앱 최초 마운트 시 실행
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('/users/logout/');
+    } catch (e) {
+      // 이미 로그아웃 상태일 수 있음
+    }
+    setIsLoggedIn(false);
+    setUserEmail('');
+    setUsername(null);
+  };
 
   return (
     <Router>
-      {/* 📌 헤더는 authReady 이후부터 렌더링 */}
       {authReady && (
         <Header
           isLoggedIn={isLoggedIn}
           userEmail={userEmail}
           username={username}
-          onLogout={() => {
-            localStorage.removeItem('access');
-            localStorage.removeItem('refresh');
-            setIsLoggedIn(false);
-            setUserEmail('');
-            setUsername(null);
-          }}
+          onLogout={handleLogout}
         />
       )}
 
-      {/* ⏳ 초기 인증 상태 확인 중일 때 로딩 표시 */}
       {!authReady ? (
         <div style={{
           height: '100vh',
@@ -93,14 +77,12 @@ function App() {
         </div>
       ) : (
         <Routes>
-          {/* 🏠 공개: 메인 영화 페이지 */}
           <Route path="/" element={<MoviesPage isLoggedIn={isLoggedIn} />} />
 
-          {/* 🔐 보호: 리뷰 전용 테스트 페이지 */}
           <Route
             path="/reviews"
             element={
-              <PrivateRoute isLoggedIn={isLoggedIn}>
+              <PrivateRoute isLoggedIn={isLoggedIn} authReady={authReady}>
                 <div style={{ padding: '2rem', color: 'white' }}>
                   📝 리뷰 페이지입니다 (로그인한 사용자만 볼 수 있습니다)
                 </div>
@@ -108,31 +90,25 @@ function App() {
             }
           />
 
-          {/* 🔑 로그인/회원가입 페이지 */}
           <Route path="/auth" element={<AuthPage onLoginSuccess={initializeAuth} />} />
-
-          {/* 🎞️ 영화 상세 페이지 */}
           <Route path="/movies/:id" element={<MovieDetailPage />} />
-
-          {/* 📺 OTT 구독 설정 페이지 */}
           <Route path="/subscribe" element={<SubscribePage />} />
 
-          {/* 👤 사용자 프로필 페이지 */}
           <Route
             path="/profile"
             element={
-              <PrivateRoute isLoggedIn={isLoggedIn}>
+              <PrivateRoute isLoggedIn={isLoggedIn} authReady={authReady}>
                 <ProfilePage setGlobalUsername={setUsername} />
               </PrivateRoute>
             }
           />
-          {/* 🗣️ 커뮤니티 게시판 */}
+
           <Route path="/community" element={<Navigate to="/community/hot" replace />} />
           <Route path="/community/:category" element={<BoardListPage />} />
           <Route
             path="/community/write"
             element={
-              <PrivateRoute isLoggedIn={isLoggedIn}>
+              <PrivateRoute isLoggedIn={isLoggedIn} authReady={authReady}>
                 <BoardWritePage />
               </PrivateRoute>
             }
@@ -140,12 +116,11 @@ function App() {
           <Route
             path="/community/edit/:id"
             element={
-              <PrivateRoute isLoggedIn={isLoggedIn}>
+              <PrivateRoute isLoggedIn={isLoggedIn} authReady={authReady}>
                 <BoardEditPage />
               </PrivateRoute>
             }
           />
-          {/* 상세 페이지 라우팅 예시 (추가/선택) */}
           <Route path="/community/:category/:id" element={<BoardDetailPage />} />
         </Routes>
       )}

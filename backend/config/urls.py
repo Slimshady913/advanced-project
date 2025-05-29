@@ -3,6 +3,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from users.views import CookieTokenObtainPairView
+
 # ✅ Django REST Framework 권한 설정
 from rest_framework import permissions
 
@@ -42,7 +44,7 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
     # JWT 인증 API
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),      # 로그인
+    path('api/token/', CookieTokenObtainPairView.as_view(), name='token_obtain_pair'),      # 로그인
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),      # 토큰 재발급
 
     # 앱별 API 라우팅

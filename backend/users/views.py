@@ -2,18 +2,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.views import TokenRefreshView
 from .serializers import RegisterSerializer
 from ott.models import OTT
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from rest_framework.permissions import AllowAny
+
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 # ✅ 회원가입 API 클래스
 class RegisterView(APIView):
     permission_classes = [AllowAny]
+
     @swagger_auto_schema(
         operation_summary="회원가입",
         operation_description="email, username, password를 입력하여 회원가입을 진행합니다.",
@@ -34,6 +37,72 @@ class RegisterView(APIView):
             serializer.save()
             return Response({"message": "회원가입 성공!"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ✅ 로그인 시 JWT를 HttpOnly 쿠키에 설정
+class CookieTokenObtainPairView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            access = response.data.get("access")
+            refresh = response.data.get("refresh")
+
+            # ✅ 새 Response 객체 생성
+            res = Response({"message": "로그인 성공"}, status=status.HTTP_200_OK)
+
+            res.set_cookie(
+                key="access_token",
+                value=access,
+                httponly=True,
+                samesite="Lax",
+                secure=False,  # ✅ 개발환경에서 반드시 False
+                max_age=300
+            )
+            res.set_cookie(
+                key="refresh_token",
+                value=refresh,
+                httponly=True,
+                samesite="Lax",
+                secure=False,
+                max_age=86400
+            )
+
+            return res  # ✅ 꼭 이 새 res 리턴
+
+        return response
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get("refresh_token")
+        if not refresh_token:
+            return Response({"detail": "No refresh token provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data={"refresh": refresh_token})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except InvalidToken as e:
+            return Response({"detail": "Refresh token is invalid or expired"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+    
+# ✅ 로그아웃 (쿠키 삭제)
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="로그아웃",
+        operation_description="access, refresh 토큰 쿠키를 삭제하여 로그아웃합니다.",
+        responses={200: openapi.Response(description="로그아웃 성공")}
+    )
+    def post(self, request):
+        res = Response({"message": "로그아웃 완료"}, status=200)
+        res.delete_cookie("access_token")
+        res.delete_cookie("refresh_token")
+        return res
 
 
 # ✅ 로그인한 사용자의 프로필 조회
@@ -103,6 +172,7 @@ def subscribe_ott(request):
     user = request.user
     user.subscribed_ott.set(ott_ids)
     return Response({'message': '구독 정보가 갱신되었습니다.'})
+
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
