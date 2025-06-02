@@ -115,10 +115,10 @@ function BoardDetailPage() {
     .slice(0, 3).map(c => c.id);
 
   // ★ 로그인 체크(예시, props나 context 등으로 대체 가능)
-  const isLoggedIn = !!document.cookie.match(/access_token=/);
+  const isLoggedIn = !!localStorage.getItem('username');
   // 혹은 App 등에서 내려받는 username을 활용 가능
   // (아래 username 변수 예시)
-  const username = null; // (최상위에서 받아온다면 반영!)
+  const username = localStorage.getItem('username');
 
   // ---------- 모든 인증 요청에서 headers 제거! ----------
   const handlePostLike = async (isLike) => {

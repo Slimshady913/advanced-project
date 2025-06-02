@@ -5,7 +5,11 @@ import './BoardListPage.css';
 import { formatDate } from '../utils/formatDate';
 import { FaThumbsUp, FaThumbsDown, FaComment, FaEye, FaImage, FaSearch } from 'react-icons/fa';
 
-function BoardListPage() {
+/**
+ * 커뮤니티 게시글 목록 페이지
+ * - App에서 isLoggedIn, username을 props로 전달받음
+ */
+function BoardListPage({ isLoggedIn, username }) {
   const { category: categorySlug } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -81,7 +85,6 @@ function BoardListPage() {
   };
 
   // 글쓰기
-  const isLoggedIn = !!localStorage.getItem('access');
   const handleWriteClick = () => {
     navigate(`/community/write?category=${encodeURIComponent(categorySlug || 'hot')}`);
   };
