@@ -67,22 +67,17 @@ function BoardWritePage() {
       return;
     }
     try {
-      const token = localStorage.getItem('access');
       const formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
       formData.append('category', category);
       media.forEach(file => formData.append('media', file)); // 여러 파일 지원 (백엔드 지원 필요)
 
+      // ✅ Authorization 헤더 제거, 쿠키 기반 인증만 사용!
       await axios.post(
         '/board/posts/',
         formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       setTitle('');
       setContent('');
