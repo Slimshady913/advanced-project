@@ -43,13 +43,10 @@ function BoardEditPage() {
       return;
     }
     try {
-      const token = localStorage.getItem('access');
+      // ✅ Authorization 헤더/토큰 없이, 쿠키 기반 인증만 사용!
       await axios.put(
         `/board/posts/${id}/`,
-        { title, content, category },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { title, content, category }
       );
       navigate(`/community/${category}/${id}`);
     } catch (err) {

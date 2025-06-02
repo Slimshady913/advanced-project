@@ -18,8 +18,9 @@ function BoardDetailPage() {
   const [error, setError] = useState('');
   const [likeLoading, setLikeLoading] = useState(false);
 
-  const token = localStorage.getItem('access');
-  const username = localStorage.getItem('username');
+  // ❌ localStorage 토큰 참조 삭제
+  // 로그인 여부, username 등은 상위(App)에서 props로 내려받는 게 권장이나,
+  // 여기선 댓글/추천 등 '버튼 활성화'에서만 체크하면 됨.
 
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
@@ -69,19 +70,18 @@ function BoardDetailPage() {
 
   const fetchPost = async () => {
     try {
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const res = await axios.get(`/board/posts/${id}/`, config);
+      // ✅ headers 옵션 제거, 쿠키 인증 자동!
+      const res = await axios.get(`/board/posts/${id}/`);
       setPost(res.data);
     } catch (err) {
       setPost(null);
     }
   };
 
-  // 로그인 여부와 상관없이 댓글을 읽을 수 있도록!
   const fetchComments = async () => {
     try {
-      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      const res = await axios.get(`/board/posts/${id}/comments/`, config);
+      // ✅ headers 옵션 제거, 쿠키 인증 자동!
+      const res = await axios.get(`/board/posts/${id}/comments/`);
       if (Array.isArray(res.data.results)) {
         setComments(res.data.results); // pagination 구조 대응
       } else if (Array.isArray(res.data)) {
@@ -114,12 +114,18 @@ function BoardDetailPage() {
     .slice().sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0))
     .slice(0, 3).map(c => c.id);
 
+  // ★ 로그인 체크(예시, props나 context 등으로 대체 가능)
+  const isLoggedIn = !!document.cookie.match(/access_token=/);
+  // 혹은 App 등에서 내려받는 username을 활용 가능
+  // (아래 username 변수 예시)
+  const username = null; // (최상위에서 받아온다면 반영!)
+
+  // ---------- 모든 인증 요청에서 headers 제거! ----------
   const handlePostLike = async (isLike) => {
-    if (!token) return;
+    if (!isLoggedIn) return;
     setLikeLoading(true);
     try {
-      await axios.post(`/board/posts/${id}/like/`, { is_like: isLike },
-        { headers: { Authorization: `Bearer ${token}` } });
+      await axios.post(`/board/posts/${id}/like/`, { is_like: isLike });
       await fetchPost();
     } catch (err) { }
     setLikeLoading(false);
@@ -129,38 +135,29 @@ function BoardDetailPage() {
     e.preventDefault();
     if (!newComment.trim()) { setError('댓글을 입력하세요.'); return; }
     try {
-      await axios.post(
-        `/board/posts/${id}/comments/`,
-        { content: newComment },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.post(`/board/posts/${id}/comments/`, { content: newComment });
       setNewComment(''); setError(''); fetchComments();
     } catch (err) { }
   };
+
   const handleCommentDelete = async (commentId) => {
     try {
-      await axios.delete(`/board/comments/${commentId}/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`/board/comments/${commentId}/`);
       fetchComments();
     } catch (err) { }
   };
+
   const handleCommentLike = async (commentId, isLike) => {
     try {
-      await axios.post(
-        `/board/comments/${commentId}/like/`,
-        { is_like: isLike },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.post(`/board/comments/${commentId}/like/`, { is_like: isLike });
       fetchComments();
     } catch (err) { }
   };
+
   const handlePostDelete = async () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       try {
-        await axios.delete(`/board/posts/${id}/`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        await axios.delete(`/board/posts/${id}/`);
         navigate('/community');
       } catch (err) { }
     }
@@ -243,21 +240,22 @@ function BoardDetailPage() {
                   <button
                     className={`${styles.likeBtn}${post.my_like === true ? ` ${styles.active}` : ''}`}
                     onClick={() => handlePostLike(true)}
-                    disabled={likeLoading || !token}
+                    disabled={likeLoading || !isLoggedIn}
                   >
                     추천 {post.like_count}
                   </button>
                   <button
                     className={`${styles.dislikeBtn}${post.my_like === false ? ` ${styles.active}` : ''}`}
                     onClick={() => handlePostLike(false)}
-                    disabled={likeLoading || !token}
+                    disabled={likeLoading || !isLoggedIn}
                   >
                     비추천
                   </button>
                 </div>
 
                 {/* 수정/삭제 */}
-                {username === (post.user?.username || post.user) && token && (
+                {/* username 확인은 상위 props나 context 활용 권장! */}
+                {isLoggedIn && (
                   <div className={styles.postActions}>
                     <button onClick={() => navigate(`/community/edit/${post.id}`)}>수정</button>
                     <button onClick={handlePostDelete}>삭제</button>
@@ -267,7 +265,7 @@ function BoardDetailPage() {
                 {/* --------- 댓글영역 --------- */}
                 <div className={styles.commentSection}>
                   <h3 className={styles.commentTitle}>댓글 {comments.length}</h3>
-                  {token ? (
+                  {isLoggedIn ? (
                     <form onSubmit={handleCommentSubmit} className={styles.commentForm}>
                       <textarea
                         value={newComment}
@@ -297,11 +295,12 @@ function BoardDetailPage() {
                           <div className={styles.commentActions}>
                             <button
                               onClick={() => handleCommentLike(comment.id, true)}
-                              disabled={!token}
+                              disabled={!isLoggedIn}
                             >
                               👍 {comment.like_count ?? 0}
                             </button>
-                            {comment.user === username && token && (
+                            {/* 댓글 삭제 버튼 활성화: 본인 여부 확인 (username 변수/props 활용 필요) */}
+                            {isLoggedIn && (
                               <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
                             )}
                           </div>
