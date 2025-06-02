@@ -13,6 +13,9 @@ const MoviesPage = ({ isLoggedIn }) => {
   const [search, setSearch] = useState('');
   const [ordering, setOrdering] = useState('');
   const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
   const navigate = useNavigate();
   const ottDropdownRef = useRef();
 
@@ -31,7 +34,6 @@ const MoviesPage = ({ isLoggedIn }) => {
   useEffect(() => {
     axios.get('/ott/')
       .then(res => {
-        // 방어: 항상 배열 보장
         const data = Array.isArray(res.data) ? res.data
           : (Array.isArray(res.data.results) ? res.data.results : []);
         setOttList(data);
@@ -56,28 +58,38 @@ const MoviesPage = ({ isLoggedIn }) => {
     }
   }, [isLoggedIn]);
 
-  // 영화 목록 불러오기
+  // 페이지, 검색어, 필터, 정렬이 변경될 때마다 영화 목록 불러오기
   useEffect(() => {
-    let url = '/movies/search/?';
-    if (search) url += `search=${search}&`;
+    let url = `/movies/search/?page=${page}&`;
+    if (search) url += `search=${encodeURIComponent(search)}&`;
     if (selectedOtts.length > 0) url += `ott_services=${selectedOtts.join(',')}&`;
     if (ordering) url += `ordering=${ordering}&`;
 
     axios.get(url)
       .then(res => {
-        // 결과가 배열 또는 {results:[]} 구조 모두 대응
-        setMovies(Array.isArray(res.data) ? res.data : (res.data.results || []));
+        // DRF 페이징 구조에 맞춰서 처리
+        setMovies(res.data.results || []);
         setError('');
+        setHasNextPage(!!res.data.next);
+        setHasPrevPage(!!res.data.previous);
       })
-      .catch(() => setError('영화 목록을 불러오는 데 실패했습니다.'));
+      .catch(() => {
+        setError('영화 목록을 불러오는 데 실패했습니다.');
+        setMovies([]);
+        setHasNextPage(false);
+        setHasPrevPage(false);
+      });
+  }, [search, selectedOtts, ordering, page]);
+
+  // 검색어, 필터, 정렬 변경 시 페이지 1로 초기화
+  useEffect(() => {
+    setPage(1);
   }, [search, selectedOtts, ordering]);
 
-  // ottList가 항상 배열로!
   const ottArr = Array.isArray(ottList) ? ottList : [];
   const subscribedOttObjs = ottArr.filter(ott => subscribedOtts.includes(ott.id));
   const otherOttObjs = ottArr.filter(ott => !subscribedOtts.includes(ott.id));
 
-  // 드롭다운 버튼용 텍스트
   const ottButtonText = selectedOtts.length === 0
     ? 'OTT 전체'
     : ottArr.filter(ott => selectedOtts.includes(ott.id)).map(ott => ott.name).join(', ');
@@ -93,14 +105,8 @@ const MoviesPage = ({ isLoggedIn }) => {
           onChange={e => setSearchInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && setSearch(searchInput)}
         />
-        <button
-          onClick={() => setSearch(searchInput)}
-          className="search-button"
-        >
-          검색
-        </button>
+        <button onClick={() => setSearch(searchInput)} className="search-button">검색</button>
 
-        {/* OTT 필터 드롭다운 */}
         <div className="ott-dropdown-wrapper" ref={ottDropdownRef}>
           <button
             className="ott-dropdown-btn"
@@ -119,7 +125,7 @@ const MoviesPage = ({ isLoggedIn }) => {
                 />
                 전체
               </label>
-              {/* 구독중인 OTT 그룹 */}
+
               {isLoggedIn && subscribedOttObjs.length > 0 && (
                 <div className="ott-dropdown-group">
                   <div className="dropdown-group-title">구독중인 OTT</div>
@@ -142,12 +148,10 @@ const MoviesPage = ({ isLoggedIn }) => {
                   ))}
                 </div>
               )}
-              {/* 기타 OTT 그룹 */}
+
               {otherOttObjs.length > 0 && (
                 <div className="ott-dropdown-group">
-                  {isLoggedIn && subscribedOttObjs.length > 0 && (
-                    <div className="dropdown-group-title">기타 OTT</div>
-                  )}
+                  {isLoggedIn && subscribedOttObjs.length > 0 && <div className="dropdown-group-title">기타 OTT</div>}
                   {otherOttObjs.map(item => (
                     <label className="ott-checkbox" key={item.id}>
                       <input
@@ -167,6 +171,7 @@ const MoviesPage = ({ isLoggedIn }) => {
                   ))}
                 </div>
               )}
+
               <button
                 type="button"
                 className="ott-reset-btn"
@@ -178,7 +183,6 @@ const MoviesPage = ({ isLoggedIn }) => {
           )}
         </div>
 
-        {/* 정렬 드롭다운 */}
         <select value={ordering} onChange={e => setOrdering(e.target.value)}>
           <option value="">정렬 없음</option>
           <option value="-release_date">최신순</option>
@@ -189,14 +193,11 @@ const MoviesPage = ({ isLoggedIn }) => {
           <option value="title">제목순</option>
         </select>
       </div>
-      {/* 에러 메시지 */}
+
       {error && (
-        <p style={{ color: '#e50914', textAlign: 'center', marginBottom: '1rem' }}>
-          {error}
-        </p>
+        <p style={{ color: '#e50914', textAlign: 'center', marginBottom: '1rem' }}>{error}</p>
       )}
 
-      {/* 영화 카드 그리드 */}
       <div className="movies-grid">
         {movies.map(movie => (
           <div
@@ -205,10 +206,7 @@ const MoviesPage = ({ isLoggedIn }) => {
             onClick={() => navigate(`/movies/${movie.id}`)}
           >
             <div className="poster-container">
-              <img
-                src={movie.thumbnail_url}
-                alt={movie.title}
-              />
+              <img src={movie.thumbnail_url} alt={movie.title} />
             </div>
             <div className="movie-info">
               <h3>{movie.title}</h3>
@@ -246,6 +244,25 @@ const MoviesPage = ({ isLoggedIn }) => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* 페이징 버튼 */}
+      <div className="pagination-controls" style={{ textAlign: 'center', margin: '1.5rem 0' }}>
+        <button
+          disabled={!hasPrevPage}
+          onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+          style={{ marginRight: 12 }}
+        >
+          이전
+        </button>
+        <span>페이지 {page}</span>
+        <button
+          disabled={!hasNextPage}
+          onClick={() => setPage(prev => prev + 1)}
+          style={{ marginLeft: 12 }}
+        >
+          다음
+        </button>
       </div>
     </div>
   );

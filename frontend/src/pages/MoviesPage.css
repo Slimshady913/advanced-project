@@ -143,7 +143,7 @@ html, body {
   background: var(--accent); border-color: var(--accent); color: #fff;
 }
 
-/* ───── 카드 그리드/카드 등 이하 동일 ───── */
+/* ───── 카드 그리드/카드 ───── */
 .movies-grid {
   max-width: 1200px; margin: 0 auto;
   display: grid;
@@ -192,7 +192,7 @@ html, body {
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* 전체 채우기 */
   margin: 0;
   display: block;
 }
@@ -245,4 +245,40 @@ html, body {
 @media (max-width: 420px) {
   .movies-grid { gap: 0.5rem !important; }
   .movie-card { max-width: 99vw; }
+}
+
+/* ───── 페이징 버튼 ───── */
+.pagination-controls {
+  text-align: center;
+  margin: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+.pagination-controls button {
+  background-color: var(--accent);
+  color: var(--text-light);
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1.1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.pagination-controls button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+.pagination-controls button:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+}
+.pagination-controls span {
+  font-size: 1rem;
+  color: var(--text-light);
+  font-weight: 700;
+  min-width: 80px;
+  text-align: center;
+  user-select: none;
 }
