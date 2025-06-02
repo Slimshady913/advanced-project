@@ -104,9 +104,10 @@ function BoardDetailPage({ isLoggedIn, username }) {
     navigate(`/community/${categorySlug}/${postId}`);
   };
 
-  const topCommentIds = comments
-    .slice().sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0))
-    .slice(0, 3).map(c => c.id);
+  // 💡 BEST 댓글 판정: 상위 3개 & 추천수 10 이상만!
+  const bestCommentIds = comments
+    .filter((comment, idx) => idx < 3 && (comment.like_count ?? 0) >= 10)
+    .map(c => c.id);
 
   const handlePostLike = async (isLike) => {
     if (!isLoggedIn) return;
@@ -265,14 +266,14 @@ function BoardDetailPage({ isLoggedIn, username }) {
                   {error && <p className={styles.errorMessage}>{error}</p>}
                   <div className={styles.commentList}>
                     {comments.map(comment => {
-                      const isTop = topCommentIds.includes(comment.id);
+                      const isBest = bestCommentIds.includes(comment.id);
                       return (
                         <div
                           key={comment.id}
-                          className={`${styles.commentItem}${isTop ? ` ${styles.best}` : ''}`}
+                          className={`${styles.commentItem}${isBest ? ` ${styles.best}` : ''}`}
                         >
                           <div className={styles.commentHead}>
-                            {isTop && <span className={styles.bestBadge}>BEST</span>}
+                            {isBest && <span className={styles.bestBadge}>BEST</span>}
                             <span className={styles.commentUser}>{comment.user}</span>
                             <span className={styles.commentDate}>{formatDate(comment.created_at)}</span>
                           </div>
