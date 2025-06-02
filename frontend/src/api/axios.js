@@ -15,14 +15,14 @@ instance.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
+        // ✅ Refresh 토큰이 쿠키에 남아 있다면 자동 갱신 요청
         await instance.post('/users/token/refresh/');
         return instance(originalRequest);
       } catch {
-        // ✅ 리디렉션 제거: 단순히 인증 실패 처리만 하고 끝냄
+        // Refresh도 만료된 경우
         return Promise.reject(error);
       }
     }
-
     return Promise.reject(error);
   }
 );
