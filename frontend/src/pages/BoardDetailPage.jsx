@@ -6,7 +6,6 @@ import './BoardListPage.css';
 import { formatDate } from '../utils/formatDate';
 import { FaThumbsUp, FaThumbsDown, FaComment, FaEye, FaImage } from 'react-icons/fa';
 
-// 👇 반드시 props로 isLoggedIn, username을 받습니다!
 function BoardDetailPage({ isLoggedIn, username }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -109,7 +108,6 @@ function BoardDetailPage({ isLoggedIn, username }) {
     .slice().sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0))
     .slice(0, 3).map(c => c.id);
 
-  // ---------- 모든 인증 요청에서 headers 제거! ----------
   const handlePostLike = async (isLike) => {
     if (!isLoggedIn) return;
     setLikeLoading(true);
@@ -167,7 +165,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
         <main className="board-center">
           <div className={styles.detailContainer}>
             {/* 카테고리 탭 */}
-            <div className="category-tabs pro" style={{marginTop:28}}>
+            <div className="category-tabs pro" style={{ marginTop: 28 }}>
               {customTabs.map(cat => (
                 <button
                   key={cat.slug}
@@ -179,9 +177,9 @@ function BoardDetailPage({ isLoggedIn, username }) {
               ))}
             </div>
 
-            {/* 상단 정보 */}
             {post && (
               <>
+                {/* 상단 정보 */}
                 <div className={styles.headerRow}>
                   <span className={styles.categoryTag}>{post.category_name || post.category}</span>
                   <div className={styles.titleText}>{post.title}</div>
@@ -196,15 +194,14 @@ function BoardDetailPage({ isLoggedIn, username }) {
                   <span className={styles.writerName}>{post.user?.username || post.user}</span>
                   <span className={styles.writeDate}>{formatDate(post.created_at)}</span>
                 </div>
-
                 {/* 본문 */}
                 <div className={styles.content}>
                   {post.thumbnail_url && (
-                    <div style={{marginBottom: "18px"}}>
+                    <div style={{ marginBottom: "18px" }}>
                       <img
                         src={post.thumbnail_url}
                         alt="썸네일"
-                        style={{maxWidth: "320px", width: "100%", borderRadius: "11px", display: "block"}}
+                        style={{ maxWidth: "320px", width: "100%", borderRadius: "11px", display: "block" }}
                         onError={e => { e.target.style.display = 'none'; }}
                       />
                     </div>
@@ -238,7 +235,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
                     onClick={() => handlePostLike(false)}
                     disabled={likeLoading || !isLoggedIn}
                   >
-                    비추천
+                    비추천 {post.dislike_count}
                   </button>
                 </div>
 
@@ -287,7 +284,6 @@ function BoardDetailPage({ isLoggedIn, username }) {
                             >
                               👍 {comment.like_count ?? 0}
                             </button>
-                            {/* 댓글 삭제 버튼 활성화: 본인 여부 확인 (username 변수/props 활용 필요) */}
                             {isLoggedIn && username === comment.user && (
                               <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
                             )}
@@ -298,7 +294,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
                   </div>
                 </div>
 
-                {/* 최신글 미리보기 */}
+                {/* ------- 최신글 미리보기: BoardListPage 스타일 통일 ------- */}
                 <div style={{ marginTop: 46 }}>
                   <div style={{
                     fontWeight: 900, fontSize: '1.13rem', color: '#53a7ff',
@@ -314,8 +310,8 @@ function BoardDetailPage({ isLoggedIn, username }) {
                           key={rp.id}
                           className="post-card pro"
                           onClick={() => handleRelatedPostClick(rp.id)}
-                          style={{ cursor: 'pointer', borderRadius: 12, background: 'none' }}
                         >
+                          {/* 썸네일 */}
                           <div className="post-thumb">
                             {rp.thumbnail_url ? (
                               <img
@@ -325,33 +321,36 @@ function BoardDetailPage({ isLoggedIn, username }) {
                                 onError={e => { e.target.style.display = 'none'; }}
                               />
                             ) : (
-                              <div className="post-thumb-icon"><FaImage /></div>
+                              <div className="post-thumb-icon">📄</div>
                             )}
                           </div>
-                          <div className="post-title-row">
-                            <span className="post-category">[{rp.category_name}]</span>
-                            <h3 className="post-title">{rp.title}</h3>
-                          </div>
-                          <div className="post-meta-row">
-                            <span className="post-user">{rp.user?.username || rp.user}</span>
-                            <span className="post-date">{formatDate(rp.created_at)}</span>
-                          </div>
-                          <div className="post-stats-row">
-                            <span className="stat">
-                              <FaThumbsUp className="icon like" /> {rp.like_count}
-                            </span>
-                            <span className="stat">
-                              <FaThumbsDown className="icon dislike" /> {rp.dislike_count}
-                            </span>
-                            <span className="stat">
-                              <FaComment className="icon comment" /> {rp.comment_count}
-                            </span>
-                            <span className="stat">
-                              <FaEye className="icon view" /> {rp.view_count}
-                            </span>
+                          {/* 내용 전체 래핑 */}
+                          <div className="post-content-wrap">
+                            <div className="post-title-row">
+                              <span className="post-category">[{rp.category_name}]</span>
+                              <h3 className="post-title">{rp.title}</h3>
+                            </div>
+                            <div className="post-meta-row">
+                              <span className="post-user">{rp.user?.username || rp.user}</span>
+                              <span className="post-date">{formatDate(rp.created_at)}</span>
+                            </div>
+                            <div className="post-stats-row">
+                              <span className="stat">
+                                <FaThumbsUp className="icon like" /> {rp.like_count}
+                              </span>
+                              <span className="stat">
+                                <FaThumbsDown className="icon dislike" /> {rp.dislike_count}
+                              </span>
+                              <span className="stat">
+                                <FaComment className="icon comment" /> {rp.comment_count}
+                              </span>
+                              <span className="stat">
+                                <FaEye className="icon view" /> {rp.view_count}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               </>
