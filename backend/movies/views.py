@@ -130,7 +130,7 @@ class MovieDetailEditDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
 # ✅ 영화 검색 (제목 검색 + OTT 필터)
 class MovieSearchView(ListAPIView):
-    authentication_classes = [CookieJWTAuthentication] 
+    authentication_classes = [CookieJWTAuthentication]
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     filter_backends = [SearchFilter, DjangoFilterBackend, OrderingFilter] 

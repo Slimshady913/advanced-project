@@ -5,25 +5,52 @@ services:
     build:
       context: ./backend
     container_name: django-backend
-    command: /entrypoint.sh
+    command: /entrypoint.sh  # 필요시 entrypoint 스크립트 실행
     volumes:
-      - ./backend:/app
+      - ./backend:/app  # 로컬 백엔드 디렉토리를 컨테이너에 마운트
+      - ./backend/static:/app/static  # 정적 파일을 수집할 디렉토리 마운트
     ports:
-      - "8000:8000"
+      - "8000:8000"  # Django API를 8000번 포트로 매핑
     env_file:
       - ./backend/.env
     depends_on:
-      - db
+      - db  # DB가 먼저 시작된 후 백엔드가 시작
+    networks:
+      - app-network
+    environment:
+      - STATIC_ROOT=/app/static  # 정적 파일을 저장할 경로 설정
+
+  frontend:
+    build:
+      context: ./frontend  # Dockerfile이 위치한 디렉토리에서 빌드
+    container_name: react-frontend
+    command: npm start  # React 개발 서버 시작
+    volumes:
+      - ./frontend:/app  # 로컬 프론트엔드 디렉토리를 컨테이너에 마운트
+    ports:
+      - "3000:3000"  # React 개발 서버 포트
+    depends_on:
+      - backend  # 프론트엔드는 백엔드가 시작된 후 실행
+    networks:
+      - app-network
+    environment:
+      - CHOKIDAR_USEPOLLING=true  # 파일 시스템 감시 모드 설정
 
   db:
     image: postgres:14
     container_name: postgres-db
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data/  # DB 데이터 지속성을 위한 볼륨
     environment:
       POSTGRES_DB: mydb
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+
+networks:
+  app-network:
+    driver: bridge  # 프론트엔드와 백엔드가 통신할 수 있도록 네트워크 설정
