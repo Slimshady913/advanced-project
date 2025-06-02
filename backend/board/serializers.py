@@ -62,7 +62,7 @@ class BoardCategorySerializer(serializers.ModelSerializer):
 # 댓글 시리얼라이저
 class BoardCommentSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
-
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = BoardComment
         fields = ['id', 'post', 'user', 'content', 'created_at']
