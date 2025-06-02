@@ -63,9 +63,29 @@ class BoardCategorySerializer(serializers.ModelSerializer):
 class BoardCommentSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     post = serializers.PrimaryKeyRelatedField(read_only=True)
+    like_count = serializers.SerializerMethodField()
+    dislike_count = serializers.SerializerMethodField()
+    my_like = serializers.SerializerMethodField()
+
     class Meta:
         model = BoardComment
-        fields = ['id', 'post', 'user', 'content', 'created_at']
+        fields = [
+            'id', 'post', 'user', 'content', 'created_at',
+            'like_count', 'dislike_count', 'my_like'
+        ]
+
+    def get_like_count(self, obj):
+        return obj.likes.filter(is_like=True).count()
+
+    def get_dislike_count(self, obj):
+        return obj.likes.filter(is_like=False).count()
+
+    def get_my_like(self, obj):
+        user = self.context.get('request').user
+        if user and user.is_authenticated:
+            like = obj.likes.filter(user=user).first()
+            return like.is_like if like else None
+        return None
 
 # 게시글 좋아요/비추천 시리얼라이저
 class BoardPostLikeSerializer(serializers.ModelSerializer):
@@ -78,3 +98,8 @@ class BoardCommentLikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardCommentLike
         fields = ['id', 'user', 'comment', 'is_like', 'created_at']
+
+        def get_serializer_context(self):
+            context = super().get_serializer_context()
+            context.update({"request": self.request})
+            return context

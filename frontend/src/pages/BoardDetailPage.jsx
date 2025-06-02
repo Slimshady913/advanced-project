@@ -279,10 +279,18 @@ function BoardDetailPage({ isLoggedIn, username }) {
                           <div className={styles.commentBody}>{comment.content}</div>
                           <div className={styles.commentActions}>
                             <button
+                              className={comment.my_like === true ? "active" : ""}
                               onClick={() => handleCommentLike(comment.id, true)}
                               disabled={!isLoggedIn}
                             >
                               👍 {comment.like_count ?? 0}
+                            </button>
+                            <button
+                              className={comment.my_like === false ? "active" : ""}
+                              onClick={() => handleCommentLike(comment.id, false)}
+                              disabled={!isLoggedIn}
+                            >
+                              👎 {comment.dislike_count ?? 0}
                             </button>
                             {isLoggedIn && username === comment.user && (
                               <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>

@@ -112,7 +112,13 @@ class BoardCommentListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         post_id = self.kwargs['post_id']
-        top_comments = BoardComment.objects.filter(post_id=post_id).annotate(like_count=models.Count('likes')).order_by('-like_count')[:3]
+        top_comments = BoardComment.objects.filter(
+    post_id=post_id
+).annotate(
+    like_count=models.Count('likes', filter=Q(likes__is_like=True))
+).filter(
+    like_count__gte=10        # 추천수 10개 이상
+).order_by('-like_count')[:3]
         other_comments = BoardComment.objects.filter(post_id=post_id).exclude(id__in=top_comments).order_by('created_at')
         return top_comments | other_comments
 
