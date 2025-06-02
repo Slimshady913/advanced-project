@@ -1,6 +1,7 @@
 # =====================
 # Python (Django 백엔드)
 # =====================
+
 # 가상환경
 venv/
 ENV/
@@ -19,7 +20,7 @@ db.sqlite3
 # Django 마이그레이션 캐시
 */migrations/__pycache__/
 
-# 환경 설정
+# 환경 설정 파일
 .env
 .env.*
 
@@ -34,6 +35,7 @@ htmlcov/
 # =====================
 # React (프론트엔드)
 # =====================
+
 frontend/node_modules/
 frontend/build/
 frontend/.env
