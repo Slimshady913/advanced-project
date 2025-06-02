@@ -3,29 +3,29 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../api/axios';
 import './AuthPage.css';
 import { ClipLoader } from 'react-spinners';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 function AuthPage({ onLoginSuccess }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 로그인/회원가입 모드 전환
   const [mode, setMode] = useState(location.state?.mode === 'register' ? 'register' : 'login');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(''); // 추가: 캡챠 토큰 상태
 
-  // 페이지 전환 시 모드 리셋
   useEffect(() => {
     const nextMode = location.state?.mode;
     if (nextMode === 'register' || nextMode === 'login') {
       setMode(nextMode);
       setErrorMessage('');
+      setCaptchaToken(''); // 모드 바뀌면 캡챠 리셋
     }
   }, [location.key]);
 
-  // 로그인/회원가입 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
@@ -34,12 +34,16 @@ function AuthPage({ onLoginSuccess }) {
     try {
       if (mode === 'login') {
         await axios.post('/users/login/', { email, password });
-        // ✅ 서버가 쿠키(HttpOnly)로 JWT 세팅, 별도 토큰 저장 없음
         onLoginSuccess?.();
         navigate('/');
       } else {
-        await axios.post('/users/register/', { email, username, password });
-        // 회원가입 성공 후 바로 자동 로그인 (쿠키 세팅)
+        // 회원가입 시 캡챠 토큰 반드시 첨부
+        if (!captchaToken) {
+          setErrorMessage('로봇이 아님을 인증해주세요.');
+          setLoading(false);
+          return;
+        }
+        await axios.post('/users/register/', { email, username, password, captcha: captchaToken });
         await axios.post('/users/login/', { email, password });
         onLoginSuccess?.();
         navigate('/subscribe');
@@ -47,9 +51,9 @@ function AuthPage({ onLoginSuccess }) {
       setEmail('');
       setUsername('');
       setPassword('');
+      setCaptchaToken('');
     } catch (err) {
       let message = mode === 'login' ? '로그인에 실패하였습니다.' : '회원가입에 실패하였습니다.';
-      // 에러 메시지 파싱
       if (err.response?.data?.email) {
         if (err.response.data.email[0].includes('already exists')) {
           message = '이미 사용 중인 이메일입니다.';
@@ -64,6 +68,8 @@ function AuthPage({ onLoginSuccess }) {
         }
       } else if (err.response?.data?.password) {
         message = err.response.data.password[0];
+      } else if (err.response?.data?.captcha) {
+        message = '로봇이 아님을 인증해주세요.'; // 서버에서 캡챠 실패 반환시
       } else if (err.response?.data?.detail) {
         message = err.response.data.detail;
       }
@@ -111,6 +117,16 @@ function AuthPage({ onLoginSuccess }) {
           required
         />
 
+        {/* 회원가입 모드에서만 캡챠 노출 */}
+        {mode === 'register' && (
+          <div style={{ margin: '18px 0 10px' }}>
+            <ReCAPTCHA
+              sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+              onChange={setCaptchaToken}
+            />
+          </div>
+        )}
+
         <button type="submit">{mode === 'login' ? '로그인' : '가입하기'}</button>
 
         {errorMessage && typeof errorMessage === 'string' && errorMessage.trim() !== '' && (
@@ -124,6 +140,7 @@ function AuthPage({ onLoginSuccess }) {
               const nextMode = mode === 'login' ? 'register' : 'login';
               setMode(nextMode);
               setErrorMessage('');
+              setCaptchaToken(''); // 전환 시 캡챠도 리셋
               navigate('/auth', { state: { mode: nextMode } });
             }}
           >

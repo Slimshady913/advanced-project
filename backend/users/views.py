@@ -13,6 +13,20 @@ from drf_yasg import openapi
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+import requests
+from django.conf import settings
+
+def verify_recaptcha(token):
+    url = 'https://www.google.com/recaptcha/api/siteverify'
+    params = {
+        'secret': settings.RECAPTCHA_SECRET_KEY,
+        'response': token,
+    }
+    print("==== reCAPTCHA SECRET_KEY:", settings.RECAPTCHA_SECRET_KEY)
+    r = requests.post(url, data=params)
+    print("==== reCAPTCHA 응답:", r.json())
+    return r.json().get('success', False)
+
 # ✅ 회원가입 API 클래스
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -32,6 +46,12 @@ class RegisterView(APIView):
         responses={201: openapi.Response(description="회원가입 성공")}
     )
     def post(self, request):
+        # 1. 프론트에서 보낸 캡챠 토큰 추출
+        captcha_token = request.data.get('captcha')
+        if not captcha_token or not verify_recaptcha(captcha_token):
+            return Response({'captcha': '로봇이 아님을 인증해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 2. 이후 기존 회원가입 로직
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
