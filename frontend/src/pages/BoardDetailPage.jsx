@@ -6,7 +6,8 @@ import './BoardListPage.css';
 import { formatDate } from '../utils/formatDate';
 import { FaThumbsUp, FaThumbsDown, FaComment, FaEye, FaImage } from 'react-icons/fa';
 
-function BoardDetailPage() {
+// 👇 반드시 props로 isLoggedIn, username을 받습니다!
+function BoardDetailPage({ isLoggedIn, username }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -17,10 +18,6 @@ function BoardDetailPage() {
   const [newComment, setNewComment] = useState('');
   const [error, setError] = useState('');
   const [likeLoading, setLikeLoading] = useState(false);
-
-  // ❌ localStorage 토큰 참조 삭제
-  // 로그인 여부, username 등은 상위(App)에서 props로 내려받는 게 권장이나,
-  // 여기선 댓글/추천 등 '버튼 활성화'에서만 체크하면 됨.
 
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
@@ -70,7 +67,6 @@ function BoardDetailPage() {
 
   const fetchPost = async () => {
     try {
-      // ✅ headers 옵션 제거, 쿠키 인증 자동!
       const res = await axios.get(`/board/posts/${id}/`);
       setPost(res.data);
     } catch (err) {
@@ -80,10 +76,9 @@ function BoardDetailPage() {
 
   const fetchComments = async () => {
     try {
-      // ✅ headers 옵션 제거, 쿠키 인증 자동!
       const res = await axios.get(`/board/posts/${id}/comments/`);
       if (Array.isArray(res.data.results)) {
-        setComments(res.data.results); // pagination 구조 대응
+        setComments(res.data.results);
       } else if (Array.isArray(res.data)) {
         setComments(res.data);
       } else {
@@ -113,12 +108,6 @@ function BoardDetailPage() {
   const topCommentIds = comments
     .slice().sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0))
     .slice(0, 3).map(c => c.id);
-
-  // ★ 로그인 체크(예시, props나 context 등으로 대체 가능)
-  const isLoggedIn = !!localStorage.getItem('username');
-  // 혹은 App 등에서 내려받는 username을 활용 가능
-  // (아래 username 변수 예시)
-  const username = localStorage.getItem('username');
 
   // ---------- 모든 인증 요청에서 headers 제거! ----------
   const handlePostLike = async (isLike) => {
@@ -254,8 +243,7 @@ function BoardDetailPage() {
                 </div>
 
                 {/* 수정/삭제 */}
-                {/* username 확인은 상위 props나 context 활용 권장! */}
-                {isLoggedIn && (
+                {isLoggedIn && username && (username === (post.user?.username || post.user)) && (
                   <div className={styles.postActions}>
                     <button onClick={() => navigate(`/community/edit/${post.id}`)}>수정</button>
                     <button onClick={handlePostDelete}>삭제</button>
@@ -300,7 +288,7 @@ function BoardDetailPage() {
                               👍 {comment.like_count ?? 0}
                             </button>
                             {/* 댓글 삭제 버튼 활성화: 본인 여부 확인 (username 변수/props 활용 필요) */}
-                            {isLoggedIn && (
+                            {isLoggedIn && username === comment.user && (
                               <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
                             )}
                           </div>
