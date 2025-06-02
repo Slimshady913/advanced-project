@@ -89,7 +89,6 @@ const MovieDetailPage = () => {
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [ordering, setOrdering] = useState('-created_at'); // 기본 최신순
 
-  const getToken = () => localStorage.getItem('access');
   const getCurrentUser = () => localStorage.getItem('username');
 
   useEffect(() => {
@@ -173,7 +172,7 @@ const MovieDetailPage = () => {
       await axios.post(
         `/reviews/`,
         formData,
-        { headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': 'multipart/form-data' } } // ✅ Authorization 헤더 제거
       );
       setNewReview({ rating: 5, comment: '', is_spoiler: false, images: [] });
       fetchReviews();  // ✅ 리뷰 새로고침
@@ -188,33 +187,15 @@ const MovieDetailPage = () => {
     setIsSubmitting(false);
   };
 
-  // 네이버 웹툰 스타일 추천/비추천
+  // 추천/비추천
   const handleVote = async (reviewId, type, myVote) => {
-    const token = getToken();
-    if (!token) return setToastMsg('로그인이 필요합니다.');
-    if (type === 'like') {
-      if (myVote === 1) {
-        // 이미 추천 → 취소 (toggle)
-      } else if (myVote === -1) {
-        setToastMsg('이미 싫어요를 누르셨습니다.');
-        return;
-      }
-    }
-    if (type === 'dislike') {
-      if (myVote === -1) {
-        // 이미 비추천 → 취소 (toggle)
-      } else if (myVote === 1) {
-        setToastMsg('이미 좋아요를 누르셨습니다.');
-        return;
-      }
-    }
+    // 로그인 체크 (권장 UX)
+    // 실질 인증은 서버에서 쿠키로 처리
     try {
       await axios.post(
-        `/reviews/${reviewId}/${type}/`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        `/reviews/${reviewId}/${type}/`
       );
-      fetchReviews();      // ✅ 리뷰(추천수 등) 새로고침
+      fetchReviews();
       fetchMovieDetail();
     } catch (error) {
       setToastMsg('추천/비추천 처리 실패');
@@ -241,10 +222,7 @@ const MovieDetailPage = () => {
   const handleImageDelete = async (imgId, reviewId) => {
     if (!window.confirm('이미지를 삭제하시겠습니까?')) return;
     try {
-      await axios.delete(`/reviews/review-images/${imgId}/`, {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      });
-      // 영화 상세 정보를 다시 불러오기 (리뷰 내부 이미지 갱신)
+      await axios.delete(`/reviews/review-images/${imgId}/`);
       fetchMovieDetail();
       setToastMsg('이미지가 삭제되었습니다.');
     } catch {
@@ -260,23 +238,21 @@ const MovieDetailPage = () => {
       formData.append('rating', editReviewData.rating);
       formData.append('comment', editReviewData.comment);
       formData.append('is_spoiler', editReviewData.is_spoiler);
-      // 새 이미지 추가
       if (editReviewData.images) {
         for (let i = 0; i < editReviewData.images.length; i++) {
           formData.append('images', editReviewData.images[i]);
         }
       }
-      // 삭제할 이미지 id도 함께 전송(비동기 삭제일 경우 생략 가능)
       if (deleteImageIds.length > 0) {
         formData.append('delete_image_ids', JSON.stringify(deleteImageIds));
       }
       await axios.patch(
         `/reviews/${editReviewId}/`,
         formData,
-        { headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': 'multipart/form-data' } } // ✅ Authorization 헤더 제거
       );
       cancelEditing();
-      fetchReviews();      // ✅ 리뷰(추천수 등) 새로고침
+      fetchReviews();
       fetchMovieDetail();
     } catch (error) {
       setToastMsg('리뷰 수정 실패');
@@ -286,10 +262,8 @@ const MovieDetailPage = () => {
   const handleDelete = async (reviewId) => {
     if (!window.confirm('정말 삭제하시겠습니까?')) return;
     try {
-      await axios.delete(`/reviews/${reviewId}/`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      fetchReviews();      // ✅ 리뷰(추천수 등) 새로고침
+      await axios.delete(`/reviews/${reviewId}/`);
+      fetchReviews();
       fetchMovieDetail();
     } catch (error) {
       setToastMsg('리뷰 삭제 실패');
