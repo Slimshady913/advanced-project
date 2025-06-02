@@ -1,6 +1,8 @@
 /* 전체 컨테이너 */
 .movie-detail-container {
-  padding: 40px;
+  max-width: 1100px;         /* 페이지 최대 너비 설정 */
+  margin: 0 auto;            /* 중앙 정렬 */
+  padding: 40px 20px;        /* 좌우 패딩으로 숨막힘 방지 */
   background: #121212;
   color: #f0f0f0;
   min-height: 100vh;
@@ -29,6 +31,8 @@
 .movie-text-info {
   flex: 1;
   min-width: 260px;
+  padding-top: 6px;
+  max-width: 650px;
 }
 
 .movie-title {
@@ -43,6 +47,7 @@
   line-height: 1.7;
   margin-bottom: 20px;
   color: #d6d6d6;
+  max-width: 100%;
 }
 
 /* OTT 섹션 */
@@ -53,7 +58,8 @@
   border-radius: 1rem;
   text-align: left;
   box-shadow: 0 1px 8px rgba(0,0,0,0.07);
-  padding-top: 20px;  /* 제목과 아이콘 간의 간격 추가 */
+  padding-top: 20px;
+  max-width: 100%;
 }
 
 .ott-section h3 {
@@ -590,21 +596,23 @@
 /* 반응형 */
 @media (max-width: 900px) {
   .movie-detail-container {
-    padding: 26px 8px;
+    padding: 24px 12px;
   }
   .movie-info-section {
     flex-direction: column;
     align-items: center;
     gap: 28px;
   }
+  .movie-text-info {
+    max-width: 100%;
+  }
   .movie-thumbnail {
     width: 98%;
-    min-width: 180px;
-    max-width: 340px;
+    max-width: 360px;
   }
   .movie-description {
     text-align: center;
-    font-size: 1rem;
+    padding: 0 10px;
   }
   .movie-title {
     font-size: 1.45rem;
@@ -617,8 +625,15 @@
     padding: 13px;
   }
   .review-actions button {
-    font-size: 0.87rem;
-    padding: 7px 10px;
+    font-size: 0.89rem;
+    padding: 9px 12px;
+    border-radius: 7px;
+    font-weight: 600;
+    background-color: #303136;
+    transition: background 0.18s ease;
+  }
+  .review-actions button:hover {
+    background-color: #e50914;
   }
   .review-content.spoiler .show-spoiler-btn {
     left: 90px;
