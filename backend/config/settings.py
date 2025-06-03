@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB', 'mydb'),
         'USER': os.environ.get('POSTGRES_USER', 'myuser'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'mypassword'),
-        'HOST': os.environ.get('DB_HOST', 'postgres'),  # docker-compose 서비스명
+        'HOST': os.environ.get('DB_HOST', 'db'),  # docker-compose 서비스명
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
