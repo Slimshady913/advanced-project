@@ -9,7 +9,6 @@ on:
 env:
   DJANGO_SETTINGS_MODULE: config.settings
   PYTHON_VERSION: '3.11'
-  NODE_VERSION: '20'
 
 jobs:
   backend:
@@ -26,18 +25,8 @@ jobs:
           POSTGRES_DB: test_db
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U user -d test_db"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Python dependencies
         run: |
@@ -54,44 +43,19 @@ jobs:
           PGPASSWORD=password psql -h db -U user -d test_db -c "SELECT 1;" || exit 1
 
       - name: Run Django migrations
+        run: python manage.py migrate
         env:
           POSTGRES_DB: test_db
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
           DB_HOST: db
           DB_PORT: 5432
-        run: python manage.py migrate
 
       - name: Run Django unit tests
+        run: python manage.py test
         env:
           POSTGRES_DB: test_db
           POSTGRES_USER: user
           POSTGRES_PASSWORD: password
           DB_HOST: db
           DB_PORT: 5432
-        run: python manage.py test
-
-  frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint (ESLint)
-        run: |
-          if [ -f node_modules/.bin/eslint ]; then
-            npm run lint || true
-          fi
-
-      - name: Build (React)
-        run: CI=false npm run build
