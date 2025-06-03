@@ -30,7 +30,7 @@ jobs:
           --health-cmd="pg_isready -U user -d test_db"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=10   # 기존 5에서 10으로 증가
+          --health-retries=10
     steps:
       - uses: actions/checkout@v4
 
@@ -44,6 +44,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # DB 초기화 대기 (최소 15초, 필요 시 늘릴 것)
       - name: Wait for DB to be ready
         run: sleep 20
 
@@ -89,7 +90,6 @@ jobs:
       # - name: Run React tests
       #   run: npm test -- --watchAll=false
 
-  # 3. (선택) Docker Build & Push (main 브랜치만)
   docker:
     if: github.ref == 'refs/heads/main'
     needs: [backend, frontend]
