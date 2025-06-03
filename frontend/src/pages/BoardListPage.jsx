@@ -40,8 +40,7 @@ function BoardListPage({ isLoggedIn, username }) {
   // 카테고리 불러오기
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
-      const data = Array.isArray(res.data) ? res.data
-                : (Array.isArray(res.data.results) ? res.data.results : []);
+      const data = Array.isArray(res.data) ? res.data : (Array.isArray(res.data.results) ? res.data.results : []);
       setCategories(data);
     });
   }, []);
@@ -72,16 +71,21 @@ function BoardListPage({ isLoggedIn, username }) {
 
   // 카테고리/탭 데이터 방어
   const categoriesArr = Array.isArray(categories) ? categories : [];
-  const saleCategory = categoriesArr.find(cat => cat.slug === 'sale');
+  
+  // 'sale' 카테고리를 없애는 로직
   const customTabs = [
     { slug: 'hot', name: '인기' },
-    ...categoriesArr.map(cat => ({ slug: cat.slug, name: cat.name, id: cat.id })),
-    ...(saleCategory ? [] : [{ slug: 'sale', name: '핫딜' }]),
+    ...categoriesArr.filter(cat => cat.slug !== 'sale').map(cat => ({ slug: cat.slug, name: cat.name, id: cat.id })),
   ];
 
   // 카테고리 변경
   const handleCategoryClick = slug => {
-    navigate(`/community/${slug}`);
+    // 'sale' 경로로 가는 경우를 막기 위해, 'sale'이 아닌 다른 카테고리로 리디렉션
+    if (slug === 'sale') {
+      navigate('/community/hot');  // 혹은 다른 기본 카테고리로 리디렉션
+    } else {
+      navigate(`/community/${slug}`);
+    }
   };
 
   // 글쓰기
