@@ -166,3 +166,5 @@ class MovieSearchView(ListAPIView):
             Movie.objects.annotate(review_count=Count('reviews'))
             .prefetch_related('reviews', 'ott_services')
         )
+
+#FR용 주석
