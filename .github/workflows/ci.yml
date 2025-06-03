@@ -12,7 +12,6 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  # 1. Backend (Django) Lint & Test
   backend:
     runs-on: ubuntu-latest
     defaults:
@@ -31,7 +30,7 @@ jobs:
           --health-cmd="pg_isready -U user -d test_db"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10   # 기존 5에서 10으로 증가
     steps:
       - uses: actions/checkout@v4
 
@@ -45,6 +44,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Wait for DB to be ready
+        run: sleep 20
+
+      - name: Debug DB hostname
+        run: nslookup db || echo "DB host not resolved"
+
       - name: Run Django migrations
         env:
           DATABASE_URL: postgres://user:password@db:5432/test_db
@@ -55,11 +60,6 @@ jobs:
           DATABASE_URL: postgres://user:password@db:5432/test_db
         run: python manage.py test
 
-      # (옵션) Black, isort, flake8 등 코드 스타일 검사 추가
-      # - name: Run Black
-      #   run: black . --check
-
-  # 2. Frontend (React) Lint & Build
   frontend:
     runs-on: ubuntu-latest
     defaults:
