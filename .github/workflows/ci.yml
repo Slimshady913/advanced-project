@@ -7,7 +7,6 @@ on:
     branches: [main, dev]
 
 env:
-  # 테스트용 환경변수, secrets.XXX 사용 가능
   DJANGO_SETTINGS_MODULE: config.settings
   PYTHON_VERSION: '3.11'
   NODE_VERSION: '20'
@@ -19,6 +18,20 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      db:
+        image: postgres:14
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U user -d test_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - uses: actions/checkout@v4
 
@@ -32,10 +45,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Django migrations (SQLite, 임시 DB)
+      - name: Run Django migrations
+        env:
+          DATABASE_URL: postgres://user:password@db:5432/test_db
         run: python manage.py migrate
 
       - name: Run Django unit tests
+        env:
+          DATABASE_URL: postgres://user:password@db:5432/test_db
         run: python manage.py test
 
       # (옵션) Black, isort, flake8 등 코드 스타일 검사 추가
