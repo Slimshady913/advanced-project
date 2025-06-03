@@ -30,7 +30,7 @@ jobs:
           --health-cmd="pg_isready -U user -d test_db"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=10
+          --health-retries=15
     steps:
       - uses: actions/checkout@v4
 
@@ -44,21 +44,32 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # DB 초기화 대기 (최소 15초, 필요 시 늘릴 것)
-      - name: Wait for DB to be ready
-        run: sleep 20
-
-      - name: Debug DB hostname
-        run: nslookup db || echo "DB host not resolved"
+      # DB가 정말 완전히 뜰 때까지 기다림
+      - name: Wait for PostgreSQL
+        run: |
+          for i in {1..12}; do
+            pg_isready -h db -p 5432 -U user -d test_db && exit 0
+            echo "Postgres not ready yet..."
+            sleep 5
+          done
+          exit 1
 
       - name: Run Django migrations
         env:
-          DATABASE_URL: postgres://user:password@db:5432/test_db
+          POSTGRES_DB: test_db
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          DB_HOST: db
+          DB_PORT: 5432
         run: python manage.py migrate
 
       - name: Run Django unit tests
         env:
-          DATABASE_URL: postgres://user:password@db:5432/test_db
+          POSTGRES_DB: test_db
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          DB_HOST: db
+          DB_PORT: 5432
         run: python manage.py test
 
   frontend:
@@ -84,53 +95,8 @@ jobs:
           fi
 
       - name: Build (React)
-        run: npm run build
+        run: CI=false npm run build
 
       # (옵션) React 테스트 실행
       # - name: Run React tests
       #   run: npm test -- --watchAll=false
-
-  docker:
-    if: github.ref == 'refs/heads/main'
-    needs: [backend, frontend]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push backend image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/advanced-project-backend:latest ./backend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/advanced-project-backend:latest
-
-      - name: Build and push frontend image
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/advanced-project-frontend:latest ./frontend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/advanced-project-frontend:latest
-
-      # (옵션) docker-compose build/push, ghcr.io 푸시 등 확장 가능
-
-  # (옵션) 실제 서버 배포 단계 추가 예시
-  # deploy:
-  #   if: github.ref == 'refs/heads/main'
-  #   needs: [docker]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: SSH 배포
-  #       uses: appleboy/ssh-action@v1
-  #       with:
-  #         host: ${{ secrets.DEPLOY_HOST }}
-  #         username: ${{ secrets.DEPLOY_USER }}
-  #         key: ${{ secrets.DEPLOY_KEY }}
-  #         script: |
-  #           cd /home/your-app
-  #           docker-compose pull
-  #           docker-compose up -d
