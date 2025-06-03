@@ -14,7 +14,7 @@ jobs:
         working-directory: backend
 
     services:
-      db:
+      postgres:
         image: postgres:14
         env:
           POSTGRES_USER: postgres
@@ -23,10 +23,10 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - name: Checkout repository
@@ -50,22 +50,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Wait for Postgres
-        run: |
-          for i in {1..20}; do
-            pg_isready -h db -p 5432 -U postgres && echo "Postgres is ready" && break
-            echo "Waiting for Postgres..."
-            sleep 3
-          done
-          # 최종 연결 테스트 (실패 시 종료)
-          PGPASSWORD=postgres psql -h db -U postgres -d test_db -c '\q' || exit 1
-
       - name: Run migrations and tests
         env:
           POSTGRES_DB: test_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          DB_HOST: db
+          DB_HOST: localhost         # ✅ 핵심: github docs에 따르면 localhost로 연결
           DB_PORT: 5432
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
@@ -98,7 +88,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Build React App (ignore CI errors)
+      - name: Build React App (ignore CI eslint errors)
         run: CI='' npm run build
 
       - name: Upload frontend build artifacts
