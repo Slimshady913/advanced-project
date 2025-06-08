@@ -602,6 +602,9 @@ const MovieDetailPage = () => {
               id="comment"
               value={newReview.comment}
               onChange={e => setNewReview({ ...newReview, comment: e.target.value })}
+              disabled={!getCurrentUser()}
+              placeholder={getCurrentUser() ? '리뷰를 작성해주세요!' : '로그인 후 리뷰를 작성할 수 있습니다.'}
+              rows={6}
             />
           </div>
           <div className="review-form-group">

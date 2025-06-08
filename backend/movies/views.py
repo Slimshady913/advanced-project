@@ -167,4 +167,4 @@ class MovieSearchView(ListAPIView):
             .prefetch_related('reviews', 'ott_services')
         )
 
-#FR용 주석
+#PR용 주석
