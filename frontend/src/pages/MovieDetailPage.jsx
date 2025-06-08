@@ -375,13 +375,15 @@ const MovieDetailPage = () => {
                 key={idx}
                 src={img.image_url}
                 alt="리뷰 이미지"
-                className="review-image-thumb"
+                className={`review-image-thumb ${spoilerHidden ? 'blurred' : ''}`}
                 onClick={() => {
-                  setModalImages(review.images.map(imgObj => imgObj.image_url));
-                  setModalIndex(idx);
-                  setModalImageUrl(img.image_url);
+                  if (!spoilerHidden) {  // 블러된 이미지는 클릭 시 확대 안되도록
+                    setModalImages(review.images.map(imgObj => imgObj.image_url));
+                    setModalIndex(idx);
+                    setModalImageUrl(img.image_url);
+                  }
                 }}
-                style={{ cursor: 'zoom-in' }}
+                style={{ cursor: spoilerHidden ? 'not-allowed' : 'zoom-in' }}
               />
             ))}
           </div>
