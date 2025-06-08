@@ -6,7 +6,8 @@ from .views import (
     BoardCommentListCreateView,
     BoardCommentDestroyView,
     BoardPostLikeToggleView,
-    BoardCommentLikeToggleView
+    BoardCommentLikeToggleView,
+    increment_post_view_count
 )
 
 urlpatterns = [
@@ -17,6 +18,8 @@ urlpatterns = [
     
     # 게시글 상세 조회, 수정, 삭제
     path('posts/<int:pk>/', BoardPostDetailView.as_view(), name='boardpost-detail'),
+
+     path('posts/<int:pk>/increment-view/', increment_post_view_count),
     
     # 특정 게시글에 대한 댓글 목록 조회 및 댓글 작성
     path('posts/<int:post_id>/comments/', BoardCommentListCreateView.as_view(), name='boardcomment-list-create'),

@@ -1,18 +1,24 @@
 from rest_framework import generics, permissions
-from .models import BoardPost, BoardComment, BoardPostLike, BoardCommentLike, BoardCategory, BoardAttachment
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+from .models import (
+    BoardPost, BoardComment, BoardPostLike, BoardCommentLike,
+    BoardCategory, BoardAttachment
+)
 from .serializers import (
     BoardPostSerializer, BoardCommentSerializer,
     BoardPostUpdateSerializer, BoardCategorySerializer
 )
-from rest_framework.permissions import IsAuthenticated, AllowAny
 from reviews.permissions import IsOwnerOrReadOnly
-from rest_framework.parsers import MultiPartParser, FormParser
-from django.db.models import Count, Q
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+
 
 # ✅ 게시글 목록 조회 + 작성
 class BoardPostListCreateView(generics.ListCreateAPIView):
@@ -24,18 +30,10 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
         operation_summary="게시글 목록 조회",
         operation_description="전체 커뮤니티 게시글 목록을 최신순으로 반환합니다. 카테고리별로 게시글을 필터링할 수 있습니다.",
         manual_parameters=[
-            openapi.Parameter(
-                'category', openapi.IN_QUERY, description="카테고리 필터링 (예: '영화', '드라마', 'hot')", type=openapi.TYPE_STRING
-            ),
-            openapi.Parameter(
-                'search_type', openapi.IN_QUERY, description="검색 타입 (title, title_content, user)", type=openapi.TYPE_STRING
-            ),
-            openapi.Parameter(
-                'search', openapi.IN_QUERY, description="검색어", type=openapi.TYPE_STRING
-            ),
-            openapi.Parameter(
-                'page', openapi.IN_QUERY, description="페이지 번호", type=openapi.TYPE_INTEGER
-            ),
+            openapi.Parameter('category', openapi.IN_QUERY, description="카테고리 필터링 (예: '영화', '드라마', 'hot')", type=openapi.TYPE_STRING),
+            openapi.Parameter('search_type', openapi.IN_QUERY, description="검색 타입 (title, title_content, user)", type=openapi.TYPE_STRING),
+            openapi.Parameter('search', openapi.IN_QUERY, description="검색어", type=openapi.TYPE_STRING),
+            openapi.Parameter('page', openapi.IN_QUERY, description="페이지 번호", type=openapi.TYPE_INTEGER),
         ],
         responses={200: BoardPostSerializer(many=True)}
     )
@@ -60,9 +58,7 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
             if search_type == "title":
                 queryset = queryset.filter(title__icontains=search)
             elif search_type == "title_content":
-                queryset = queryset.filter(
-                    Q(title__icontains=search) | Q(content__icontains=search)
-                )
+                queryset = queryset.filter(Q(title__icontains=search) | Q(content__icontains=search))
             elif search_type == "user":
                 queryset = queryset.filter(user__username__icontains=search)
 
@@ -73,6 +69,7 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
         post = serializer.save(user=self.request.user)
         for file in self.request.FILES.getlist('media'):
             BoardAttachment.objects.create(post=post, file=file)
+
 
 # ✅ 게시글 상세 조회 / 수정 / 삭제
 class BoardPostDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -89,16 +86,21 @@ class BoardPostDetailView(generics.RetrieveUpdateDestroyAPIView):
             return [IsAuthenticated(), IsOwnerOrReadOnly()]
         return [AllowAny()]
 
+    def retrieve(self, request, *args, **kwargs):
+        # ❌ 더 이상 조회수 증가 없음
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         data = request.data.copy()
 
-        # 🔹 delete_attachments 처리
         delete_ids = []
         if 'delete_attachments' in data:
             try:
-                raw = data.getlist('delete_attachments')  # 여러 개면 리스트로 처리
+                raw = data.getlist('delete_attachments')
                 delete_ids = [int(x) for x in raw]
             except (ValueError, TypeError):
                 return Response({'delete_attachments': ['정수 리스트 형식이어야 합니다.']}, status=400)
@@ -107,18 +109,27 @@ class BoardPostDetailView(generics.RetrieveUpdateDestroyAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
-        # 🔹 삭제 대상 파일 삭제
         if delete_ids:
             attachments = BoardAttachment.objects.filter(id__in=delete_ids, post=instance)
             for att in attachments:
                 att.file.delete(save=False)
                 att.delete()
 
-        # 🔹 새 첨부파일 추가
         for file in request.FILES.getlist('media'):
             BoardAttachment.objects.create(post=instance, file=file)
 
         return Response(BoardPostSerializer(instance, context={'request': request}).data)
+
+
+# ✅ 게시글 조회수 증가 전용 API
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def increment_post_view_count(request, pk):
+    post = get_object_or_404(BoardPost, pk=pk)
+    post.view_count = (post.view_count or 0) + 1
+    post.save(update_fields=["view_count"])
+    return Response({"status": "ok", "view_count": post.view_count})
+
 
 # ✅ 댓글 목록 조회 + 작성
 class BoardCommentListCreateView(generics.ListCreateAPIView):
@@ -127,17 +138,11 @@ class BoardCommentListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         post_id = self.kwargs['post_id']
-        top_comments = BoardComment.objects.filter(
-            post_id=post_id
-        ).annotate(
+        top_comments = BoardComment.objects.filter(post_id=post_id).annotate(
             like_count=Count('likes', filter=Q(likes__is_like=True))
-        ).filter(
-            like_count__gte=10
-        ).order_by('-like_count')[:3]
+        ).filter(like_count__gte=10).order_by('-like_count')[:3]
 
-        other_comments = BoardComment.objects.filter(
-            post_id=post_id
-        ).exclude(id__in=top_comments).order_by('created_at')
+        other_comments = BoardComment.objects.filter(post_id=post_id).exclude(id__in=top_comments).order_by('created_at')
 
         return top_comments | other_comments
 
@@ -153,6 +158,7 @@ class BoardCommentListCreateView(generics.ListCreateAPIView):
         post_id = self.kwargs['post_id']
         serializer.save(user=self.request.user, post_id=post_id)
 
+
 # ✅ 댓글 삭제
 class BoardCommentDestroyView(generics.DestroyAPIView):
     queryset = BoardComment.objects.all()
@@ -162,6 +168,7 @@ class BoardCommentDestroyView(generics.DestroyAPIView):
     @swagger_auto_schema(operation_summary="댓글 삭제")
     def delete(self, request, *args, **kwargs):
         return super().delete(request, *args, **kwargs)
+
 
 # ✅ 게시글 추천/비추천
 class BoardPostLikeToggleView(APIView):
@@ -176,6 +183,7 @@ class BoardPostLikeToggleView(APIView):
             defaults={'is_like': is_like}
         )
         return Response({'status': 'updated', 'is_like': is_like})
+
 
 # ✅ 댓글 추천/비추천
 class BoardCommentLikeToggleView(APIView):
@@ -195,6 +203,7 @@ class BoardCommentLikeToggleView(APIView):
             defaults={'is_like': is_like}
         )
         return Response({'status': 'updated', 'is_like': is_like})
+
 
 # ✅ 카테고리 목록 조회
 class BoardCategoryListView(generics.ListAPIView):

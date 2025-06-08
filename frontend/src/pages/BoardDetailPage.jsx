@@ -29,8 +29,16 @@ function BoardDetailPage({ isLoggedIn, username }) {
   useEffect(() => {
     fetchPost();
     fetchComments();
+     incrementView();
     // eslint-disable-next-line
   }, [id]);
+  const incrementView = async () => {
+    try {
+      await axios.post(`/board/posts/${id}/increment-view/`);
+    } catch (err) {
+      console.error('조회수 증가 실패:', err);
+    }
+  };
 
   const getCategorySlug = () => {
     if (post?.category_slug) return post.category_slug;
@@ -124,7 +132,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
     if (!newComment.trim()) { setError('댓글을 입력하세요.'); return; }
     try {
       await axios.post(`/board/posts/${id}/comments/`, { content: newComment });
-      setNewComment(''); setError(''); fetchComments();
+      setNewComment(''); setError(''); fetchComments(); fetchPost();
     } catch (err) { }
   };
 
