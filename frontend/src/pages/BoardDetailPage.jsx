@@ -331,7 +331,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
                           <div className="post-thumb">
                             {rp.thumbnail_url ? (
                               <img
-                                src={rp.thumbnail_url}
+                                src={rp.thumbnail_url.startsWith('http') ? rp.thumbnail_url : `http://localhost:8000${rp.thumbnail_url}`}
                                 alt="썸네일"
                                 className="post-thumb-img"
                                 onError={e => { e.target.style.display = 'none'; }}
