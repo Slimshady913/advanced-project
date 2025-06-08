@@ -9,6 +9,7 @@ services:
     volumes:
       - ./backend:/app  # 로컬 백엔드 디렉토리를 컨테이너에 마운트
       - ./backend/static:/app/static  # 정적 파일을 수집할 디렉토리 마운트
+      - ./backend/media:/app/media  # 미디어 파일을 저장할 디렉토리 마운트
     ports:
       - "8000:8000"  # Django API를 8000번 포트로 매핑
     env_file:

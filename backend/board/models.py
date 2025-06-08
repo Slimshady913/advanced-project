@@ -104,3 +104,11 @@ class BoardCommentLike(models.Model):
 
     def __str__(self):
         return f"{self.user.username} {'👍' if self.is_like else '👎'} 댓글({self.comment.id})"
+    
+class BoardAttachment(models.Model):
+    post = models.ForeignKey(BoardPost, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(upload_to='board_attachments/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.file.name

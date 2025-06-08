@@ -208,19 +208,26 @@ function BoardDetailPage({ isLoggedIn, username }) {
                     </div>
                   )}
                   {post.content}
+                  {/* 첨부 이미지/동영상 표시 */}
+                  {post.attachments && post.attachments.length > 0 && (
+                    <div className={styles.attachmentGallery}>
+                      {post.attachments.map((fileObj, idx) => {
+                        const fileUrl = fileObj.file;
+                        if (!fileUrl) return null;
+                        const isVideo = fileUrl.endsWith('.mp4') || fileUrl.includes('video');
+                        return (
+                          <div key={idx} className={styles.mediaItem} style={{ marginTop: '16px' }}>
+                            {isVideo ? (
+                              <video src={fileUrl} controls width="320" />
+                            ) : (
+                              <img src={fileUrl} alt={`첨부파일-${idx}`} width="320" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-                {/* 첨부파일 */}
-                {post.attachment && (
-                  <div className={styles.attachmentRow}>
-                    <a
-                      href={post.attachment}
-                      download
-                      className={styles.attachmentLink}
-                    >
-                      {post.attachment.split('/').pop()}
-                    </a>
-                  </div>
-                )}
 
                 {/* 추천/비추천 */}
                 <div className={styles.postLikeActions}>

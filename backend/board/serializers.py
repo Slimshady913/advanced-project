@@ -1,6 +1,12 @@
 from rest_framework import serializers
-from .models import BoardCategory, BoardPost, BoardComment, BoardPostLike, BoardCommentLike
+from .models import BoardAttachment, BoardCategory, BoardPost, BoardComment, BoardPostLike, BoardCommentLike
 
+
+class BoardAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardAttachment
+        fields = ['id', 'file']
+        
 # 게시글 시리얼라이저
 class BoardPostSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
@@ -12,12 +18,13 @@ class BoardPostSerializer(serializers.ModelSerializer):
     comment_count = serializers.SerializerMethodField()
     view_count = serializers.IntegerField(read_only=True) 
     thumbnail_url = serializers.SerializerMethodField()
+    attachments = BoardAttachmentSerializer(many=True, read_only=True)
 
     class Meta:
         model = BoardPost
         fields = ['id', 'category','category_name', 'title', 'content', 'user',
                    'created_at', 'dislike_count', 'comment_count', 'view_count', 'like_count', 'my_like'
-                   , 'thumbnail_url']
+                   , 'thumbnail_url', 'attachments']
 
     def get_like_count(self, obj):
         # 추천(True)만 카운트
@@ -103,3 +110,4 @@ class BoardCommentLikeSerializer(serializers.ModelSerializer):
             context = super().get_serializer_context()
             context.update({"request": self.request})
             return context
+        

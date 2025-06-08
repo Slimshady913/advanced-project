@@ -15,6 +15,7 @@ from rest_framework import generics
 from .models import BoardCategory
 from .serializers import BoardCategorySerializer
 from django.db.models import Count, Q
+from .models import BoardAttachment
 
 # ✅ 게시글 목록 조회 + 작성
 class BoardPostListCreateView(generics.ListCreateAPIView):
@@ -75,7 +76,9 @@ class BoardPostListCreateView(generics.ListCreateAPIView):
         return super().get(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        post = serializer.save(user=self.request.user)
+        for file in self.request.FILES.getlist('media'):
+            BoardAttachment.objects.create(post=post, file=file)
 
 
 # ✅ 게시글 상세 조회 / 수정 / 삭제
