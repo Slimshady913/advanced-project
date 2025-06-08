@@ -19,7 +19,7 @@ from .models import BoardAttachment
 
 # ✅ 게시글 목록 조회 + 작성
 class BoardPostListCreateView(generics.ListCreateAPIView):
-    queryset = BoardPost.objects.all().order_by('-created_at')
+    queryset = BoardPost.objects.all().order_by('-created_at').prefetch_related('attachments')
     serializer_class = BoardPostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 

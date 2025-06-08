@@ -6,7 +6,7 @@ class BoardAttachmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardAttachment
         fields = ['id', 'file']
-        
+
 # 게시글 시리얼라이저
 class BoardPostSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
@@ -45,20 +45,18 @@ class BoardPostSerializer(serializers.ModelSerializer):
         return obj.comments.count()
     
     def get_thumbnail_url(self, obj):
-        # 1. 첨부 이미지 모델이 있으면 그 중 첫 번째 반환 (예시)
-        first_image = getattr(obj, 'images', None)
-        if first_image and hasattr(first_image, 'first'):
-            image_obj = first_image.first()
-            if image_obj and hasattr(image_obj, 'image') and image_obj.image:
-                return image_obj.image.url
+        # 1. 첨부파일 중 이미지 확장자 찾기
+        for attachment in obj.attachments.all():
+            filename = attachment.file.name.lower()
+            if filename.endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                return attachment.file.url
 
-        # 2. 본문(content)에 <img src=...>가 있다면 추출 (간단 예시)
+        # 2. 본문 내용에서 <img src=...> 찾기
         import re
         match = re.search(r'<img[^>]+src="([^">]+)"', obj.content or '')
         if match:
             return match.group(1)
 
-        # 3. 없다면 None
         return None
     
 class BoardCategorySerializer(serializers.ModelSerializer):

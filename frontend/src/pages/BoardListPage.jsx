@@ -207,7 +207,7 @@ function BoardListPage({ isLoggedIn, username }) {
                     <div className="post-thumb">
                       {post.thumbnail_url ? (
                         <img
-                          src={post.thumbnail_url}
+                          src={post.thumbnail_url.startsWith('http') ? post.thumbnail_url : `http://localhost:8000${post.thumbnail_url}`}
                           alt="썸네일"
                           className="post-thumb-img"
                           onError={e => { e.target.style.display = 'none'; }}
