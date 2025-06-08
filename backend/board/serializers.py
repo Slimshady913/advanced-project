@@ -108,4 +108,31 @@ class BoardCommentLikeSerializer(serializers.ModelSerializer):
             context = super().get_serializer_context()
             context.update({"request": self.request})
             return context
-        
+
+class BoardPostUpdateSerializer(serializers.ModelSerializer):
+    delete_attachments = serializers.ListField(
+        child=serializers.IntegerField(), write_only=True, required=False
+    )
+
+    class Meta:
+        model = BoardPost
+        fields = ['title', 'content', 'category', 'delete_attachments']
+
+    def to_internal_value(self, data):
+        # JSON 문자열로 전달된 delete_attachments 처리
+        if 'delete_attachments' in data and isinstance(data['delete_attachments'], str):
+            import json
+            try:
+                data['delete_attachments'] = json.loads(data['delete_attachments'])
+            except json.JSONDecodeError:
+                raise serializers.ValidationError({"delete_attachments": "유효한 JSON 형식이 아닙니다."})
+        return super().to_internal_value(data)
+
+    def update(self, instance, validated_data):
+        delete_ids = validated_data.pop('delete_attachments', [])
+        if delete_ids:
+            attachments = BoardAttachment.objects.filter(id__in=delete_ids, post=instance)
+            for att in attachments:
+                att.file.delete(save=False)
+                att.delete()
+        return super().update(instance, validated_data)
