@@ -31,7 +31,6 @@
 
 - [🛠 백엔드 README](./backend/README.md)
   - [백엔드 실행 방법](https://github.com/Slimshady913/advanced-project/blob/main/backend/README.md#-실행-방법)
-  - [Swagger 인증 사용법](https://github.com/Slimshady913/advanced-project/blob/main/backend/README.md#-JWT-인증-사용법-(Swagger에서))
 
 ### ✅ frontend
 
