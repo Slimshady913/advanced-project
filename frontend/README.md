@@ -248,6 +248,9 @@ REACT_APP_API_BASE_URL=http://localhost:8000
 #### (2025-05-27)
 - **로그인 후 자동 리디렉션 및 Toast 알림 적용**
 
+#### (2025-05-23)
+- **로그인 관련 문제 해결**
+
 #### (2025-05-16)
 - **UI문제 해결(MoviesPage, MovieDetailPage)**
 
