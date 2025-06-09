@@ -1,22 +1,23 @@
+/* 전체 페이지 배경 스타일 */
 .write-bg {
   min-height: 100vh;
   background: #17191b;
   padding: 50px 0 70px 0;
 }
 
+/* 작성 폼 컨테이너 */
 .write-container {
-  /* 기존보다 넓게 (반응형: 900px까지) */
-  max-width: 1200px;
-  min-width: 340px;
+  max-width: 1200px; /* 최대 너비 설정 */
+  min-width: 340px;  /* 최소 너비 설정 */
   margin: 60px auto 0 auto;
-  background: rgba(29,32,37,0.98);
-  border-radius: 18px;
-  /* 파란 Glow 완전 제거, 그림자만 부드럽게 */
-  box-shadow: 0 6px 36px rgba(0,0,0,0.19), 0 1.5px 12px rgba(0,0,0,0.13);
-  padding: 52px 60px 46px 60px;
-  transition: max-width 0.2s, padding 0.2s;
+  background: rgba(29,32,37,0.98); /* 어두운 반투명 배경 */
+  border-radius: 18px; /* 둥근 테두리 */
+  box-shadow: 0 6px 36px rgba(0,0,0,0.19), 0 1.5px 12px rgba(0,0,0,0.13); /* 그림자 효과 */
+  padding: 52px 60px 46px 60px; /* 내부 여백 */
+  transition: max-width 0.2s, padding 0.2s; /* 반응형 트랜지션 */
 }
 
+/* 중간 크기 화면 대응 */
 @media (max-width: 1200px) {
   .write-container {
     max-width: 700px;
@@ -24,6 +25,7 @@
   }
 }
 
+/* 모바일 대응 */
 @media (max-width: 700px) {
   .write-container {
     max-width: 98vw;
@@ -32,6 +34,7 @@
   }
 }
 
+/* 제목 스타일 */
 .write-title {
   font-size: 2.08rem;
   font-weight: 900;
@@ -41,12 +44,14 @@
   text-align: center;
 }
 
+/* 작성 폼 전체 */
 .write-form {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
+/* 각 항목 라벨 */
 .write-form label {
   font-size: 1.05rem;
   color: #a9d8ff;
@@ -54,6 +59,7 @@
   margin-bottom: 3px;
 }
 
+/* 입력 필드 공통 스타일 */
 .write-form input,
 .write-form textarea,
 .write-form select {
@@ -69,6 +75,7 @@
   transition: border 0.13s;
 }
 
+/* 포커스 시 스타일 */
 .write-form input:focus,
 .write-form textarea:focus,
 .write-form select:focus {
@@ -76,16 +83,19 @@
   background: #232c38;
 }
 
+/* 파일 업로드 input 숨김 */
 .file-input {
   display: none;
 }
 
+/* 파일 업로드 설명 텍스트 */
 .media-label {
   margin-top: 4px;
   color: #97e0ff;
   font-size: 1.01rem;
 }
 
+/* 파일 업로드 버튼 */
 .media-upload-btn {
   background: linear-gradient(90deg, #00AEEF, #0062F5);
   color: #fff;
@@ -100,17 +110,22 @@
   box-shadow: 0 2px 6px rgba(0,174,239,0.09);
   transition: background 0.12s, transform 0.10s;
 }
+
+/* 업로드 버튼 hover 효과 */
 .media-upload-btn:hover {
   background: linear-gradient(90deg, #0083b0, #0053c4);
   transform: scale(1.03);
 }
 
+/* 업로드 미디어 미리보기 래퍼 */
 .media-preview-wrap {
   display: flex;
   flex-wrap: wrap;
   gap: 11px;
   margin-bottom: 2px;
 }
+
+/* 각 미리보기 아이템 */
 .media-preview-item {
   position: relative;
   border-radius: 7px;
@@ -123,6 +138,8 @@
   align-items: center;
   justify-content: center;
 }
+
+/* 이미지 또는 비디오 미리보기 */
 .media-preview-item img,
 .media-preview-item video {
   width: 120px;
@@ -130,6 +147,8 @@
   object-fit: cover;
   border-radius: 7px;
 }
+
+/* 삭제 버튼 */
 .remove-btn {
   position: absolute;
   top: 5px;
@@ -147,6 +166,7 @@
   justify-content: center;
 }
 
+/* 제출 버튼 */
 .submit-btn {
   padding: 16px;
   background: linear-gradient(90deg, #00AEEF, #0062F5);
@@ -160,11 +180,14 @@
   box-shadow: 0 2px 9px rgba(0,174,239,0.09);
   transition: background 0.12s, transform 0.11s;
 }
+
+/* 제출 버튼 hover 효과 */
 .submit-btn:hover {
   background: linear-gradient(90deg, #0094cc, #0053c4);
   transform: scale(1.03);
 }
 
+/* 에러 메시지 표시 */
 .error-message {
   color: #ff4d4f;
   font-weight: 600;
