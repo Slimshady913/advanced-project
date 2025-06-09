@@ -141,27 +141,28 @@
 
 frontend/
 ├── public/
-│ └── index.html
+│   └── index.html
 ├── src/
-│ ├── api/ # Axios 인스턴스 및 인증 처리
-│ │ └── axios.js
-│ ├── components/ # 공통 UI 컴포넌트 (Header 등)
-│ │ └── Header.jsx
-│ ├── pages/ # 페이지 컴포넌트
-│ │ ├── AuthPage.jsx / LoginPage.jsx / RegisterPage.jsx
-│ │ ├── MoviesPage.jsx / MovieDetailPage.jsx
-│ │ ├── BoardListPage.jsx / BoardDetailPage.jsx / BoardWritePage.jsx / BoardEditPage.jsx
-│ │ ├── ProfilePage.jsx / SubscribePage.jsx
-│ │ └── 각 페이지별 *.css 또는 *.module.css
-│ ├── routes/ # 보호 라우팅 컴포넌트
-│ │ └── PrivateRoute.jsx
-│ ├── utils/ # 유틸 함수 모음
-│ │ ├── formatDate.js
-│ │ └── validatePost.js
-│ ├── App.jsx # 전체 라우터 및 상태 초기화
-│ ├── index.js # React 진입점
-│ └── index.css / App.css
-└── package.json # 종속성 관리
+│   ├── api/               # Axios 인스턴스 및 인증 처리
+│   │   └── axios.js
+│   ├── components/        # 공통 UI 컴포넌트 (Header 등)
+│   │   └── Header.jsx
+│   ├── pages/             # 페이지 컴포넌트
+│   │   ├── AuthPage.jsx / LoginPage.jsx / RegisterPage.jsx
+│   │   ├── MoviesPage.jsx / MovieDetailPage.jsx
+│   │   ├── BoardListPage.jsx / BoardDetailPage.jsx / BoardWritePage.jsx / BoardEditPage.jsx
+│   │   ├── ProfilePage.jsx / SubscribePage.jsx
+│   │   └── 각 페이지별 *.css 또는 *.module.css
+│   ├── routes/            # 보호 라우팅 컴포넌트
+│   │   └── PrivateRoute.jsx
+│   ├── utils/             # 유틸 함수 모음
+│   │   ├── formatDate.js
+│   │   └── validatePost.js
+│   ├── App.jsx            # 전체 라우터 및 상태 초기화
+│   ├── index.js           # React 진입점
+│   └── index.css / App.css
+├── package.json           # 종속성 관리
+└── .env                   # 환경변수 설정 파일 (선택)
 
 ---
 
@@ -229,6 +230,8 @@ REACT_APP_API_BASE_URL=http://localhost:8000
 ## 📌 향후 구현 예정 기능
 
 - 게시판 기능 최적화
+- 리뷰/댓글 알림 기능 추가
+- 반응형 UI 세부 개선
 
 ---
 
