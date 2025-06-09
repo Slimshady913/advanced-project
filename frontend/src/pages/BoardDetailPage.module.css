@@ -1,3 +1,4 @@
+/* ====== 게시글 상세 컨테이너 ====== */
 .detailContainer {
   width: 100%;
   max-width: 1100px;
@@ -12,7 +13,7 @@
   align-items: stretch;
 }
 
-/* ======= 상단 행(카테고리, 타이틀, 통계) ======= */
+/* ====== 게시글 상단 (카테고리, 제목, 통계) ====== */
 .headerRow {
   display: flex;
   align-items: center;
@@ -39,7 +40,7 @@
   flex: 1;
   letter-spacing: -0.2px;
   margin-right: 16px;
-  word-break: break-all;
+  word-break: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -63,7 +64,7 @@
   vertical-align: middle;
 }
 
-/* ======= 작성자/날짜 ======= */
+/* ====== 작성자 정보 ====== */
 .writerRow {
   display: flex;
   align-items: center;
@@ -82,9 +83,9 @@
   margin-left: 8px;
 }
 
-/* ======= 본문 ======= */
+/* ====== 게시글 본문 ====== */
 .content {
-  margin: 18px 0 0 0;
+  margin-top: 18px;
   font-size: 1.13rem;
   line-height: 1.95;
   color: #eaf6ff;
@@ -92,9 +93,10 @@
   border-radius: 11px;
   padding: 34px 42px 24px 42px;
   min-height: 100px;
-  word-break: break-all;
-  box-shadow: none;
+  word-break: break-word;
 }
+
+/* ====== 반응형 대응 ====== */
 @media (max-width: 900px) {
   .detailContainer { max-width: 98vw; }
   .headerRow, .writerRow, .content { padding-left: 4vw; padding-right: 4vw; }
@@ -106,7 +108,7 @@
   .content { font-size: 0.96rem; }
 }
 
-/* ======= 첨부파일 ======= */
+/* ====== 첨부파일 링크 영역 ====== */
 .attachmentRow {
   padding: 14px 42px 10px 42px;
 }
@@ -118,9 +120,9 @@
   border-radius: 7px;
   text-decoration: none;
   font-size: 1.05rem;
-  transition: background 0.13s, color 0.13s;
   margin-top: 2px;
   display: inline-block;
+  transition: background 0.13s, color 0.13s;
 }
 .attachmentLink:hover {
   background: #00AEEF;
@@ -133,7 +135,7 @@
   .attachmentRow { padding-left: 2vw; padding-right: 2vw; }
 }
 
-/* ======= 추천/비추천 ======= */
+/* ====== 추천/비추천 버튼 ====== */
 .postLikeActions {
   display: flex;
   gap: 14px;
@@ -167,7 +169,7 @@
   .postLikeActions { margin-left: 2vw; margin-right: 2vw; }
 }
 
-/* ======= 수정/삭제 ======= */
+/* ====== 게시글 수정/삭제 버튼 ====== */
 .postActions {
   display: flex;
   justify-content: flex-end;
@@ -186,7 +188,6 @@
 }
 .postActions button:hover {
   background: linear-gradient(90deg, #0094cc, #0053c4);
-  color: #fff;
 }
 @media (max-width: 900px) {
   .postActions { margin-left: 4vw; margin-right: 4vw; }
@@ -195,9 +196,9 @@
   .postActions { margin-left: 2vw; margin-right: 2vw; }
 }
 
-/* ======= 댓글 ======= */
+/* ====== 댓글 영역 전체 ====== */
 .commentSection {
-  margin: 40px 0 0 0;
+  margin-top: 40px;
   background: #232d3b;
   border-radius: 12px;
   padding: 20px 42px 36px 42px;
@@ -216,15 +217,13 @@
   .commentSection { padding-left: 2vw; padding-right: 2vw; }
 }
 
-/* 댓글 입력폼 */
+/* 댓글 입력 폼 */
 .commentForm {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 19px;
-  position: relative;
 }
-
 .commentForm textarea {
   width: 100%;
   min-height: 74px;
@@ -235,16 +234,13 @@
   border: 1.5px solid #263048;
   color: #d2ecfc;
   resize: vertical;
-  transition: border 0.12s;
   box-sizing: border-box;
 }
-
 .commentForm textarea:focus {
   border: 1.7px solid #00aeef;
 }
-
 .commentForm button {
-  align-self: flex-end; /* 오른쪽 정렬 */
+  align-self: flex-end;
   padding: 8px 22px;
   background: linear-gradient(90deg, #00AEEF, #0062f5);
   color: #fff;
@@ -256,13 +252,12 @@
   box-shadow: 0 2px 9px rgba(0,174,239,0.07);
   transition: background 0.14s, transform 0.12s;
 }
-
 .commentForm button:hover {
   background: linear-gradient(90deg, #0094cc, #0053c4);
   transform: translateY(-1.5px) scale(1.03);
 }
 
-/* 댓글 안내/에러 */
+/* 댓글 관련 안내 및 에러 메시지 */
 .loginMessage {
   color: #bcd3e3;
   margin: 1.2rem 0 1.6rem 0;
@@ -270,7 +265,7 @@
 .errorMessage {
   color: #fc6d6d;
   font-weight: 800;
-  margin: 13px 0 0 0;
+  margin-top: 13px;
 }
 
 /* 댓글 목록 */
@@ -286,7 +281,6 @@
   font-size: 1rem;
   color: #d2ecfc;
   box-shadow: 0 1px 6px rgba(30,36,80,0.09);
-  position: relative;
   transition: background 0.13s;
 }
 .commentItem:hover {
@@ -310,6 +304,8 @@
   vertical-align: middle;
   letter-spacing: 0.01em;
 }
+
+/* 댓글 항목 구성 */
 .commentHead {
   display: flex;
   align-items: center;
