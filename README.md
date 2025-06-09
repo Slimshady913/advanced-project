@@ -9,6 +9,8 @@
 
 > 사용자들이 영화를 검색하고, 리뷰를 작성하고, 커뮤니티에서 소통할 수 있는 웹 애플리케이션입니다.
 
+![screenshot](./docs/images/preview_main1.png)
+![screenshot](./docs/images/preview_main2.png)
 
 ---
 
