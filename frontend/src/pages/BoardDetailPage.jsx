@@ -4,12 +4,13 @@ import axios from '../api/axios';
 import styles from './BoardDetailPage.module.css';
 import './BoardListPage.css';
 import { formatDate } from '../utils/formatDate';
-import { FaThumbsUp, FaThumbsDown, FaComment, FaEye, FaImage } from 'react-icons/fa';
+import { FaThumbsUp, FaThumbsDown, FaComment, FaEye } from 'react-icons/fa';
 
 function BoardDetailPage({ isLoggedIn, username }) {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  // 상태 변수 정의
   const [categories, setCategories] = useState([]);
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
@@ -18,20 +19,25 @@ function BoardDetailPage({ isLoggedIn, username }) {
   const [error, setError] = useState('');
   const [likeLoading, setLikeLoading] = useState(false);
 
+  // 카테고리 목록 불러오기 (최초 1회)
   useEffect(() => {
     axios.get('/board/categories/').then(res => {
-      const data = Array.isArray(res.data) ? res.data
+      const data = Array.isArray(res.data)
+        ? res.data
         : (Array.isArray(res.data.results) ? res.data.results : []);
       setCategories(data);
     });
   }, []);
 
+  // 게시글, 댓글, 조회수 증가 요청 (게시글 ID 변경 시)
   useEffect(() => {
     fetchPost();
     fetchComments();
-     incrementView();
+    incrementView();
     // eslint-disable-next-line
   }, [id]);
+
+  // 조회수 증가 요청
   const incrementView = async () => {
     try {
       await axios.post(`/board/posts/${id}/increment-view/`);
@@ -40,6 +46,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
     }
   };
 
+  // 게시글의 카테고리 슬러그를 유추
   const getCategorySlug = () => {
     if (post?.category_slug) return post.category_slug;
     if (post?.category_name) {
@@ -54,6 +61,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
     return 'free';
   };
 
+  // 관련 게시글 불러오기 (post 또는 카테고리 변경 시)
   useEffect(() => {
     if (!post || categories.length === 0) return;
     let categorySlug = getCategorySlug();
@@ -61,26 +69,31 @@ function BoardDetailPage({ isLoggedIn, username }) {
     // eslint-disable-next-line
   }, [post, categories]);
 
+  // 관련 게시글 API 호출
   const fetchRelatedPosts = async (categorySlug) => {
     let url = `/board/posts/?category=${categorySlug}&ordering=-created_at&page=1&page_size=10`;
     try {
       const res = await axios.get(url);
-      let list = Array.isArray(res.data?.results) ? res.data.results : Array.isArray(res.data) ? res.data : [];
+      let list = Array.isArray(res.data?.results)
+        ? res.data.results
+        : (Array.isArray(res.data) ? res.data : []);
       setRelatedPosts(list.filter(p => p.id !== Number(id)));
-    } catch (err) {
+    } catch {
       setRelatedPosts([]);
     }
   };
 
+  // 게시글 상세 데이터 불러오기
   const fetchPost = async () => {
     try {
       const res = await axios.get(`/board/posts/${id}/`);
       setPost(res.data);
-    } catch (err) {
+    } catch {
       setPost(null);
     }
   };
 
+  // 댓글 목록 불러오기
   const fetchComments = async () => {
     try {
       const res = await axios.get(`/board/posts/${id}/comments/`);
@@ -91,11 +104,12 @@ function BoardDetailPage({ isLoggedIn, username }) {
       } else {
         setComments([]);
       }
-    } catch (err) {
+    } catch {
       setComments([]);
     }
   };
 
+  // 상단 카테고리 탭 구성
   const saleCategory = categories.find(cat => cat.slug === 'sale');
   const customTabs = [
     { slug: 'hot', name: '인기' },
@@ -104,64 +118,78 @@ function BoardDetailPage({ isLoggedIn, username }) {
   ];
   const categorySlug = getCategorySlug();
 
+  // 카테고리 클릭 시 이동
   const handleCategoryClick = slug => {
     navigate(`/community/${slug}`);
   };
 
+  // 관련 게시글 클릭 시 이동
   const handleRelatedPostClick = postId => {
     navigate(`/community/${categorySlug}/${postId}`);
   };
 
-  // 💡 BEST 댓글 판정: 상위 3개 & 추천수 10 이상만!
+  // BEST 댓글: 상위 3개 중 추천수 10 이상
   const bestCommentIds = comments
     .filter((comment, idx) => idx < 3 && (comment.like_count ?? 0) >= 10)
     .map(c => c.id);
 
+  // 게시글 추천/비추천
   const handlePostLike = async (isLike) => {
     if (!isLoggedIn) return;
     setLikeLoading(true);
     try {
       await axios.post(`/board/posts/${id}/like/`, { is_like: isLike });
       await fetchPost();
-    } catch (err) { }
+    } catch {}
     setLikeLoading(false);
   };
 
+  // 댓글 작성
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) { setError('댓글을 입력하세요.'); return; }
+    if (!newComment.trim()) {
+      setError('댓글을 입력하세요.');
+      return;
+    }
     try {
       await axios.post(`/board/posts/${id}/comments/`, { content: newComment });
-      setNewComment(''); setError(''); fetchComments(); fetchPost();
-    } catch (err) { }
+      setNewComment('');
+      setError('');
+      fetchComments();
+      fetchPost();
+    } catch {}
   };
 
+  // 댓글 삭제
   const handleCommentDelete = async (commentId) => {
     try {
       await axios.delete(`/board/comments/${commentId}/`);
       fetchComments();
-    } catch (err) { }
+    } catch {}
   };
 
+  // 댓글 추천/비추천
   const handleCommentLike = async (commentId, isLike) => {
     try {
       await axios.post(`/board/comments/${commentId}/like/`, { is_like: isLike });
       fetchComments();
-    } catch (err) { }
+    } catch {}
   };
 
+  // 게시글 삭제
   const handlePostDelete = async () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       try {
         await axios.delete(`/board/posts/${id}/`);
         navigate('/community');
-      } catch (err) { }
+      } catch {}
     }
   };
 
   return (
     <div className="board-root-layout">
       <div className="board-center-wrap">
+        {/* 좌측 광고 영역 */}
         <aside className="ad-left">
           <div className="ad-fixed">
             <div className="ad-banner">광고1</div>
@@ -171,9 +199,12 @@ function BoardDetailPage({ isLoggedIn, username }) {
             </div>
           </div>
         </aside>
+
+        {/* 본문 영역 */}
         <main className="board-center">
           <div className={styles.detailContainer}>
-            {/* 카테고리 탭 */}
+            
+            {/* 카테고리 탭 영역 */}
             <div className="category-tabs pro" style={{ marginTop: 28 }}>
               {customTabs.map(cat => (
                 <button
@@ -188,7 +219,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
 
             {post && (
               <>
-                {/* 상단 정보 */}
+                {/* 게시글 제목 및 통계 */}
                 <div className={styles.headerRow}>
                   <span className={styles.categoryTag}>{post.category_name || post.category}</span>
                   <div className={styles.titleText}>{post.title}</div>
@@ -199,11 +230,14 @@ function BoardDetailPage({ isLoggedIn, username }) {
                     <span className={styles.stat}><FaEye className="icon" />{post.views || post.view_count || 0}</span>
                   </div>
                 </div>
+
+                {/* 작성자 및 작성일 */}
                 <div className={styles.writerRow}>
                   <span className={styles.writerName}>{post.user?.username || post.user}</span>
                   <span className={styles.writeDate}>{formatDate(post.created_at)}</span>
                 </div>
-                {/* 본문 */}
+
+                {/* 게시글 본문 및 첨부파일 */}
                 <div className={styles.content}>
                   {post.thumbnail_url && (
                     <div style={{ marginBottom: "18px" }}>
@@ -216,7 +250,8 @@ function BoardDetailPage({ isLoggedIn, username }) {
                     </div>
                   )}
                   {post.content}
-                  {/* 첨부 이미지/동영상 표시 */}
+
+                  {/* 첨부 이미지 또는 비디오 출력 */}
                   {post.attachments && post.attachments.length > 0 && (
                     <div className={styles.attachmentGallery}>
                       {post.attachments.map((fileObj, idx) => {
@@ -237,7 +272,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
                   )}
                 </div>
 
-                {/* 추천/비추천 */}
+                {/* 추천 / 비추천 버튼 */}
                 <div className={styles.postLikeActions}>
                   <button
                     className={`${styles.likeBtn}${post.my_like === true ? ` ${styles.active}` : ''}`}
@@ -255,7 +290,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
                   </button>
                 </div>
 
-                {/* 수정/삭제 */}
+                {/* 수정 / 삭제 버튼 (작성자만) */}
                 {isLoggedIn && username && (username === (post.user?.username || post.user)) && (
                   <div className={styles.postActions}>
                     <button onClick={() => navigate(`/community/edit/${post.id}`)}>수정</button>
@@ -263,7 +298,7 @@ function BoardDetailPage({ isLoggedIn, username }) {
                   </div>
                 )}
 
-                {/* --------- 댓글영역 --------- */}
+                {/* 댓글 영역 */}
                 <div className={styles.commentSection}>
                   <h3 className={styles.commentTitle}>댓글 {comments.length}</h3>
                   {isLoggedIn ? (
@@ -279,6 +314,8 @@ function BoardDetailPage({ isLoggedIn, username }) {
                     <p className={styles.loginMessage}>댓글 작성은 로그인 후 이용하실 수 있습니다.</p>
                   )}
                   {error && <p className={styles.errorMessage}>{error}</p>}
+
+                  {/* 댓글 목록 */}
                   <div className={styles.commentList}>
                     {comments.map(comment => {
                       const isBest = bestCommentIds.includes(comment.id);
@@ -318,13 +355,13 @@ function BoardDetailPage({ isLoggedIn, username }) {
                   </div>
                 </div>
 
-                {/* ------- 최신글 미리보기: BoardListPage 스타일 통일 ------- */}
+                {/* 관련 게시글 미리보기 */}
                 <div style={{ marginTop: 46 }}>
                   <div style={{
                     fontWeight: 900, fontSize: '1.13rem', color: '#53a7ff',
                     marginBottom: 18, paddingLeft: 42
                   }}>
-                    {(post.category_name || post.category) + ' 게시판의 최신글'}
+                    {(post.category_name || post.category)} 게시판의 최신글
                   </div>
                   <div className="post-list pro" style={{ marginBottom: 8 }}>
                     {relatedPosts.length === 0
@@ -345,10 +382,11 @@ function BoardDetailPage({ isLoggedIn, username }) {
                                 onError={e => { e.target.style.display = 'none'; }}
                               />
                             ) : (
-                              <div className="post-thumb-icon">📄</div>
+                              <div className="post-thumb-icon">문서</div>
                             )}
                           </div>
-                          {/* 내용 전체 래핑 */}
+
+                          {/* 게시글 정보 */}
                           <div className="post-content-wrap">
                             <div className="post-title-row">
                               <span className="post-category">[{rp.category_name}]</span>
@@ -359,18 +397,10 @@ function BoardDetailPage({ isLoggedIn, username }) {
                               <span className="post-date">{formatDate(rp.created_at)}</span>
                             </div>
                             <div className="post-stats-row">
-                              <span className="stat">
-                                <FaThumbsUp className="icon like" /> {rp.like_count}
-                              </span>
-                              <span className="stat">
-                                <FaThumbsDown className="icon dislike" /> {rp.dislike_count}
-                              </span>
-                              <span className="stat">
-                                <FaComment className="icon comment" /> {rp.comment_count}
-                              </span>
-                              <span className="stat">
-                                <FaEye className="icon view" /> {rp.view_count}
-                              </span>
+                              <span className="stat"><FaThumbsUp className="icon like" /> {rp.like_count}</span>
+                              <span className="stat"><FaThumbsDown className="icon dislike" /> {rp.dislike_count}</span>
+                              <span className="stat"><FaComment className="icon comment" /> {rp.comment_count}</span>
+                              <span className="stat"><FaEye className="icon view" /> {rp.view_count}</span>
                             </div>
                           </div>
                         </div>
@@ -381,6 +411,8 @@ function BoardDetailPage({ isLoggedIn, username }) {
             )}
           </div>
         </main>
+
+        {/* 우측 광고 영역 */}
         <aside className="ad-right">
           <div className="ad-fixed">
             <div className="ad-banner">광고A</div>
