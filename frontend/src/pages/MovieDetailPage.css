@@ -218,6 +218,18 @@
   padding-bottom: 0.5rem;
   color: #fff;
 }
+/* 리뷰 로딩 중: 깜빡임 방지용 opacity 전환 효과 */
+.reviews.loading {
+  opacity: 0.35;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* 로딩 스피너 (리뷰 내에 표시됨) */
+.review-spinner {
+  text-align: center;
+  margin: 20px 0;
+}
 
 .review-form {
   display: flex;
@@ -277,6 +289,8 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .review-card {

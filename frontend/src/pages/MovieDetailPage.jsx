@@ -181,7 +181,7 @@ const MovieDetailPage = () => {
       if (error.response?.data?.non_field_errors) {
         setToastMsg(error.response.data.non_field_errors[0]);
       } else {
-        setToastMsg('리뷰 작성 실패');
+        setToastMsg('리뷰 작성 실패(로그인 필요)');
       }
     }
     setIsSubmitting(false);
@@ -198,7 +198,7 @@ const MovieDetailPage = () => {
       fetchReviews();
       fetchMovieDetail();
     } catch (error) {
-      setToastMsg('추천/비추천 처리 실패');
+      setToastMsg('추천/비추천 처리 실패(로그인 필요)');
     }
   };
 
@@ -677,7 +677,7 @@ const MovieDetailPage = () => {
       {/* 전체 리뷰 */}
       <section className="review-section">
         <h2>전체 리뷰</h2>
-        {/* 정렬 드롭다운 추가 */}
+        {/* 정렬 드롭다운 */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ fontWeight: 600, marginRight: 10 }}>정렬:</label>
           <select value={ordering} onChange={e => setOrdering(e.target.value)}>
@@ -688,13 +688,19 @@ const MovieDetailPage = () => {
             <option value="-rating">평점 높은순</option>
           </select>
         </div>
-        <div className="reviews">
-          {reviewsLoading ? (
-            <p>리뷰 불러오는 중...</p>
-          ) : reviews.length === 0 ? (
+
+        {/* 리뷰 목록 */}
+        <div className={`reviews ${reviewsLoading ? 'loading' : ''}`}>
+          {reviews.length === 0 && !reviewsLoading ? (
             <p>첫 리뷰를 남겨주세요!</p>
           ) : (
             reviews.map((review) => renderReviewCard(review, false))
+          )}
+
+          {reviewsLoading && (
+            <div className="review-spinner">
+              <ClipLoader size={30} color="#e50914" />
+            </div>
           )}
         </div>
       </section>
