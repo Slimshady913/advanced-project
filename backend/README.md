@@ -5,153 +5,168 @@
 ![JWT](https://img.shields.io/badge/Auth-JWT-red)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
-> Django와 Django REST Framework를 기반으로 사용자 인증, 영화 관리, 리뷰 작성, 게시판 기능 등을 제공하는 백엔드 API입니다.  
-> Swagger를 통해 API 문서화 및 테스트를 지원하며, React 프론트엔드와 연동 가능합니다.
+> Django와 Django REST Framework 기반의 영화 리뷰/게시판 백엔드 API입니다.  
+> Swagger로 API 문서화 및 테스트 지원, React 프론트엔드와 연동 가능합니다.
 
 ---
 
 ## 📑 목차
-
+- [📁 프로젝트 구조 요약](#-프로젝트-구조-요약)
+- [⚙️ 앱 책임 및 역할](#️-앱-책임-및-역할)
 - [🔧 주요 기능](#-주요-기능)
-  - [✅ 사용자 기능](#-사용자-기능)
-  - [✅ OTT 플랫폼 관리](#-ott-플랫폼-관리)
-  - [✅ 영화 기능](#-영화-기능)
-  - [✅ 검색 및 필터](#-검색-및-필터)
-  - [✅ 리뷰 기능](#-리뷰-기능)
-  - [✅ 게시판 기능](#-게시판-기능)
-  - [✅ API 문서화 (Swagger)](#-api-문서화-swagger)
 - [📦 API 요약](#-api-요약)
 - [⚙️ 시스템 설정 및 성능 최적화](#️-시스템-설정-및-성능-최적화)
 - [🧩 주요 이슈 해결 내역](#-주요-이슈-해결-내역)
 - [🚀 실행 방법](#-실행-방법)
-  - [1. 가상환경 설치 및 패키지 설치](#1-가상환경-설치-및-패키지-설치)
-  - [2. 마이그레이션 및 서버 실행](#2-마이그레이션-및-서버-실행)
-  - [3. Swagger 접속](#3-swagger-접속)
+- [🧪 샘플 데이터 삽입](#-샘플-데이터-삽입-옵션)
 - [🔐 JWT 인증 사용법 (Swagger에서)](#-jwt-인증-사용법-swagger에서)
+- [📷 미디어 파일 경로 예시](#-미디어-파일-경로-예시)
+- [🔄 CI/CD (GitHub Actions)](#-cicd-github-actions)
 - [🔗 프론트엔드 연동](#-프론트엔드-연동)
+- [📎 라이선스](#-라이선스)
+
+---
+
+## 📁 프로젝트 구조 요약
+
+```
+backend/
+├── board/         # 게시판 앱 (글, 댓글, 추천 등)
+├── movies/        # 영화 등록/검색/정렬 기능
+├── ott/           # OTT 플랫폼 정보 관리
+├── reviews/       # 리뷰/댓글/이미지/추천
+├── config/        # Django 설정 파일들
+├── docs/          # Swagger 스크린샷 이미지 등
+├── media/         # 업로드 이미지/첨부파일
+├── manage.py      # Django 실행 진입점
+├── requirements.txt
+├── Dockerfile
+└── entrypoint.sh
+```
+
+---
+
+## ⚙️ 앱 책임 및 역할
+
+| 앱 이름    | 설명                                                         |
+|------------|-------------------------------------------------------------|
+| `board`    | 게시판 글/댓글/추천, 주제별 게시판, 핫글 분류                |
+| `movies`   | 영화 등록/조회/검색/정렬, OTT 연결                           |
+| `ott`      | OTT 플랫폼 정보(이름, 로고, 링크) 관리                       |
+| `reviews`  | 영화 리뷰/댓글/좋아요/이미지 첨부/수정 이력                  |
+| `config`   | Django 설정, URL 라우팅, WSGI/ASGI 환경 구성                 |
 
 ---
 
 ## 🔧 주요 기능
 
 ### ✅ 사용자 기능
-- **JWT 기반 회원가입 / 로그인 / 토큰 발급**
-- **프로필 조회 및 OTT 구독 설정**
-- **Access/Refresh 토큰 기반 인증 시스템**
-- **Swagger UI에서 Authorization 헤더 인증 테스트 가능**
-- **OTT 구독 모델과 사용자 연결 구조 구현 완료**
+- JWT 기반 회원가입/로그인/토큰 발급
+- 프로필 조회 및 OTT 구독 설정
+- Swagger UI에서 Authorization 헤더 인증 테스트
 
 ### ✅ OTT 플랫폼 관리
-- **OTT 모델 구현 (이름, 로고 URL 포함)**
-- **영화와 다대다(ManyToMany) 관계 설정 완료**
+- OTT 모델(이름, 로고 URL)
+- 영화와 다대다(ManyToMany) 관계
 
 ### ✅ 영화 기능
-- **영화 등록, 목록 조회, 상세 보기, 수정/삭제**
-- **영화 정렬 기능**: 평점, 개봉일, 제목 등 기준별 정렬
-- **OTT 플랫폼과의 다대다 연결**
-- **제목 검색 및 OTT 필터링 기능**
-- **평균 평점 캐시 저장 및 정렬 최적화**
-- **Movie 모델: 제목, 설명, 개봉일, 썸네일 URL, OTT 연결, 평균 평점 캐시 필드 포함**
-- **CRUD API 구현 완료: 영화 등록, 목록 조회, 상세 조회, 수정, 삭제**
-- **정렬 기능: `ordering=average_rating|release_date|title` 쿼리 지원**
-- **Swagger 문서화 및 테스트 가능**
+- 영화 CRUD, 정렬(평점/개봉일/제목), 검색, OTT 필터링
+- 평균 평점 캐시 및 정렬 최적화
 
 ### ✅ 검색 및 필터
-- **제목 기반 검색 (SearchFilter)**
-- **OTT 플랫폼 필터링 (django-filter)**
-- **`/api/movies/search/?search=키워드&ott_services=1,2` 형태로 사용 가능**
-- **Swagger에 필터 설명 포함**
+- 제목 기반 검색, OTT 플랫폼 필터링
+- `/api/movies/search/?search=키워드&ott_services=1,2`
 
 ### ✅ 리뷰 기능
-
-- **영화별 리뷰 작성 / 조회 / 수정 / 삭제**
-- **평점 (1~5점) 및 스포일러 여부(`is_spoiler`) 설정**
-- **리뷰 추천 / 비추천 (좋아요/싫어요 토글 방식)**
-- **리뷰 정렬 기능**
-  - 최신순 (`-created_at`)
-  - 평점 높은순 / 낮은순 (`-rating`, `rating`)
-  - 추천순 (`-like_count`)
-- **리뷰 댓글 기능**
-  - 댓글 작성 / 삭제
-  - 댓글 추천(좋아요) 및 추천순 상위 3개 우선 정렬
-- **리뷰 수정 히스토리 기록 (`ReviewHistory`)**
-  - 수정 시 자동 기록
-  - `is_edited` 필드로 수정 여부 제공
-  - `/api/reviews/{id}/history/`로 이력 확인 가능
-- **리뷰 이미지 첨부 기능**
-  - 여러 이미지 업로드 가능
-  - `/api/reviews/{id}/images/`로 업로드
-  - 응답 시 `images` 필드로 포함
-
+- 영화별 리뷰 CRUD, 평점(1~5), 스포일러 여부
+- 리뷰 추천/비추천, 정렬(최신/평점/추천순)
+- 리뷰 댓글(작성/삭제/추천/정렬)
+- 리뷰 수정 이력(자동 기록, `is_edited` 제공)
+- 리뷰 이미지 첨부(여러 이미지 업로드)
 
 ### ✅ 게시판 기능
-- **게시글 작성 및 조회**
-- **게시글에 댓글 작성**
-- **게시글 추천/비추천 기능 (좋아요/싫어요)**
-- **주제별 게시판 분리**: 영화 정보, 국내 드라마 등 카테고리 구분
-- **일일/월간 핫글 게시판**: 추천수를 기준으로 인기 게시글을 자동 분류
-- **댓글 정렬 로직직**: 추천수 상위 3개 댓글 우선 표시 + 이후 댓글은 작성 순
-- **댓글 추천 API**: `/api/board/comment-likes/` (POST, is_like 필드 포함)
+- 게시글/댓글 CRUD, 추천/비추천
+- 주제별 게시판, 핫글 자동 분류
+- 댓글 추천순+작성순 혼합 정렬
 
 ### ✅ API 문서화 (Swagger)
-- **drf-yasg를 통한 자동 문서화**
-- **한글 설명 제공**
-- **Swagger UI에서 직접 테스트 가능** (`/swagger/`)
+- drf-yasg 기반 자동 문서화(한글 설명)
+- `/swagger/`에서 직접 테스트 가능
 
 #### 🔍 Swagger 미리보기
-
 ![Swagger UI 스크린샷](docs/images/swagger.png)
 ![Swagger UI 스크린샷](docs/images/swagger2.png)
 
+### ✅ API 문서화 (🛠️ 관리자(admin) 페이지)
+- Django 기본 admin 페이지 제공
+- superuser 생성 후 접속:  
+  ```bash
+  python manage.py createsuperuser
+
+- 접속 경로: http://localhost:8000/admin/
+- 주요 관리 기능:
+- 사용자(User) 관리 (가입, 권한, 정보 수정)
+- 영화, OTT, 리뷰, 게시판, 댓글 등 모든 모델 데이터 관리 및 검색/필터
+- 이미지/첨부파일 업로드 및 미리보기
+- 각 앱별 커스텀 admin 옵션 적용(필드 검색, 리스트 필터, 인라인 관리 등)
+
+#### 🔍 관리자 페이지 미리보기
+![admin UI 스크린샷](docs/images/admin.png)
+
+---
+
 ## 📦 API 요약
 
-| 기능 구분     | 메서드 | 엔드포인트 URL                     | 설명                                      |
-|--------------|--------|-----------------------------------|-------------------------------------------|
-| 🔐 회원가입    | POST   | `/api/users/register/`            | 사용자 회원가입                          |
-| 🔐 로그인      | POST   | `/api/token/`                     | JWT access/refresh 토큰 발급              |
-| 👤 프로필 조회 | GET    | `/api/users/profile/`             | 현재 로그인한 사용자 정보 조회            |
-| 📺 OTT 목록   | GET    | `/api/ott/`                       | 등록된 OTT 플랫폼 목록 조회               |
-| 🎥 영화 목록   | GET    | `/api/movies/`                    | 영화 목록 조회 (정렬 기능 포함)           |
-| 🎥 영화 등록   | POST   | `/api/movies/`                    | 영화 등록 (OTT 연결 포함)                 |
-| 🎥 영화 상세   | GET    | `/api/movies/{id}/`               | 특정 영화 상세 조회                       |
-| 🎥 영화 수정   | PUT    | `/api/movies/{id}/`               | 영화 정보 수정                            |
-| 🎥 영화 삭제   | DELETE | `/api/movies/{id}/`               | 영화 삭제                                 |
-| 🔍 영화 검색   | GET    | `/api/movies/search/`             | 제목 검색 + OTT 필터링                    |
-| 📝 리뷰 작성   | POST   | `/api/reviews/`                   | 특정 영화에 대한 리뷰 작성                |
-| 📝 리뷰 수정   | PUT    | `/api/reviews/{id}/`              | 리뷰 수정                                 |
-| 📝 리뷰 삭제   | DELETE | `/api/reviews/{id}/`              | 리뷰 삭제                                 |
-| 📝 리뷰 목록   | GET    | `/api/reviews/?movie_id=ID`       | 특정 영화의 리뷰 목록 조회                |
-| ❤️ 리뷰 좋아요 | POST   | `/api/review-likes/`              | 리뷰 좋아요 등록                          |
-| ❤️ 리뷰 좋아요 취소 | DELETE | `/api/review-likes/{id}/`       | 좋아요 취소                              |
-| 💬 리뷰 댓글   | POST   | `/api/review-comments/`           | 리뷰에 댓글 작성                          |
-| 📝 게시글 작성 | POST   | `/api/board/posts/`               | 게시판 글 작성                            |
-| 📝 게시글 목록 | GET    | `/api/board/posts/`               | 게시판 목록 조회                          |
-| 📝 게시글 수정 | PUT    | `/api/board/posts/{id}/`          | 게시글 수정                              |
-| 📝 게시글 삭제 | DELETE | `/api/board/posts/{id}/`          | 게시글 삭제                              |
-| 💬 댓글 삭제   | DELETE | `/api/board/comments/{id}/`       | 게시글 댓글 삭제                         |
-| 💬 게시글 댓글 | POST   | `/api/board/comments/`            | 게시글에 대한 댓글 작성                   |
-| 💬 댓글 삭제   | DELETE | `/api/board/comments/{id}/`       | 게시글 댓글 삭제                         |
+| 기능         | 메서드 | 엔드포인트                       | 설명                        |
+|--------------|--------|----------------------------------|-----------------------------|
+| 회원가입     | POST   | `/api/users/register/`           | 사용자 회원가입             |
+| 로그인       | POST   | `/api/token/`                    | JWT 토큰 발급               |
+| 프로필 조회  | GET    | `/api/users/profile/`            | 로그인 사용자 정보 조회     |
+| OTT 목록     | GET    | `/api/ott/`                      | OTT 플랫폼 목록             |
+| 영화 목록    | GET    | `/api/movies/`                   | 영화 목록(정렬 포함)        |
+| 영화 등록    | POST   | `/api/movies/`                   | 영화 등록                   |
+| 영화 상세    | GET    | `/api/movies/{id}/`              | 영화 상세 조회              |
+| 영화 수정    | PUT    | `/api/movies/{id}/`              | 영화 정보 수정              |
+| 영화 삭제    | DELETE | `/api/movies/{id}/`              | 영화 삭제                   |
+| 영화 검색    | GET    | `/api/movies/search/`            | 제목 검색+OTT 필터링        |
+| 리뷰 작성    | POST   | `/api/reviews/`                  | 리뷰 작성                   |
+| 리뷰 수정    | PUT    | `/api/reviews/{id}/`             | 리뷰 수정                   |
+| 리뷰 삭제    | DELETE | `/api/reviews/{id}/`             | 리뷰 삭제                   |
+| 리뷰 목록    | GET    | `/api/reviews/?movie_id=ID`      | 영화별 리뷰 목록            |
+| 리뷰 좋아요  | POST   | `/api/review-likes/`             | 리뷰 좋아요 등록            |
+| 리뷰 좋아요 취소 | DELETE | `/api/review-likes/{id}/`      | 좋아요 취소                 |
+| 리뷰 댓글    | POST   | `/api/review-comments/`          | 리뷰에 댓글 작성            |
+| 게시글 작성  | POST   | `/api/board/posts/`              | 게시판 글 작성              |
+| 게시글 목록  | GET    | `/api/board/posts/`              | 게시판 목록 조회            |
+| 게시글 수정  | PUT    | `/api/board/posts/{id}/`         | 게시글 수정                 |
+| 게시글 삭제  | DELETE | `/api/board/posts/{id}/`         | 게시글 삭제                 |
+| 게시글 댓글  | POST   | `/api/board/comments/`           | 게시글 댓글 작성            |
+| 댓글 삭제    | DELETE | `/api/board/comments/{id}/`      | 게시글 댓글 삭제            |
 
-### ⚙️ 시스템 설정 및 성능 최적화
-- **CORS 설정 완료 (React 연동 대비)**
-- **django_filters 설정 완료**
-- **REST_FRAMEWORK 설정 정리 완료 (인증, 필터 등)**
-- **리뷰 정렬 기능 확장:최신순, 평점순, 추천순 정렬 가능 (ordering 파라미터 지원)**
+---
 
-### 🧩 주요 이슈 해결 내역
+## ⚙️ 시스템 설정 및 성능 최적화
+- CORS 설정 완료 (React 연동)
+- django_filters 적용
+- REST_FRAMEWORK 인증/필터 등 설정 정리
+- 리뷰 정렬 기능 확장(ordering 파라미터 지원)
 
-#### (2025-05-07)
-- **`average_rating_cache` 필드 마이그레이션 누락 → 정상 반영**
-- **리뷰 모델에 `updated_at` 필드 추가 후 마이그레이션 → 적용 완료**
-- **`average_rating()` 함수 정렬 오류 → 캐시 필드 기반 정렬로 변경**
-- **Swagger에서 영화 등록/검색/리뷰 작성 API 테스트 완료**
+---
+
+## 🧩 주요 이슈 해결 내역
+
+- **2025-06-09**: 리뷰 정렬 선택시 깜빡거림 수정
+- **2025-06-02**: 캡챠 기능 추가
+- **2025-05-28**: 보안문제 해결(httponly)
+- **2025-05-21**: 게시판 관련 문제들 해결
+- **2025-05-12**: 리뷰 수정 시간 및 이력 기록 기능 추가
+- **2025-05-07**: average_rating_cache 필드 마이그레이션 누락 → 정상 반영, 리뷰 모델에 updated_at 필드 추가, 정렬 오류 → 캐시 필드 기반 정렬로 변경, Swagger에서 영화/리뷰 API 테스트 완료
 
 ---
 
 ## 🚀 실행 방법
 
 ### 1. 가상환경 설치 및 패키지 설치
-
 ```bash
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
@@ -159,7 +174,6 @@ pip install -r requirements.txt
 ```
 
 ### 2. 마이그레이션 및 서버 실행
-
 ```bash
 python manage.py makemigrations
 python manage.py migrate
@@ -167,27 +181,51 @@ python manage.py runserver
 ```
 
 ### 3. Swagger 접속
+- http://localhost:8000/swagger/
 
+### 4. Docker 환경 실행
+```bash
+docker-compose up --build
 ```
-http://localhost:8000/swagger/
+
+---
+
+## 🧪 샘플 데이터 삽입 (옵션)
+```bash
+python manage.py seed_board         # 게시판 샘플 데이터
+python manage.py seed_movies        # 영화 및 OTT 데이터
+python manage.py loaddata dumpdata.json  # 전체 더미 데이터
 ```
 
 ---
 
 ## 🔐 JWT 인증 사용법 (Swagger에서)
-
 1. `/api/token/`에서 access, refresh 토큰 발급
 2. Swagger 우측 상단 **Authorize** 클릭
-3. `Bearer <access_token>` 형식으로 입력 후 인증
-4. 인증 후 Swagger에서 각 API를 테스트할 수 있습니다.
+3. `Bearer <access_token>` 입력 후 인증
+4. 인증 후 Swagger에서 각 API 테스트 가능
 
-**예시**:
-- **Access Token 발급 후**: `Bearer <your_access_token>`을 사용하여 요청에 인증을 추가합니다.
+---
+
+## 📷 미디어 파일 경로 예시
+- 리뷰 이미지: `/media/review_images/{파일명}`
+- 게시글 첨부파일: `/media/board_attachments/{파일명}`
+- MEDIA_URL, MEDIA_ROOT 설정은 settings.py 참고
+
+---
+
+## 🔄 CI/CD (GitHub Actions)
+- `.github/workflows/ci.yml` 포함
+- Push 시 자동 테스트 실행
 
 ---
 
 ## 🔗 프론트엔드 연동
+- CORS 설정(`CORS_ALLOW_ALL_ORIGINS = True`)으로 React 연동
+- 기본 프론트엔드: `http://localhost:3000`
+- JWT 인증 기반 React 헤더에 사용자 이메일 표시
 
-- CORS 설정 (`CORS_ALLOW_ALL_ORIGINS = True`)으로 React와 연동 가능
-- 기본 프론트엔드 주소: `http://localhost:3000`
-- JWT 인증 기반으로 React 헤더에 사용자 이메일 표시
+---
+
+## 📎 라이선스
+MIT License
