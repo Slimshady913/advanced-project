@@ -1,4 +1,4 @@
-/* 🔒 전체 로그인/회원가입 페이지 컨테이너 */
+/* 전체 로그인/회원가입 페이지 컨테이너 */
 .auth-container {
   display: flex;
   justify-content: center;
@@ -7,17 +7,17 @@
   background-color: #141414;
 }
 
-/* 🔳 로그인/회원가입 박스 스타일 */
+/* 로그인/회원가입 박스 스타일 */
 .auth-box {
   background-color: rgba(0, 0, 0, 0.75);
   padding: 3rem;
   border-radius: 12px;
-  width: 380px; /* ✅ 사이즈 키움 */
+  width: 380px; /* 박스 너비 */
   text-align: center;
   box-sizing: border-box;
 }
 
-/* 🔤 제목 */
+/* 제목 텍스트 스타일 */
 .auth-box h2 {
   color: white;
   margin-bottom: 2rem;
@@ -25,10 +25,10 @@
   font-weight: 700;
 }
 
-/* 🧾 입력 필드 */
+/* 입력 필드 스타일 */
 .auth-box input {
   width: 100%;
-  padding: 1rem; /* ✅ 키움 */
+  padding: 1rem;
   margin: 0.6rem 0;
   background: #333;
   border: none;
@@ -42,7 +42,7 @@
   background: #444;
 }
 
-/* 🔘 버튼 (로그인/가입) */
+/* 로그인/회원가입 버튼 스타일 */
 .auth-box button {
   width: 100%;
   padding: 1rem;
@@ -51,7 +51,7 @@
   background-color: #e50914;
   color: white;
   border: none;
-  border-radius: 8px; /* ✅ 둥글게 */
+  border-radius: 8px;
   cursor: pointer;
   margin-top: 1rem;
   margin-bottom: 0.8rem;
@@ -62,7 +62,7 @@
   background-color: #b0060f;
 }
 
-/* ❗ 에러 메시지 */
+/* 에러 메시지 스타일 */
 .error-message {
   color: #e50914;
   font-size: 0.92rem;
@@ -73,7 +73,7 @@
   width: 100%;
 }
 
-/* 🔁 로그인/회원가입 모드 전환 텍스트 */
+/* 로그인/회원가입 모드 전환 텍스트 */
 .toggle-text {
   margin-top: 0.2rem;
   color: #ccc;
@@ -93,7 +93,7 @@
   text-decoration: underline;
 }
 
-/* 🔄 전체화면 로딩 스피너 */
+/* 전체화면 로딩 스피너 스타일 */
 .fullscreen-loading {
   position: fixed;
   top: 0;
@@ -116,13 +116,14 @@
   animation: blink 1.2s infinite;
 }
 
+/* 로딩 텍스트 깜빡이는 애니메이션 */
 @keyframes blink {
   0%   { opacity: 1; }
   50%  { opacity: 0.4; }
   100% { opacity: 1; }
 }
 
-/* 📱 모바일 대응 */
+/* 모바일 화면 대응 */
 @media (max-width: 480px) {
   .auth-box {
     width: 90vw;
