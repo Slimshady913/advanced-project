@@ -69,7 +69,7 @@ const renderAverageStars = (score) => {
   return <span className="star-rating">{stars}</span>;
 };
 
-const MovieDetailPage = () => {
+const MovieDetailPage = ({ isLoggedIn, username } ) => {
   const { id } = useParams();
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -88,9 +88,7 @@ const MovieDetailPage = () => {
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [ordering, setOrdering] = useState('-created_at'); // 기본 최신순
-
-  const getCurrentUser = () => localStorage.getItem('username');
-
+  
   useEffect(() => {
     axios.get('/ott/')
       .then(res => {
@@ -330,7 +328,7 @@ const MovieDetailPage = () => {
     const isOwner =
       review.is_owner !== undefined
         ? review.is_owner
-        : getCurrentUser() && review.user === getCurrentUser();
+        : isLoggedIn && review.user === username;
     const myVote = review.my_vote ?? 0;
 
     return (
@@ -604,8 +602,8 @@ const MovieDetailPage = () => {
               id="comment"
               value={newReview.comment}
               onChange={e => setNewReview({ ...newReview, comment: e.target.value })}
-              disabled={!getCurrentUser()}
-              placeholder={getCurrentUser() ? '리뷰를 작성해주세요!' : '로그인 후 리뷰를 작성할 수 있습니다.'}
+              disabled={!isLoggedIn}
+              placeholder={isLoggedIn ? '리뷰를 작성해주세요!' : '로그인 후 리뷰를 작성할 수 있습니다.'}
               rows={6}
             />
           </div>
